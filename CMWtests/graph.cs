@@ -22,6 +22,7 @@ namespace CMWgraph
 
             if (book.Exists)
             {
+                // testing branch commit
                 CheckOpenFile(book);
                 if (isFirstTest)
                 {
