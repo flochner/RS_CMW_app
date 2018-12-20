@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("RS_CMW_app")]
+[assembly: AssemblyTitle("CMW GPRF RF Level Accuracy Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RS_CMW_app")]
+[assembly: AssemblyCompany("Continental Resources, Inc.\nAuthor: Freddie Lochner")]
+[assembly: AssemblyProduct("CMWtests")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("adfe6715-3a19-4518-a0f5-ffc7cb17e119")]
+[assembly: Guid("1ae6759b-b8f9-4199-88fc-8a0896aa2713")]
 
 // Version information for an assembly consists of the following four values:
 //
