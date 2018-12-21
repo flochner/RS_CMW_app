@@ -26,7 +26,7 @@ namespace CMWgraph
                 CheckOpenFile(book);
                 if (isFirstTest)
                 {
-                    book.Delete();
+                    File.Delete(bookName);
                     book = new FileInfo(bookName);
                 }
             }
@@ -152,7 +152,7 @@ namespace CMWgraph
                 fileIsOpen = false;
                 try
                 {
-                    stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+                    using (stream = file.Open(FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
                 }
                 catch (IOException)
                 {
@@ -160,11 +160,6 @@ namespace CMWgraph
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                     fileIsOpen = true;
-                }
-                finally
-                {
-                    if (stream != null)
-                        stream.Close();
                 }
             }
             while (fileIsOpen);

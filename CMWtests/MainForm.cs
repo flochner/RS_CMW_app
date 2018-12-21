@@ -30,8 +30,8 @@ namespace CMWtests
             BtnBeginEnabled(false);
             TextBoxResults.Clear();
 
-            this.task = new Thread(new ThreadStart(this.SequencerAsync));
-            this.task.Start();
+            task = new Thread(new ThreadStart(SequencerAsync));
+            task.Start();
 
             //if (GetBtnBeginEnabled() == false)
             //    SetBtnBeginEnabled(true);
@@ -107,19 +107,6 @@ namespace CMWtests
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            string visaResponse = "PA,PC";
-            try
-            {
-                double pmPower = Convert.ToDouble(visaResponse.Split(',')[2]);
-            }
-            catch (FormatException f)
-            {
-                MessageBox.Show(f.Message, f.GetType().ToString());
-            }
-            catch (IndexOutOfRangeException g)
-            {
-                MessageBox.Show(g.Message, g.GetType().ToString());
-            }
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e) => this.Close();
@@ -140,7 +127,8 @@ namespace CMWtests
         private void LabelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
         private void BtnCancelTests_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("canceled!");
+            task.Abort("Cancelling (mbox inside thread)");
+            MessageBox.Show("canceled! (mainform mbox)");
             BtnBeginTests.Enabled = true;
         }
 
