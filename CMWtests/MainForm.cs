@@ -14,23 +14,25 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        public const bool SUCCESS = true;
-        public MainForm()
-        {
-            InitializeComponent();
-        }
-
+        public const bool Success = true;
+        public const bool Failure = false;
         private Thread task = null;
         delegate void StringArgReturningVoidDelegate(string text);
         delegate void BoolArgReturningVoidDelegate(bool v);
         private static ManualResetEvent mre = new ManualResetEvent(false);
+
+
+        public MainForm()
+        {
+            InitializeComponent();
+        }
 
         private void BtnBeginTests_Click(object sender, EventArgs e)
         {
             BtnBeginEnabled(false);
             TextBoxResults.Clear();
 
-            task = new Thread(new ThreadStart(SequencerAsync));
+            task = new Thread(new ThreadStart(SequencerAsync);
             task.Start();
 
             //if (GetBtnBeginEnabled() == false)

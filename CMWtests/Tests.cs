@@ -24,7 +24,7 @@ namespace CMWtests
         private string chartLimits3 = null;
         private string chartLimits6 = null;
         private string cmwID = null;
-         string csvFileName = null;
+        string csvFileName = null;
         private string testName = null;
 
         private void SequencerAsync(ManualResetEvent e)

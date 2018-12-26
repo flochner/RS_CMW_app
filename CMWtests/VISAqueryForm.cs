@@ -12,8 +12,7 @@ namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        private MBSession session;
-        private string response;
+        private MBSession _session;
 
         public VISAqueryForm()
         {
@@ -24,10 +23,10 @@ namespace CMWtests
 
         private void BtnWriteVISA_Click(object sender, EventArgs e)
         {
-            if (session != null)
+            if (_session != null)
             {
                 TextBoxResponse.Text = null;
-                session.MbSession.Write(TextBoxStringToWrite.Text);
+                _session.Write(TextBoxStringToWrite.Text);
             }
             else
             {
@@ -37,9 +36,11 @@ namespace CMWtests
 
         private void BtnQueryVISA_Click(object sender, EventArgs e)
         {
-            if (session != null)
+            string response;
+
+            if (_session != null)
             {
-                response = session.Query(TextBoxStringToWrite.Text);
+                response = _session.Query(TextBoxStringToWrite.Text);
                 TextBoxResponse.Text = response;
             }
             else
@@ -50,21 +51,22 @@ namespace CMWtests
 
         private void BtnConnectNew_Click(object sender, EventArgs e)
         {
+            string[] modelSer;
+
             LabelResource.Text = "No Resource Selected";
             BtnWriteVISA.Enabled = false;
             BtnQueryVISA.Enabled = false;
             TextBoxResponse.Text = null;
-            string[] modelSer;
-            session = null;
+            _session = null;
 
             VISAresourceForm resource = new VISAresourceForm();
             resource.ShowDialog();
 
             if (!string.Equals(resource.Selection, "No VISA resources found.") && resource.Selection != null)
             {
-                session = new MBSession(resource.Selection);
+                _session = new MBSession(resource.Selection);
                 resource.Dispose();
-                modelSer = session.Query("*IDN?").Split(',');
+                modelSer = _session.Query("*IDN?").Split(',');
                 if (modelSer[2].Contains(@"/"))
                     modelSer[2] = modelSer[2].Split('/')[1];
                 LabelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
@@ -75,7 +77,7 @@ namespace CMWtests
 
         private void BtnClose_Click(object sender, EventArgs e)
         {
-            session = null;
+            _session.MbSession.Dispose();
             Close();
         }
 
