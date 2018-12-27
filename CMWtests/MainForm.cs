@@ -19,7 +19,8 @@ namespace CMWtests
         delegate void StringArgReturningVoidDelegate(string text);
         delegate void BoolArgReturningVoidDelegate(bool v);
         delegate bool VoidArgReturningBoolDelegate();
-        CancellationTokenSource cts = new CancellationTokenSource();
+        private CancellationTokenSource cts = null;
+        private Tests tests = null;
 
         public MainForm()
         {
@@ -30,28 +31,15 @@ namespace CMWtests
         {
             SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
+            BtnCancelTests.Enabled = true;
 
-            var t = Task.Run( () => Sequencer(cts), cts.Token);
+            cts = null ?? new CancellationTokenSource();
+            tests = null ?? new Tests(this, cts);
 
-
-            //if (t.Result == Failure)
-            //{
-            //    AddToResults("\nProcedure Aborted.");
-            //    // return;
-            //}
-            //else
-            //{
-            //    AddToResults("\nProcedure Succeeded.");
-            //}
-            //    BtnBeginEnabled(true);
-
-
-            if (GetBtnBeginEnabled() == false)
-                SetBtnBeginEnabled(true);
-
+            var t = Task.Run( () => tests.Sequencer() );
         }
 
-        private void SetBtnBeginEnabled(bool v)
+        public void SetBtnBeginEnabled(bool v)
         {
             if (this.BtnBeginTests.InvokeRequired)
             {
@@ -64,7 +52,7 @@ namespace CMWtests
             }
         }
 
-        private bool GetBtnBeginEnabled()
+        public bool GetBtnBeginEnabled()
         {
             //if (this.BtnBeginTests.InvokeRequired)
             //{
@@ -74,11 +62,11 @@ namespace CMWtests
             //}
             //else
             //{
-                return this.BtnBeginTests.Enabled;
+            return this.BtnBeginTests.Enabled;
             //}
         }
 
-        private void AddToResults(string item)
+        public void AddToResults(string item)
         {
             if (this.TextBoxResults.InvokeRequired)
             {
@@ -91,7 +79,7 @@ namespace CMWtests
             }
         }
 
-        private void SetHead1Text(string text)
+        public void SetHead1Text(string text)
         {
             if (this.LabelHead1.InvokeRequired)
             {
@@ -104,7 +92,7 @@ namespace CMWtests
             }
         }
 
-        private void SetHead2Text(string text)
+        public void SetHead2Text(string text)
         {
             if (this.LabelHead1.InvokeRequired)
             {
@@ -130,7 +118,11 @@ namespace CMWtests
         {
         }
 
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e) => this.Close();
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BtnCancelTests_Click(sender, e);
+            this.Close();
+        }
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -149,8 +141,9 @@ namespace CMWtests
         private void BtnCancelTests_Click(object sender, EventArgs e)
         {
             cts.Cancel();
-            MessageBox.Show("canceled! (mainform mbox)");
-            BtnBeginTests.Enabled = true;
+    //        tests = null;
+      //      cts = null;
+            BtnCancelTests.Enabled = false;
         }
 
         #region Code for future use
