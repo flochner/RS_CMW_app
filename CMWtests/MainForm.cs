@@ -16,11 +16,10 @@ namespace CMWtests
     {
         public const bool Success = true;
         public const bool Failure = false;
-        private Thread task = null;
         delegate void StringArgReturningVoidDelegate(string text);
         delegate void BoolArgReturningVoidDelegate(bool v);
-        private static ManualResetEvent mre = new ManualResetEvent(false);
-
+        delegate bool VoidArgReturningBoolDelegate();
+        CancellationTokenSource cts = new CancellationTokenSource();
 
         public MainForm()
         {
@@ -29,34 +28,54 @@ namespace CMWtests
 
         private void BtnBeginTests_Click(object sender, EventArgs e)
         {
-            BtnBeginEnabled(false);
+            SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
 
-            task = new Thread(new ThreadStart(SequencerAsync);
-            task.Start();
+            var t = Task.Run( () => Sequencer(cts), cts.Token);
 
-            //if (GetBtnBeginEnabled() == false)
-            //    SetBtnBeginEnabled(true);
 
-            if (abort)
-            {
-                AddToResults("\nProcedure Aborted.");
-                BtnBeginEnabled(true);
-                return;
-            }
+            //if (t.Result == Failure)
+            //{
+            //    AddToResults("\nProcedure Aborted.");
+            //    // return;
+            //}
+            //else
+            //{
+            //    AddToResults("\nProcedure Succeeded.");
+            //}
+            //    BtnBeginEnabled(true);
+
+
+            if (GetBtnBeginEnabled() == false)
+                SetBtnBeginEnabled(true);
+
         }
 
-        private void BtnBeginEnabled(bool v)
+        private void SetBtnBeginEnabled(bool v)
         {
             if (this.BtnBeginTests.InvokeRequired)
             {
-                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(BtnBeginEnabled);
+                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnBeginEnabled);
                 this.Invoke(d, new object[] { v });
             }
             else
             {
                 this.BtnBeginTests.Enabled = v;
             }
+        }
+
+        private bool GetBtnBeginEnabled()
+        {
+            //if (this.BtnBeginTests.InvokeRequired)
+            //{
+            //    VoidArgReturningBoolDelegate d = new VoidArgReturningBoolDelegate(GetBtnBeginEnabled);
+            //    this.Invoke(d, new object[] { });
+            //    return false;
+            //}
+            //else
+            //{
+                return this.BtnBeginTests.Enabled;
+            //}
         }
 
         private void AddToResults(string item)
@@ -129,7 +148,7 @@ namespace CMWtests
         private void LabelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
         private void BtnCancelTests_Click(object sender, EventArgs e)
         {
-            task.Abort("Cancelling (mbox inside thread)");
+            cts.Cancel();
             MessageBox.Show("canceled! (mainform mbox)");
             BtnBeginTests.Enabled = true;
         }

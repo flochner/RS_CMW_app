@@ -24,16 +24,15 @@ namespace CMWtests
         private string chartLimits3 = null;
         private string chartLimits6 = null;
         private string cmwID = null;
-        string csvFileName = null;
-        private string testName = null;
+        private string csvFileName = null;
 
-        private void SequencerAsync(ManualResetEvent e)
+        private bool Sequencer(CancellationTokenSource cts)
         {
             int[] amplList = null;
-            string testHeader = null;
+            string testName = null;
 
+            cts.Token.ThrowIfCancellationRequested();
             ConnectIdentifyDUT();
-
 
             SetHead1Text("GPRF CW Measurement Tests");
 
@@ -43,21 +42,18 @@ namespace CMWtests
             amplList = new int[] { 0 }; //, -8, -20 };
 
             testName = "RF1COM_RX";
-            Connection(testName);
+            ConnectionMessage(testName);
             InitMeasureSettings();
 
             session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX1");
             foreach (int ampl in amplList)
-            {
-                testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm";
-                Measure(testHeader, ampl);
-                //                // if (abort) return false;
-            }
+                if (Measure(testName, ampl, "", cts) == Failure)
+                    return Failure;
 
 
 
             /////
-            return;// true;
+            return Success;// true;
 
 
             if (numOfTRX > 1)
@@ -67,25 +63,17 @@ namespace CMWtests
                 else
                     session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX3");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 2";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 2", cts);
             }
 
             /// -------------------------------------------------------------
             testName = "RF2COM_RX";
-            Connection(testName);
+            ConnectionMessage(testName);
             InitMeasureSettings();
 
             session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX1");
             foreach (int ampl in amplList)
-            {
-                testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm";
-                Measure(testHeader, ampl);
-                // if (abort) return false;
-            }
+                Measure(testName, ampl, "", cts);
 
             if (numOfTRX > 1)
             {
@@ -94,56 +82,36 @@ namespace CMWtests
                 else
                     session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX3");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 2";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 2", cts);
             }
 
             /// -------------------------------------------------------------
             if (numOfFrontEnds > 1)
             {
                 testName = "RF3COM_RX";
-                Connection(testName);
+                ConnectionMessage(testName);
                 InitMeasureSettings();
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX2");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 3";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 3", cts);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX4");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 4";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 4", cts);
 
                 /// -------------------------------------------------------------
                 testName = "RF4COM_RX";
-                Connection(testName);
+                ConnectionMessage(testName);
                 InitMeasureSettings();
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX2");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 3";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 3", cts);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX4");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 4";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 4", cts);
             }
 
             ///
@@ -157,15 +125,11 @@ namespace CMWtests
             amplList = new int[] { -8, -44 };
 
             testName = "RF1COM_TX";
-            Connection(testName);
+            ConnectionMessage(testName);
 
             session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1C, TX1");
             foreach (int ampl in amplList)
-            {
-                testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm";
-                Measure(testHeader, ampl);
-                // if (abort) return false;
-            }
+                Measure(testName, ampl, "", cts);
 
             if (numOfTRX > 1)
             {
@@ -174,11 +138,7 @@ namespace CMWtests
                 else
                     session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1C, TX3");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 2";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 2", cts);
             }
 
             /// -------------------------------------------------------------
@@ -187,15 +147,11 @@ namespace CMWtests
             amplList = new int[] { -0, -36 };
 
             testName = "RF1OUT_TX";
-            Connection(testName);
+            ConnectionMessage(testName);
 
             session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1O, TX1");
             foreach (int ampl in amplList)
-            {
-                testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm";
-                Measure(testHeader, ampl);
-                // if (abort) return false;
-            }
+                Measure(testName, ampl, "", cts);
 
             if (numOfTRX > 1)
             {
@@ -204,11 +160,7 @@ namespace CMWtests
                 else
                     session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF1O, TX3");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 2";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 2", cts);
             }
 
             /// -------------------------------------------------------------
@@ -217,15 +169,11 @@ namespace CMWtests
             amplList = new int[] { -8, -44 };
 
             testName = "RF2COM_TX";
-            Connection(testName);
+            ConnectionMessage(testName);
 
             session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF2C, TX1");
             foreach (int ampl in amplList)
-            {
-                testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm";
-                Measure(testHeader, ampl);
-                // if (abort) return false;
-            }
+                Measure(testName, ampl, "", cts);
 
             if (numOfTRX > 1)
             {
@@ -234,11 +182,7 @@ namespace CMWtests
                 else
                     session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF2C, TX3");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 2";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 2", cts);
             }
 
             /// -------------------------------------------------------------
@@ -249,23 +193,15 @@ namespace CMWtests
                 amplList = new int[] { -8, -44 };
 
                 testName = "RF3COM_TX";
-                Connection(testName);
+                ConnectionMessage(testName);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3C, TX2");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 3";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 3", cts);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3C, TX4");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 4";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 4", cts);
 
                 /// -------------------------------------------------------------
                 chartLimits3 = (",-1.0,-0.8,0,0.8,1.0");
@@ -273,23 +209,15 @@ namespace CMWtests
                 amplList = new int[] { -0, -36 };
 
                 testName = "RF3OUT_TX";
-                Connection(testName);
+                ConnectionMessage(testName);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3O, TX2");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 3";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 3", cts);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF3O, TX4");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 4";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 4", cts);
 
                 /// -------------------------------------------------------------
                 chartLimits3 = (",-0.8,-0.6,0,0.6,0.8");
@@ -297,28 +225,20 @@ namespace CMWtests
                 amplList = new int[] { -8, -44 };
 
                 testName = "RF4COM_TX";
-                Connection(testName);
+                ConnectionMessage(testName);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF4C, TX2");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 3";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 3", cts);
 
                 session.Write(@"ROUTe:GPRF:MEAS:SCENario:SALone RF4C, TX4");
                 foreach (int ampl in amplList)
-                {
-                    testHeader = testName.Split('_')[0] + " @ " + ampl + " dBm  Path 4";
-                    Measure(testHeader, ampl);
-                    // if (abort) return false;
-                }
+                    Measure(testName, ampl, "Path 4", cts);
             }
-            return;// true;
+            return true;
         }
 
-        private void Measure(string testHeader, int testAmpl)
+        private bool Measure(string testName, int testAmpl, string path, CancellationTokenSource cts)
         {
             int pointsCount = 0;
             double amplError = 0.0;
@@ -331,16 +251,20 @@ namespace CMWtests
             long endFreq = 0;
             bool retry = false;
             string chartLimits = null;
+            string testHeader = null;
             string visaResponse = null;
             StreamWriter csvStream = null;
 
+            cts.Token.ThrowIfCancellationRequested();
+
+            testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path; 
             AddToResults(Environment.NewLine + testHeader);
 
             csvStream = OpenTempFile();
             if (csvStream == null)
             {
                 abort = true;
-                return;
+                return Failure;
             }
 
             ///// setup sensor to read
@@ -379,13 +303,20 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                try { }
-                catch (ThreadAbortException abortException)
+                if (cts.IsCancellationRequested)
                 {
-                    AbortCleanup();
-                    Thread.Sleep(5000);
-                    MessageBox.Show((string)abortException.ExceptionState);
+                    AbortCleanup(cts);
+                    abort = true;
+                    return Failure;
                 }
+
+                //try { }
+                //catch (ThreadAbortException abortException)
+                //{
+                //    AbortCleanup();
+                //    Thread.Sleep(5000);
+                //    MessageBox.Show((string)abortException.ExceptionState);
+                //}
 
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
@@ -423,7 +354,7 @@ namespace CMWtests
                         retry = resp.Contains("Retry");
 
                         if (abort)
-                            AbortCleanup();
+                            AbortCleanup(cts);
                         session.Write(@"SOURce:GPRF:GEN:STATe ON");
                     }
                 } while (retry);
@@ -472,7 +403,7 @@ namespace CMWtests
                     else
                     {
                         csvStream.Close();
-                        return;
+                        return Failure;
                     }
                 }
 
@@ -528,10 +459,10 @@ namespace CMWtests
             ignoreAmplError = true;
 
             abort = false;
-            return;
+            return Failure;
         }
 
-        public void Connection(string connection)
+        private void ConnectionMessage(string connection)
         {
             bool retryZero = false;
             string visaResponse = null;
@@ -571,7 +502,7 @@ namespace CMWtests
             ignoreAmplError = false;
         }
 
-        public bool ConnectIdentifyDUT()
+        private bool ConnectIdentifyDUT()
         {
             string cmwModel = null;
             string cmwSerNum = null;
@@ -658,7 +589,7 @@ namespace CMWtests
             AddToResults("hasKB036: " + hasKB036.ToString());
             AddToResults("numOfTRX: " + numOfTRX.ToString());
             AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
-            return true;
+            return Success;
         }
 
         private StreamWriter OpenTempFile()
@@ -695,8 +626,9 @@ namespace CMWtests
             }
         }
 
-        private void AbortCleanup()
+        private void AbortCleanup(CancellationTokenSource cts)
         {
+            MessageBox.Show("aborting!");
             session.Write(@"*RST");
             if (csvStream != null)
                 try { csvStream.Close(); }
@@ -704,7 +636,7 @@ namespace CMWtests
             if (File.Exists(csvFileName))
                 try { File.Delete(csvFileName); }
                 catch { }
-
+            cts.Cancel();
 
 
             return;

@@ -45,6 +45,10 @@ namespace CMWtests
             {
                 return _mbSession.Query(visaQuery);
             }
+            catch (VisaException exp)
+            {
+                MessageBox.Show(exp.Message, exp.GetType().ToString());
+            }
             catch (Exception exp)
             {
                 MessageBox.Show(exp.Message, exp.GetType().ToString());
