@@ -8,8 +8,8 @@ namespace CMWtests
 {
     class Program
     {
-        public MainForm Obj { get => obj; private set { } }
-        private MainForm obj = null;
+        public MainForm Obj { get => _obj; private set { } }
+        private readonly MainForm _obj = null;
 
         /// <summary>
         /// The main entry point for the application.
@@ -19,8 +19,8 @@ namespace CMWtests
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            MainForm obj = new MainForm();
-            Application.Run(obj);
+            MainForm _obj = new MainForm();
+            Application.Run(_obj);
         }
     }
 }

@@ -13,11 +13,8 @@ namespace CMWtests
 {
     public partial class VISAresourceForm : Form
     {
-        public string Selection { get => selection; private set { } }
-
-        private string[] resources = null;
-        private string[] tempResources = null;
-        private string selection;
+        public string Selection { get => _selection; private set { } }
+        private string _selection;
 
         public VISAresourceForm()
         {
@@ -30,13 +27,15 @@ namespace CMWtests
             if (listBoxResources.Visible == true &&
                 listBoxResources.SelectedIndex >= 0)
             {
-                selection = listBoxResources.SelectedItem.ToString();
+                _selection = listBoxResources.SelectedItem.ToString();
                 this.Close();
             }
         }
 
         public void GetResources()
         {
+            string[] resources = null;
+            string[] tempResources = null;
             listBoxResources.Visible = true;
             Label1.Visible = false;
 
@@ -92,7 +91,7 @@ namespace CMWtests
                 if (listBoxResources.Visible == true &&
                     listBoxResources.SelectedIndex >= 0)
                 {
-                    selection = listBoxResources.SelectedItem.ToString();
+                    _selection = listBoxResources.SelectedItem.ToString();
                     Close();
                 }
             }

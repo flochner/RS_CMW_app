@@ -6,9 +6,8 @@ namespace CMWtests
 {
     class MBSession
     {
-        public MessageBasedSession MbSession { get => mbSession; private set { } }
-
-        private MessageBasedSession mbSession = null;
+        public MessageBasedSession MbSession { get => _mbSession; private set { } }
+        private MessageBasedSession _mbSession = null;
 
         public MBSession(string resourceString)
         {
@@ -21,7 +20,7 @@ namespace CMWtests
             {
                 try
                 {
-                    mbSession = (MessageBasedSession)ResourceManager.GetLocalManager().Open(resourceString);
+                    _mbSession = (MessageBasedSession)ResourceManager.GetLocalManager().Open(resourceString);
                 }
                 catch (Exception exp)
                 {
@@ -44,7 +43,11 @@ namespace CMWtests
             MbSession.Timeout = timeout;
             try
             {
-                return mbSession.Query(visaQuery);
+                return _mbSession.Query(visaQuery);
+            }
+            catch (VisaException exp)
+            {
+                MessageBox.Show(exp.Message, exp.GetType().ToString());
             }
             catch (Exception exp)
             {
@@ -63,7 +66,7 @@ namespace CMWtests
             MbSession.Timeout = timeout;
             try
             {
-                mbSession.Write(visaStmt);
+                _mbSession.Write(visaStmt);
             }
             catch (Exception exp)
             {

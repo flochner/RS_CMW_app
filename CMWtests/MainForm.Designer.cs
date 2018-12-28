@@ -478,6 +478,7 @@ namespace CMWtests
             // 
             // BtnCancelTests
             // 
+            this.BtnCancelTests.Enabled = false;
             this.BtnCancelTests.Location = new System.Drawing.Point(93, 57);
             this.BtnCancelTests.Name = "BtnCancelTests";
             this.BtnCancelTests.Size = new System.Drawing.Size(75, 23);

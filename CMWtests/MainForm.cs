@@ -14,41 +14,36 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        public const bool SUCCESS = true;
+        public const bool Success = true;
+        public const bool Failure = false;
+        delegate void StringArgReturningVoidDelegate(string text);
+        delegate void BoolArgReturningVoidDelegate(bool v);
+        delegate bool VoidArgReturningBoolDelegate();
+        private CancellationTokenSource cts = null;
+        private Tests tests = null;
+
         public MainForm()
         {
             InitializeComponent();
         }
 
-        private Thread task = null;
-        delegate void StringArgReturningVoidDelegate(string text);
-        delegate void BoolArgReturningVoidDelegate(bool v);
-        private static ManualResetEvent mre = new ManualResetEvent(false);
-
         private void BtnBeginTests_Click(object sender, EventArgs e)
         {
-            BtnBeginEnabled(false);
+            SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
+            BtnCancelTests.Enabled = true;
 
-            task = new Thread(new ThreadStart(SequencerAsync));
-            task.Start();
+            cts = null ?? new CancellationTokenSource();
+            tests = null ?? new Tests(this, cts);
 
-            //if (GetBtnBeginEnabled() == false)
-            //    SetBtnBeginEnabled(true);
-
-            if (abort)
-            {
-                AddToResults("\nProcedure Aborted.");
-                BtnBeginEnabled(true);
-                return;
-            }
+            var t = Task.Run( () => tests.Sequencer() );
         }
 
-        private void BtnBeginEnabled(bool v)
+        public void SetBtnBeginEnabled(bool v)
         {
             if (this.BtnBeginTests.InvokeRequired)
             {
-                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(BtnBeginEnabled);
+                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnBeginEnabled);
                 this.Invoke(d, new object[] { v });
             }
             else
@@ -57,7 +52,21 @@ namespace CMWtests
             }
         }
 
-        private void AddToResults(string item)
+        public bool GetBtnBeginEnabled()
+        {
+            //if (this.BtnBeginTests.InvokeRequired)
+            //{
+            //    VoidArgReturningBoolDelegate d = new VoidArgReturningBoolDelegate(GetBtnBeginEnabled);
+            //    this.Invoke(d, new object[] { });
+            //    return false;
+            //}
+            //else
+            //{
+            return this.BtnBeginTests.Enabled;
+            //}
+        }
+
+        public void AddToResults(string item)
         {
             if (this.TextBoxResults.InvokeRequired)
             {
@@ -70,7 +79,7 @@ namespace CMWtests
             }
         }
 
-        private void SetHead1Text(string text)
+        public void SetHead1Text(string text)
         {
             if (this.LabelHead1.InvokeRequired)
             {
@@ -83,7 +92,7 @@ namespace CMWtests
             }
         }
 
-        private void SetHead2Text(string text)
+        public void SetHead2Text(string text)
         {
             if (this.LabelHead1.InvokeRequired)
             {
@@ -109,7 +118,11 @@ namespace CMWtests
         {
         }
 
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e) => this.Close();
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            BtnCancelTests_Click(sender, e);
+            this.Close();
+        }
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -127,9 +140,10 @@ namespace CMWtests
         private void LabelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
         private void BtnCancelTests_Click(object sender, EventArgs e)
         {
-            task.Abort("Cancelling (mbox inside thread)");
-            MessageBox.Show("canceled! (mainform mbox)");
-            BtnBeginTests.Enabled = true;
+            cts.Cancel();
+    //        tests = null;
+      //      cts = null;
+            BtnCancelTests.Enabled = false;
         }
 
         #region Code for future use
