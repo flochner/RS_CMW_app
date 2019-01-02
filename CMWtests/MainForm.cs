@@ -28,7 +28,7 @@ namespace CMWtests
         }
 
         private void BtnBeginTests_Click(object sender, EventArgs e)
-        {
+         {
             Tests tests;
             SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
@@ -149,8 +149,13 @@ namespace CMWtests
             {
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
             }
+            int i = 0;
             while (TestsDone != true)
+            {
+                i++;
+                Console.WriteLine("sleeping {0}", i);
                 Thread.Sleep(500);
+            }
         }
 
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
