@@ -25,7 +25,7 @@ namespace CMWtests
         {
             if (_session != null)
             {
-                TextBoxResponse.Text = null;
+                TextBoxResponse.Text = "";
                 _session.Write(TextBoxStringToWrite.Text);
             }
             else
@@ -56,7 +56,7 @@ namespace CMWtests
             LabelResource.Text = "No Resource Selected";
             BtnWriteVISA.Enabled = false;
             BtnQueryVISA.Enabled = false;
-            TextBoxResponse.Text = null;
+            TextBoxResponse.Text = "";
             _session = null;
 
             VISAresourceForm resource = new VISAresourceForm();

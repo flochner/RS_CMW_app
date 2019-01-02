@@ -169,9 +169,7 @@
             this.tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
             this.ResumeLayout(false);
-
         }
-
         #endregion
 
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel;

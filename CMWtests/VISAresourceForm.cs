@@ -22,20 +22,10 @@ namespace CMWtests
             GetResources();
         }
 
-        private void BtnSelect_Click(object sender, EventArgs e)
-        {
-            if (listBoxResources.Visible == true &&
-                listBoxResources.SelectedIndex >= 0)
-            {
-                _selection = listBoxResources.SelectedItem.ToString();
-                this.Close();
-            }
-        }
-
         public void GetResources()
         {
-            string[] resources = null;
-            string[] tempResources = null;
+            string[] resources = { };
+            string[] tempResources = { };
             listBoxResources.Visible = true;
             Label1.Visible = false;
 
@@ -88,18 +78,23 @@ namespace CMWtests
             int index = listBoxResources.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches)
             {
-                if (listBoxResources.Visible == true &&
-                    listBoxResources.SelectedIndex >= 0)
-                {
-                    _selection = listBoxResources.SelectedItem.ToString();
-                    Close();
-                }
+                BtnSelect_Click(sender, e);
+            }
+        }
+
+        private void BtnSelect_Click(object sender, EventArgs e)
+        {
+            if (listBoxResources.Visible == true &&
+                listBoxResources.SelectedIndex >= 0)
+            {
+                _selection = listBoxResources.SelectedItem.ToString();
+                this.Dispose();
             }
         }
 
         private void BtnCancel_Click(object sender, EventArgs e)
         {
-            Close();
+            this.Dispose();
         }
     }
 }

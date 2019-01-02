@@ -14,13 +14,13 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        public const bool Success = true;
-        public const bool Failure = false;
         delegate void StringArgReturningVoidDelegate(string text);
         delegate void BoolArgReturningVoidDelegate(bool v);
         delegate bool VoidArgReturningBoolDelegate();
-        private CancellationTokenSource cts = null;
-        private Tests tests = null;
+        private CancellationTokenSource _cts = null;
+
+        public bool TestsDone { get; set; } = false;
+
 
         public MainForm()
         {
@@ -29,14 +29,14 @@ namespace CMWtests
 
         private void BtnBeginTests_Click(object sender, EventArgs e)
         {
+            Tests tests;
             SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
-            BtnCancelTests.Enabled = true;
 
-            cts = null ?? new CancellationTokenSource();
-            tests = null ?? new Tests(this, cts);
+            _cts = null ?? new CancellationTokenSource();
+            tests = null ?? new Tests(this, _cts);
 
-            var t = Task.Run( () => tests.Sequencer() );
+            var seq = Task.Run(() => tests.Sequencer());
         }
 
         public void SetBtnBeginEnabled(bool v)
@@ -49,6 +49,21 @@ namespace CMWtests
             else
             {
                 this.BtnBeginTests.Enabled = v;
+                this.Refresh();
+            }
+        }
+
+        public void SetBtnCancelEnabled(bool v)
+        {
+            if (this.BtnCancelTests.InvokeRequired)
+            {
+                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnCancelEnabled);
+                this.Invoke(d, new object[] { v });
+            }
+            else
+            {
+                this.BtnCancelTests.Enabled = v;
+                this.Refresh();
             }
         }
 
@@ -124,6 +139,20 @@ namespace CMWtests
             this.Close();
         }
 
+        private void BtnCancelTests_Click(object sender, EventArgs e)
+        {
+            try { _cts.Cancel(); }
+            catch (NullReferenceException) { TestsDone = true; }
+            catch (ObjectDisposedException) { }
+            catch
+            (NationalInstruments.VisaNS.VisaException exc)
+            {
+                MessageBox.Show(exc.Message, exc.GetType().ToString());
+            }
+            while (TestsDone != true)
+                Thread.Sleep(500);
+        }
+
         private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutBox about = new AboutBox();
@@ -138,13 +167,6 @@ namespace CMWtests
         private void TextBoxResults_TextChanged(object sender, EventArgs e) { this.Refresh(); }
         private void LabelHead1_TextChanged(object sender, EventArgs e) { this.Refresh(); }
         private void LabelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
-        private void BtnCancelTests_Click(object sender, EventArgs e)
-        {
-            cts.Cancel();
-    //        tests = null;
-      //      cts = null;
-            BtnCancelTests.Enabled = false;
-        }
 
         #region Code for future use
         //string[] args = new string[]
@@ -154,6 +176,5 @@ namespace CMWtests
         //};
         //CMWgraph.Graph graph = new CMWgraph.Graph(args);    }
         #endregion
-
     }
 }

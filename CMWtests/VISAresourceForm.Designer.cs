@@ -97,9 +97,7 @@ namespace CMWtests
             this.Text = "Select VISA Resource";
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
-
         #endregion
 
         private System.Windows.Forms.ListBox listBoxResources;

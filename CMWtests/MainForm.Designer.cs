@@ -515,9 +515,7 @@ namespace CMWtests
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
-
         #endregion
 
         private System.Windows.Forms.MenuStrip menuStrip1;
