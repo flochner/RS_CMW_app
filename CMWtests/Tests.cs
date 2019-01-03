@@ -276,7 +276,6 @@ namespace CMWtests
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
-
             _csvStream = OpenTempFile();
             if (_csvStream == null)
                 return Status.Abort;
@@ -337,7 +336,6 @@ namespace CMWtests
                     cmwMeasPower = Convert.ToDouble(visaResponse.Split(',')[1]);
                 }
                 #endregion
-
 
                 #region Take sensor reading
                 do
@@ -497,13 +495,12 @@ namespace CMWtests
                     return Status.Abort;
 
                 _parent.SetHead2Text("Zeroing Sensor...");
-
-                //        session.Write(@"CALibration:GPRF:MEAS:EPSensor:ZERO", 20000);
-                //        Thread.Sleep(5000);
+                _session.Write(@"CALibration:GPRF:MEAS:EPSensor:ZERO", 20000);
+                Thread.Sleep(5000);
                 visaResponse = _session.Query(@"CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 
-                //  if (!visaResponse.Contains("PASS"))
-                if (visaResponse.Contains("PASS"))
+                if ( ! visaResponse.Contains("PASS"))
+                    //if (visaResponse.Contains("PASS"))
                 {
                     var result = MessageBox.Show("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
                                                  "(Retry) after verifying the connections" + Environment.NewLine +
@@ -567,16 +564,6 @@ namespace CMWtests
             }
             _session.Query("*RST;*OPC?\n", 4000);
             _session.Query("*CLS;*OPC?\n", 4000);
-
-            //_session.Write(@"*CLS", 4000);
-            //_session.Query(@"*OPC?", 4000);
-            //_session.Write(@"*RST", 4000);
-            //_session.Query(@"*OPC?", 4000);
-
-            //session.Write(@"*RST", 4000);
-            //visaResponse = session.Query(@"*OPC?", 4000);
-            //session.Write(@"*CLS", 4000);
-            //visaResponse = session.Query(@"*OPC?", 4000);
 
             visaResponse = _session.Query("*IDN?\n");
             identFields = visaResponse.Split(',');
@@ -671,6 +658,15 @@ namespace CMWtests
             }
         }
 
+        private void InitMeasureSettings()
+        {
+            _session.Write(@"CONFigure:GPRF:MEAS:POWer:MODE POWer");
+            _session.Write(@"CONFigure:GPRF:MEAS:POWer:SCOunt 50");
+            _session.Write(@"CONFigure:GPRF:MEAS:POWer:SLENgth 1000e-6");
+            _session.Write(@"CONFigure:GPRF:MEAS:POWer:MLENgth 950e-6");
+            _session.Write(@"TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
+        }
+
         private Status GracefulExit()
         {
             _parent.SetBtnCancelEnabled(false);
@@ -702,15 +698,5 @@ namespace CMWtests
             MessageBox.Show("aborted!");
             return Status.Abort;
         }
-
-        private void InitMeasureSettings()
-        {
-            _session.Write(@"CONFigure:GPRF:MEAS:POWer:MODE POWer");
-            _session.Write(@"CONFigure:GPRF:MEAS:POWer:SCOunt 50");
-            _session.Write(@"CONFigure:GPRF:MEAS:POWer:SLENgth 1000e-6");
-            _session.Write(@"CONFigure:GPRF:MEAS:POWer:MLENgth 950e-6");
-            _session.Write(@"TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
-        }
-
     }
 }

@@ -28,7 +28,7 @@ namespace CMWtests
         }
 
         private void BtnBeginTests_Click(object sender, EventArgs e)
-         {
+        {
             Tests tests;
             SetBtnBeginEnabled(false);
             TextBoxResults.Clear();
