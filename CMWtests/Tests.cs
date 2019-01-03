@@ -500,7 +500,6 @@ namespace CMWtests
                 visaResponse = _session.Query(@"CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 
                 if ( ! visaResponse.Contains("PASS"))
-                    //if (visaResponse.Contains("PASS"))
                 {
                     var result = MessageBox.Show("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
                                                  "(Retry) after verifying the connections" + Environment.NewLine +

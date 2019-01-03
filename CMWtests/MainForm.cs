@@ -21,7 +21,6 @@ namespace CMWtests
 
         public bool TestsDone { get; set; } = false;
 
-
         public MainForm()
         {
             InitializeComponent();
