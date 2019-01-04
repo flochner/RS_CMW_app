@@ -130,12 +130,14 @@ namespace CMWtests
 
         private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            VISAresourceForm resource = new VISAresourceForm();
+            resource.ShowDialog();
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             BtnCancelTests_Click(sender, e);
-            this.Close();
+            Application.Exit();
         }
 
         private void BtnCancelTests_Click(object sender, EventArgs e)
@@ -143,11 +145,12 @@ namespace CMWtests
             try { _cts.Cancel(); }
             catch (NullReferenceException) { TestsDone = true; }
             catch (ObjectDisposedException) { }
-            catch
-            (NationalInstruments.VisaNS.VisaException exc)
-            {
-                MessageBox.Show(exc.Message, exc.GetType().ToString());
-            }
+            //catch
+            //(NationalInstruments.VisaNS.VisaException exc)
+            //{
+            //    MessageBox.Show(exc.Message, exc.GetType().ToString());
+            //}
+
             int i = 0;
             while (TestsDone != true)
             {

@@ -89,9 +89,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CMWgraphs\lib\EPPlus.dll</HintPath>
     </Reference>
-    <Reference Include="NationalInstruments.VisaNS, Version=13.0.45.167, Culture=neutral, PublicKeyToken=4febd62461bf11a4, processorArchitecture=MSIL">
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -111,7 +108,6 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="MBSession.cs" />
     <Compile Include="ConnectionImageForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -125,9 +121,8 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Tests.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="RsVisaLoader.cs" />
+    <Compile Include="Tests.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="VISAresourceForm.cs">
@@ -142,6 +137,7 @@
     <Compile Include="VISAqueryForm.Designer.cs">
       <DependentUpon>VISAqueryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViSession.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>

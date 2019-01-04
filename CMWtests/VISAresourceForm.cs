@@ -7,14 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using NationalInstruments.VisaNS;
+using RsVisaLoader;
 
 namespace CMWtests
 {
     public partial class VISAresourceForm : Form
     {
-        public string Selection { get => _selection; private set { } }
-        private string _selection;
+        public string Selection { get; private set; }
 
         public VISAresourceForm()
         {
@@ -24,77 +23,102 @@ namespace CMWtests
 
         public void GetResources()
         {
-            string[] resources = { };
-            string[] tempResources = { };
+            int m_defRM = visa32.VI_NULL;
+            int retCount = 0;
+            int vi = 0;
+
             listBoxResources.Visible = true;
+            BtnSelect.Enabled = false;
             Label1.Visible = false;
 
-            try
+            if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
-                tempResources = ResourceManager.GetLocalManager().FindResources(@"(GPIB|USB)?*INSTR");
-            }
-            catch
-            {
-                listBoxResources.Visible = false;
-                Label1.Visible = true;
+                if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_RS))
+                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_RS);
+                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_NI))
+                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_NI);
+                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_AG))
+                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_AG);
+                else
+                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
 
-                resources = new string[] { "No VISA resources available" };
-                BtnSelect.Enabled = false;
+                visa32.viOpenDefaultRM(out m_defRM);
+            }
+            else
+            {
+                MessageBox.Show("No VISAs Installed!");
                 return;
             }
 
-    //        tempResources = null;// new string[] { "asdfasdfasdf", "waerwqerqwer", "cvbnvcmnvcm",
-   //                              //        "sdf::1::poiu", "fjofh34tgjs", "areg::1::hsercvbc", "xcvbxcsdfsdfw443" };
+            StringBuilder desc = new StringBuilder(256);
+            visa32.viFindRsrc(m_defRM, "USB?*", out vi, out retCount, desc);
 
-            // Remove any resource with "::1::"
-            if (tempResources != null)
+            if (retCount > 0)
             {
-                int tempLen = tempResources.Length;
-
-                for (int i = 0; i < tempLen; i++)
+                for (int i = 0; i < retCount; ++i)
                 {
-                    if (tempResources[i].Contains("::1::"))
-                        tempLen--;
-                }
-                resources = new string[tempLen];
-                for (int i = 0, j = 0; i < tempLen; i++)
-                {
-                    if (tempResources[j].Contains("::1::"))
-                        j++;
-                    resources[i] = tempResources[j];
-                    j++;
+                    if (!desc.ToString().Contains("::1::"))
+                        listBoxResources.Items.Add(desc.ToString());
+                    visa32.viFindNext(vi, desc);
                 }
             }
+            else
+            {
+                listBoxResources.Visible = false;
+                Label1.Visible = true;
+                BtnSelect.Visible = false;
+                this.Height = 120;
+            }
 
-            listBoxResources.Height = listBoxResources.ItemHeight * (resources.Length + 1);
-            Height = Height + ((resources.Length - 1) * 15);
-            listBoxResources.DataSource = null;
-            listBoxResources.DataSource = resources;
-            listBoxResources.SelectedIndex = -1;
+            if (listBoxResources.Items.Count > 0)
+            {
+                listBoxResources.Height = 15 * (listBoxResources.Items.Count + 1);
+                this.Height = this.Height + listBoxResources.Height;
+            }
+
+            if (listBoxResources.Items.Count == 1)
+            {
+                listBoxResources.SelectedIndex = 0;
+                BtnSelect.Enabled = true;
+            }
+            else
+            {
+                listBoxResources.SelectedIndex = -1;
+            }
         }
 
-        private void ListBoxResources_DoubleClick(object sender, MouseEventArgs e)
+        private static bool IsVisaLibraryInstalled(UInt16 iManfId)
+        {
+            return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
+        }
+
+        private void listBoxResources_DoubleClick(object sender, MouseEventArgs e)
         {
             int index = listBoxResources.IndexFromPoint(e.Location);
             if (index != ListBox.NoMatches)
             {
-                BtnSelect_Click(sender, e);
+                btnSelect_Click(sender, e);
             }
         }
 
-        private void BtnSelect_Click(object sender, EventArgs e)
+        private void btnSelect_Click(object sender, EventArgs e)
         {
             if (listBoxResources.Visible == true &&
                 listBoxResources.SelectedIndex >= 0)
             {
-                _selection = listBoxResources.SelectedItem.ToString();
-                this.Dispose();
+                Selection = listBoxResources.SelectedItem.ToString();
+            }
+            else
+            {
+                Selection = "No VISA resources found.";
             }
         }
 
-        private void BtnCancel_Click(object sender, EventArgs e)
+        private void listBoxResources_SelectedIndexChanged(object sender, EventArgs e)
         {
-            this.Dispose();
+            BtnSelect.Enabled = true;
         }
+
+        private void btnCancel_Click(object sender, EventArgs e) { }
     }
 }
