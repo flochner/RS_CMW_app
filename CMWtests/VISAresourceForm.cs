@@ -15,6 +15,7 @@ namespace CMWtests
     {
         public string Selection { get; private set; }
 
+
         public VISAresourceForm()
         {
             InitializeComponent();
@@ -23,32 +24,15 @@ namespace CMWtests
 
         public void GetResources()
         {
-            int m_defRM = visa32.VI_NULL;
             int retCount = 0;
             int vi = 0;
+
+
 
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
             Label1.Visible = false;
 
-            if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
-            {
-                if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_RS))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_RS);
-                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_NI))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_NI);
-                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_AG))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_AG);
-                else
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
-
-                visa32.viOpenDefaultRM(out m_defRM);
-            }
-            else
-            {
-                MessageBox.Show("No VISAs Installed!");
-                return;
-            }
 
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(m_defRM, "USB?*", out vi, out retCount, desc);

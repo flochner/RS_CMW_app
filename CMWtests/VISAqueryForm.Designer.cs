@@ -28,18 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.btnQueryVISA = new System.Windows.Forms.Button();
             this.btnWriteVISA = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.textBoxStringToWrite = new System.Windows.Forms.TextBox();
             this.btnConnectNew = new System.Windows.Forms.Button();
             this.labelResource = new System.Windows.Forms.Label();
-            this.BtnClose = new System.Windows.Forms.Button();
+            this.btnClose = new System.Windows.Forms.Button();
             this.textBoxResponse = new System.Windows.Forms.TextBox();
-            this.ContextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.CopyToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.ContextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // btnQueryVISA
@@ -50,7 +46,7 @@
             this.btnQueryVISA.TabIndex = 12;
             this.btnQueryVISA.Text = "Query";
             this.btnQueryVISA.UseVisualStyleBackColor = true;
-            this.btnQueryVISA.Click += new System.EventHandler(this.BtnQueryVISA_Click);
+            this.btnQueryVISA.Click += new System.EventHandler(this.btnQueryVISA_Click);
             // 
             // btnWriteVISA
             // 
@@ -60,7 +56,7 @@
             this.btnWriteVISA.TabIndex = 11;
             this.btnWriteVISA.Text = "Write";
             this.btnWriteVISA.UseVisualStyleBackColor = true;
-            this.btnWriteVISA.Click += new System.EventHandler(this.BtnWriteVISA_Click);
+            this.btnWriteVISA.Click += new System.EventHandler(this.btnWriteVISA_Click);
             // 
             // label2
             // 
@@ -79,7 +75,7 @@
             this.textBoxStringToWrite.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBoxStringToWrite.Location = new System.Drawing.Point(12, 64);
             this.textBoxStringToWrite.Name = "textBoxStringToWrite";
-            this.textBoxStringToWrite.Size = new System.Drawing.Size(265, 20);
+            this.textBoxStringToWrite.Size = new System.Drawing.Size(287, 20);
             this.textBoxStringToWrite.TabIndex = 9;
             // 
             // btnConnectNew
@@ -90,7 +86,7 @@
             this.btnConnectNew.TabIndex = 14;
             this.btnConnectNew.Text = "Connect...";
             this.btnConnectNew.UseVisualStyleBackColor = true;
-            this.btnConnectNew.Click += new System.EventHandler(this.BtnConnectNew_Click);
+            this.btnConnectNew.Click += new System.EventHandler(this.btnConnectNew_Click);
             // 
             // labelResource
             // 
@@ -102,55 +98,37 @@
             this.labelResource.TabIndex = 15;
             this.labelResource.Text = "No Resource Selected";
             // 
-            // BtnClose
+            // btnClose
             // 
-            this.BtnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.BtnClose.Location = new System.Drawing.Point(202, 294);
-            this.BtnClose.Name = "BtnClose";
-            this.BtnClose.Size = new System.Drawing.Size(75, 23);
-            this.BtnClose.TabIndex = 16;
-            this.BtnClose.Text = "Close";
-            this.BtnClose.UseVisualStyleBackColor = true;
-            this.BtnClose.Click += new System.EventHandler(this.BtnClose_Click);
+            this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.btnClose.Location = new System.Drawing.Point(224, 288);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 16;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
             // textBoxResponse
             // 
             this.textBoxResponse.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxResponse.ContextMenuStrip = this.ContextMenuStrip1;
             this.textBoxResponse.Location = new System.Drawing.Point(12, 120);
             this.textBoxResponse.Multiline = true;
             this.textBoxResponse.Name = "textBoxResponse";
-            this.textBoxResponse.Size = new System.Drawing.Size(265, 168);
+            this.textBoxResponse.Size = new System.Drawing.Size(287, 154);
             this.textBoxResponse.TabIndex = 17;
-            // 
-            // ContextMenuStrip1
-            // 
-            this.ContextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.CopyToolStripMenuItem});
-            this.ContextMenuStrip1.Name = "ContextMenuStrip1";
-            this.ContextMenuStrip1.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
-            this.ContextMenuStrip1.ShowImageMargin = false;
-            this.ContextMenuStrip1.Size = new System.Drawing.Size(78, 26);
-            this.ContextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.ContextMenuStrip1_Opening);
-            // 
-            // CopyToolStripMenuItem
-            // 
-            this.CopyToolStripMenuItem.Name = "CopyToolStripMenuItem";
-            this.CopyToolStripMenuItem.Size = new System.Drawing.Size(77, 22);
-            this.CopyToolStripMenuItem.Text = "&Copy";
-            this.CopyToolStripMenuItem.Click += new System.EventHandler(this.CopyToolStripMenuItem_Click);
             // 
             // VISAqueryForm
             // 
             this.AcceptButton = this.btnQueryVISA;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.CancelButton = this.BtnClose;
-            this.ClientSize = new System.Drawing.Size(289, 329);
-            this.Controls.Add(this.BtnClose);
+            this.CancelButton = this.btnClose;
+            this.ClientSize = new System.Drawing.Size(311, 323);
+            this.Controls.Add(this.btnClose);
             this.Controls.Add(this.textBoxResponse);
             this.Controls.Add(this.labelResource);
             this.Controls.Add(this.btnConnectNew);
@@ -161,23 +139,19 @@
             this.Name = "VISAqueryForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "VISAquery";
-            this.Load += new System.EventHandler(this.VISAquery_Load);
-            this.ContextMenuStrip1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
+
         private System.Windows.Forms.Button btnQueryVISA;
         private System.Windows.Forms.Button btnWriteVISA;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBoxStringToWrite;
         private System.Windows.Forms.Button btnConnectNew;
         private System.Windows.Forms.Label labelResource;
-        private System.Windows.Forms.Button BtnClose;
+        private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.TextBox textBoxResponse;
-        private System.Windows.Forms.ContextMenuStrip ContextMenuStrip1;
-        private System.Windows.Forms.ToolStripMenuItem CopyToolStripMenuItem;
     }
 }

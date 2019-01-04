@@ -26,11 +26,11 @@ namespace CMWtests
             InitializeComponent();
         }
 
-        private void BtnBeginTests_Click(object sender, EventArgs e)
+        private void btnBeginTests_Click(object sender, EventArgs e)
         {
             Tests tests;
             SetBtnBeginEnabled(false);
-            TextBoxResults.Clear();
+            textBoxResults.Clear();
 
             _cts = null ?? new CancellationTokenSource();
             tests = null ?? new Tests(this, _cts);
@@ -40,28 +40,28 @@ namespace CMWtests
 
         public void SetBtnBeginEnabled(bool v)
         {
-            if (this.BtnBeginTests.InvokeRequired)
+            if (this.btnBeginTests.InvokeRequired)
             {
                 BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnBeginEnabled);
                 this.Invoke(d, new object[] { v });
             }
             else
             {
-                this.BtnBeginTests.Enabled = v;
+                this.btnBeginTests.Enabled = v;
                 this.Refresh();
             }
         }
 
         public void SetBtnCancelEnabled(bool v)
         {
-            if (this.BtnCancelTests.InvokeRequired)
+            if (this.btnCancelTests.InvokeRequired)
             {
                 BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnCancelEnabled);
                 this.Invoke(d, new object[] { v });
             }
             else
             {
-                this.BtnCancelTests.Enabled = v;
+                this.btnCancelTests.Enabled = v;
                 this.Refresh();
             }
         }
@@ -76,50 +76,50 @@ namespace CMWtests
             //}
             //else
             //{
-            return this.BtnBeginTests.Enabled;
+            return this.btnBeginTests.Enabled;
             //}
         }
 
         public void AddToResults(string item)
         {
-            if (this.TextBoxResults.InvokeRequired)
+            if (this.textBoxResults.InvokeRequired)
             {
                 StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(AddToResults);
                 this.Invoke(d, new object[] { item });
             }
             else
             {
-                this.TextBoxResults.AppendText(item + Environment.NewLine);
+                this.textBoxResults.AppendText(item + Environment.NewLine);
             }
         }
 
         public void SetHead1Text(string text)
         {
-            if (this.LabelHead1.InvokeRequired)
+            if (this.labelHead1.InvokeRequired)
             {
                 StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(SetHead1Text);
                 this.Invoke(d, new object[] { text });
             }
             else
             {
-                this.LabelHead1.Text = text;
+                this.labelHead1.Text = text;
             }
         }
 
         public void SetHead2Text(string text)
         {
-            if (this.LabelHead1.InvokeRequired)
+            if (this.labelHead1.InvokeRequired)
             {
                 StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(SetHead2Text);
                 this.Invoke(d, new object[] { text });
             }
             else
             {
-                this.LabelHead2.Text = text;
+                this.labelHead2.Text = text;
             }
         }
 
-        private void CommunicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
+        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             //var commWindow = new VISAqueryForm();
             //commWindow.ShowDialog();
@@ -128,19 +128,19 @@ namespace CMWtests
             new VISAqueryForm().ShowDialog();
         }
 
-        private void SaveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             VISAresourceForm resource = new VISAresourceForm();
             resource.ShowDialog();
         }
 
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BtnCancelTests_Click(sender, e);
+            btnCancelTests_Click(sender, e);
             Application.Exit();
         }
 
-        private void BtnCancelTests_Click(object sender, EventArgs e)
+        private void btnCancelTests_Click(object sender, EventArgs e)
         {
             try { _cts.Cancel(); }
             catch (NullReferenceException) { TestsDone = true; }
@@ -160,20 +160,20 @@ namespace CMWtests
             }
         }
 
-        private void AboutToolStripMenuItem_Click(object sender, EventArgs e)
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutBox about = new AboutBox();
             about.ShowDialog();
         }
 
-        private void NewToolStripMenuItem_Click(object sender, EventArgs e) { }
-        private void OpenToolStripMenuItem_Click(object sender, EventArgs e) { }
+        private void newToolStripMenuItem_Click(object sender, EventArgs e) { }
+        private void openToolStripMenuItem_Click(object sender, EventArgs e) { }
         private void MainForm_Load(object sender, EventArgs e) { }
-        private void CopyToolStripMenuItem1_Click(object sender, EventArgs e) { }
-        private void MenuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) { }
-        private void TextBoxResults_TextChanged(object sender, EventArgs e) { this.Refresh(); }
-        private void LabelHead1_TextChanged(object sender, EventArgs e) { this.Refresh(); }
-        private void LabelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
+        private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
+        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) { }
+        private void textBoxResults_TextChanged(object sender, EventArgs e) { this.Refresh(); }
+        private void labelHead1_TextChanged(object sender, EventArgs e) { this.Refresh(); }
+        private void labelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
 
         #region Code for future use
         //string[] args = new string[]

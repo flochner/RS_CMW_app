@@ -11,217 +11,95 @@ namespace CMWtests
     public class ViSession
     {
         private int m_defRM = visa32.VI_NULL;
+        private int vi = 0;
 
         public ViSession()
         {
+            Open();
         }
 
-        private void OpenSession ()
+        private int Open()
         {
-            bool bNetworkSearch = false;
             if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
                 if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_RS))
-                {
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_RS);
-                    bNetworkSearch = true;
-                }
                 else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_NI))
-                {
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_NI);
-                }
                 else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_AG))
-                {
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_AG);
-                }
                 else
-                {
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
-                }
+
                 visa32.viOpenDefaultRM(out m_defRM);
+                return m_defRM;
             }
             else
             {
                 MessageBox.Show("No VISAs Installed!");
-                return;
+                return -1;
             }
-
-            // visa32.viClose(m_defRM);
-            // RsVisa.RsViUnloadVisaLibrary();
-
-
         }
 
+        private void Close()
+        {
+            visa32.viClose(m_defRM);
+            RsVisa.RsViUnloadVisaLibrary();
+        }
 
         private static bool IsVisaLibraryInstalled(UInt16 iManfId)
         {
             return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
         }
 
-        private delegate void DelegateMethod();
-        private delegate void DelegateMethodString(string text);
-        private delegate void DelegateMethodAddDevice(int iHostIndex, string text);
-
-
-
-        private void FindLxiDevices()
+        private void ShowIDN(string item)
         {
-            //if (mDNScheckBox.Enabled)
-            //{
-            //    RsVisaLoader.RsAttr attrValue = RsAttr.VI_RS_FIND_MODE_CONFIG;
+            ViStatus status = visa32.viOpen(m_defRM, item, 0, 0, out vi);
+            if (status < ViStatus.VI_SUCCESS)
+            {
+                ShowErrorText(status);
+            }
 
-            //    if (mDNScheckBox.Checked)
-            //    {
-            //        attrValue |= RsAttr.VI_RS_FIND_MODE_MDNS;
-            //    }
+            string sAnswer;
+            status = Query("*IDN?\n", out sAnswer);
+            visa32.viClose(vi);
 
-            //    if (VXI11checkBox.Checked)
-            //    {
-            //        attrValue |= RsAttr.VI_RS_FIND_MODE_VXI11;
-            //    }
-
-            //    visa32.viSetAttribute(m_defRM, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_MODE, (int)attrValue);
-            //}
-
-            //int vi = 0;
-            //int retCount = 0;
-            //StringBuilder desc = new StringBuilder(256);
-            //visa32.viFindRsrc(m_defRM, "USB?*", out vi, out retCount, desc);
-            //if (retCount > 0)
-            //{
-            //    listDevices.Items.Add(desc.ToString());
-            //    for (int i = 0; i < retCount - 1; ++i)
-            //    {
-            //        visa32.viFindNext(vi, desc);
-            //        listDevices.Items.Add(desc.ToString());
-            //    }
-            //}
-            //listDevices.SelectedIndex = 0;
-            //btnIDN.Enabled = btnSRQ.Enabled = (listDevices.Items.Count > 0);
-        }
-
-        private void btnFind_Click(object sender, EventArgs e)
-        {
-            //listDevices.Items.Clear();
-            //btnFind.Enabled = false;
-            //UseWaitCursor = true;
-
-            //FindLxiDevices();
-
-            //UseWaitCursor = false;
-            //btnFind.Enabled = true;
-        }
+            if (status < ViStatus.VI_SUCCESS)
+            {
+                ShowErrorText(status);
+            }
+            else
+            {
+                MessageBox.Show(sAnswer.ToString());
+            }
+            return;
+        } 
 
         private void ShowErrorText(ViStatus status)
         {
-            //StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            //ViStatus err = visa32.viStatusDesc(m_defRM, status, text);
+            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
+            ViStatus err = visa32.viStatusDesc(m_defRM, status, text);
             //txtResult.Text += Environment.NewLine + text.ToString();
-        }
-
-        private void ShowIDN(string item)
-        {
-            //int session;
-            //txtResult.Text = String.Empty;
-            //Update();
-            //ViStatus status = visa32.viOpen(m_defRM, item, 0, 0, out session);
-            //if (status < ViStatus.VI_SUCCESS)
-            //{
-            //    ShowErrorText(status);
-            //    return;
-            //}
-
-            //string sAnswer;
-            //status = Query(session, "*IDN?\n", out sAnswer);
-            //visa32.viClose(session);
-
-            //if (status < ViStatus.VI_SUCCESS)
-            //{
-            //    ShowErrorText(status);
-            //}
-            //else
-            //{
-            //    txtResult.Text = "Identification: " + sAnswer.ToString();
-            //}
-        }
-
-        private void btnExit_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
-
-        private void btnIDN_Click(object sender, EventArgs e)
-        {
-            //string curItem = listDevices.SelectedItem.ToString();
-            //if (curItem != null)
-            //{
-            //    ShowIDN(curItem);
-            //}
-        }
-
-        private void btnSRQ_Click(object sender, EventArgs e)
-        {
-            //string curItem = listDevices.SelectedItem.ToString();
-            //if (curItem != null)
-            //{
-            //    TestSRQ(curItem);
-            //}
-        }
-
-        private void cmbVISA_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            //visa32.viClose(m_defRM);
-            //RsVisa.RsViUnloadVisaLibrary();
-            //string sVisa = cmbVISA.SelectedItem.ToString();
-            //bool bNetworkSearch = false;
-            //if (sVisa == "Keysight")
-            //{
-            //    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_AG);
-
-            //}
-            //else if (sVisa == "R&S")
-            //{
-            //    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_RS);
-            //    bNetworkSearch = true;
-            //}
-            //else if (sVisa == "National")
-            //{
-            //    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_NI);
-            //}
-            //else
-            //{
-            //    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
-            //}
-            //mDNScheckBox.Enabled = bNetworkSearch;
-            //VXI11checkBox.Enabled = bNetworkSearch;
-            //visa32.viOpenDefaultRM(out m_defRM);
-            //StringBuilder sManufacturer = new StringBuilder(visa32.VI_FIND_BUFLEN);
-
-            //visa32.viGetAttribute(m_defRM, ViAttr.VI_ATTR_RSRC_MANF_NAME, sManufacturer);
-            //txtResult.Text = "VISA loaded of: " + sManufacturer.ToString();
-
+            MessageBox.Show(text.ToString());
         }
 
         private ViStatus EventHandler(int vi, ViEventType inEventType, int inContext, int inUserHandle)
         {
             short stb;
             ViStatus status = visa32.viReadSTB(vi, out stb);
-            string text = Environment.NewLine + "EventHandler: Event " + inEventType.ToString() +
+            string text = "EventHandler: Event " + inEventType.ToString() +
                           " occurred with STB = 0x" + stb.ToString("X");
-
-      //      txtResult.BeginInvoke(new DelegateMethodString(AddStatusText), text);
-            //Note! following call produces a deadlock
-            //AddStatusText(text);
+            MessageBox.Show(text);
             return status;
         }
 
-        private static ViStatus Write(int vi, string buffer)
+        public ViStatus Write(string buffer)
         {
             int retCount;
             return visa32.viWrite(vi, buffer, buffer.Length, out retCount);
         }
 
-        private static ViStatus Read(int vi, out string buffer)
+        public ViStatus Read(out string buffer)
         {
             ViStatus status;
             buffer = "";
@@ -239,12 +117,12 @@ namespace CMWtests
             return status;
         }
 
-        private ViStatus Query(int vi, string sQuery, out string sAnswer)
+        public ViStatus Query(string sQuery, out string sAnswer)
         {
             sAnswer = "";
-            ViStatus status = Write(vi, sQuery);
+            ViStatus status = Write(sQuery);
             if (status < 0) return status;
-            return Read(vi, out sAnswer);
+            return Read(out sAnswer);
         }
 
         private void TestSRQ(string item)
@@ -343,17 +221,5 @@ namespace CMWtests
         //    ShowErrorText(status);
         //    return;
         }
-
-        //private void AddStatusText(string text)
-        //{
-        //    if (txtResult.InvokeRequired)
-        //    {
-        //        txtResult.Invoke(new DelegateMethodString(AddStatusText), text);
-        //    }
-        //    else
-        //    {
-        //        txtResult.Text += text;
-        //    }
-        //}
     }
 }

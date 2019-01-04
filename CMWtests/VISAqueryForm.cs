@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using RsVisaLoader;
 
 namespace CMWtests
 {
@@ -21,7 +22,7 @@ namespace CMWtests
             btnQueryVISA.Enabled = false;
         }
 
-        private void BtnWriteVISA_Click(object sender, EventArgs e)
+        private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             //if (_session != null)
             //{
@@ -34,9 +35,35 @@ namespace CMWtests
             //}
         }
 
-        private void BtnQueryVISA_Click(object sender, EventArgs e)
+        private void btnQueryVISA_Click(object sender, EventArgs e)
         {
             string response;
+
+            int session;
+            txtResult.Text = String.Empty;
+            Update();
+            ViStatus status = visa32.viOpen(m_defRM, item, 0, 0, out session);
+            if (status < ViStatus.VI_SUCCESS)
+            {
+                ShowErrorText(status);
+                return;
+            }
+
+            string sAnswer;
+            status = Query(session, "*IDN?\n", out sAnswer);
+            visa32.viClose(session);
+
+            if (status < ViStatus.VI_SUCCESS)
+            {
+                ShowErrorText(status);
+            }
+            else
+            {
+                textBoxResponse.Text = "Identification: " + sAnswer.ToString();
+            }
+
+
+
 
             //if (_session != null)
             //{
@@ -49,7 +76,14 @@ namespace CMWtests
             //}
         }
 
-        private void BtnConnectNew_Click(object sender, EventArgs e)
+        private void ShowErrorText(ViStatus status)
+        {
+            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
+            ViStatus err = visa32.viStatusDesc(m_defRM, status, text);
+            txtResult.Text += Environment.NewLine + text.ToString();
+        }
+
+        private void btnConnectNew_Click(object sender, EventArgs e)
         {
             string[] modelSer;
 
@@ -75,14 +109,10 @@ namespace CMWtests
             }
         }
 
-        private void BtnClose_Click(object sender, EventArgs e)
+        private void btnClose_Click(object sender, EventArgs e)
         {
             //_session.MbSession.Dispose();
             //Close();
         }
-
-        private void VISAquery_Load(object sender, EventArgs e) { }
-        private void ContextMenuStrip1_Opening(object sender, CancelEventArgs e) { }
-        private void CopyToolStripMenuItem_Click(object sender, EventArgs e) { }
     }
 }
