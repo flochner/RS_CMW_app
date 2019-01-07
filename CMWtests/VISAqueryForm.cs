@@ -13,7 +13,7 @@ namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        // private MBSession _session;
+        ViSession connection = null;
 
         public VISAqueryForm()
         {
@@ -22,20 +22,7 @@ namespace CMWtests
             btnQueryVISA.Enabled = false;
         }
 
-        private void btnWriteVISA_Click(object sender, EventArgs e)
-        {
-            //if (_session != null)
-            //{
-            //    TextBoxResponse.Text = "";
-            //    _session.Write(TextBoxStringToWrite.Text);
-            //}
-            //else
-            //{
-            //    TextBoxResponse.Text = "VISA Resource Not Connected";
-            //}
-        }
-
-        private void btnQueryVISA_Click(object sender, EventArgs e)
+         private void btnQueryVISA_Click(object sender, EventArgs e)
         {
             string response;
 
@@ -50,7 +37,7 @@ namespace CMWtests
             }
 
             string sAnswer;
-            status = Query(session, "*IDN?\n", out sAnswer);
+            status = sesn.Query(session, "*IDN?\n", out sAnswer);
             visa32.viClose(session);
 
             if (status < ViStatus.VI_SUCCESS)
@@ -76,6 +63,19 @@ namespace CMWtests
             //}
         }
 
+       private void btnWriteVISA_Click(object sender, EventArgs e)
+        {
+            //if (_session != null)
+            //{
+            //    TextBoxResponse.Text = "";
+            //    _session.Write(TextBoxStringToWrite.Text);
+            //}
+            //else
+            //{
+            //    TextBoxResponse.Text = "VISA Resource Not Connected";
+            //}
+        }
+
         private void ShowErrorText(ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
@@ -85,33 +85,46 @@ namespace CMWtests
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
+            ViStatus status;
+            int session;
             string[] modelSer;
+            string idn;
+            string resource = "";
 
             labelResource.Text = "No Resource Selected";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
             textBoxResponse.Text = "";
-            //_session = null;
 
-            VISAresourceForm resource = new VISAresourceForm();
-            resource.ShowDialog();
+            connection = new ViSession();
 
-            if (!string.Equals(resource.Selection, "No VISA resources found.") && resource.Selection != null)
+            var resForm = new VISAresourceForm(connection.ResourceMgr);
+            resForm.ShowDialog();
+
+            // get resource string, create session, get session ID
+            resource = resForm.Resource;
+            status = connection.OpenSession(resource, out session);
+
+            if (status < 0)
+                MessageBox.Show("Something went wrong opening session. Try again.");
+            resForm.Dispose();
+
+            if (resource != null)
             {
-                //_session = new MBSession(resource.Selection);
-                //resource.Dispose();
-                //modelSer = _session.Query("*IDN?").Split(',');
-                //if (modelSer[2].Contains(@"/"))
-                //    modelSer[2] = modelSer[2].Split('/')[1];
-                //LabelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
-                //BtnQueryVISA.Enabled = true;
-                //BtnWriteVISA.Enabled = true;
+                status = connection.Query("*IDN?", out idn);
+                modelSer = idn.Split(',');
+                if (modelSer[2].Contains(@"/"))
+                    modelSer[2] = modelSer[2].Split('/')[1];
+                labelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
+                btnQueryVISA.Enabled = true;
+                btnWriteVISA.Enabled = true;
             }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            //_session.MbSession.Dispose();
+
+            connection.CloseResMgr();
             //Close();
         }
     }

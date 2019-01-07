@@ -10,15 +10,17 @@ namespace CMWtests
 {
     public class ViSession
     {
-        private int m_defRM = visa32.VI_NULL;
+        public int ResourceMgr { get => _defRM; private set { } } // => _defRM = value
+
+        private int _defRM = visa32.VI_NULL;
         private int vi = 0;
 
         public ViSession()
         {
-            Open();
+            OpenResMgr();
         }
 
-        private int Open()
+        private int OpenResMgr()
         {
             if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
@@ -31,8 +33,8 @@ namespace CMWtests
                 else
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
 
-                visa32.viOpenDefaultRM(out m_defRM);
-                return m_defRM;
+                visa32.viOpenDefaultRM(out _defRM);
+                return _defRM;
             }
             else
             {
@@ -41,10 +43,17 @@ namespace CMWtests
             }
         }
 
-        private void Close()
+        public void CloseResMgr()
         {
-            visa32.viClose(m_defRM);
+            visa32.viClose(_defRM);
             RsVisa.RsViUnloadVisaLibrary();
+        }
+
+        public ViStatus OpenSession(string resource, out int session)
+        {
+            ViStatus status = visa32.viOpen(_defRM, resource, 0, 0, out session);
+
+            return status;
         }
 
         private static bool IsVisaLibraryInstalled(UInt16 iManfId)
@@ -54,7 +63,7 @@ namespace CMWtests
 
         private void ShowIDN(string item)
         {
-            ViStatus status = visa32.viOpen(m_defRM, item, 0, 0, out vi);
+            ViStatus status = visa32.viOpen(_defRM, item, 0, 0, out vi);
             if (status < ViStatus.VI_SUCCESS)
             {
                 ShowErrorText(status);
@@ -78,7 +87,7 @@ namespace CMWtests
         private void ShowErrorText(ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            ViStatus err = visa32.viStatusDesc(m_defRM, status, text);
+            ViStatus err = visa32.viStatusDesc(_defRM, status, text);
             //txtResult.Text += Environment.NewLine + text.ToString();
             MessageBox.Show(text.ToString());
         }
@@ -91,6 +100,14 @@ namespace CMWtests
                           " occurred with STB = 0x" + stb.ToString("X");
             MessageBox.Show(text);
             return status;
+        }
+
+        public ViStatus Query(string sQuery, out string sAnswer)
+        {
+            sAnswer = "";
+            ViStatus status = Write(sQuery);
+            if (status < 0) return status;
+            return Read(out sAnswer);
         }
 
         public ViStatus Write(string buffer)
@@ -115,14 +132,6 @@ namespace CMWtests
             } while (status == ViStatus.VI_SUCCESS_MAX_CNT);
 
             return status;
-        }
-
-        public ViStatus Query(string sQuery, out string sAnswer)
-        {
-            sAnswer = "";
-            ViStatus status = Write(sQuery);
-            if (status < 0) return status;
-            return Read(out sAnswer);
         }
 
         private void TestSRQ(string item)

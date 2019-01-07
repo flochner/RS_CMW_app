@@ -13,29 +13,26 @@ namespace CMWtests
 {
     public partial class VISAresourceForm : Form
     {
-        public string Selection { get; private set; }
-
-
-        public VISAresourceForm()
+        public string Resource { get; private set; }
+        
+        public VISAresourceForm(int resourceMgr)
         {
             InitializeComponent();
-            GetResources();
+            GetResources(resourceMgr);
         }
 
-        public void GetResources()
+        public void GetResources(int resourceMgr)
         {
             int retCount = 0;
             int vi = 0;
-
-
-
+            
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
             Label1.Visible = false;
 
 
             StringBuilder desc = new StringBuilder(256);
-            visa32.viFindRsrc(m_defRM, "USB?*", out vi, out retCount, desc);
+            visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);
 
             if (retCount > 0)
             {
@@ -71,11 +68,6 @@ namespace CMWtests
             }
         }
 
-        private static bool IsVisaLibraryInstalled(UInt16 iManfId)
-        {
-            return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
-        }
-
         private void listBoxResources_DoubleClick(object sender, MouseEventArgs e)
         {
             int index = listBoxResources.IndexFromPoint(e.Location);
@@ -90,11 +82,11 @@ namespace CMWtests
             if (listBoxResources.Visible == true &&
                 listBoxResources.SelectedIndex >= 0)
             {
-                Selection = listBoxResources.SelectedItem.ToString();
+                Resource = listBoxResources.SelectedItem.ToString();
             }
             else
             {
-                Selection = "No VISA resources found.";
+                Resource = null;
             }
         }
 
