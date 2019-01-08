@@ -130,8 +130,6 @@ namespace CMWtests
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            VISAresourceForm resource = new VISAresourceForm();
-            resource.ShowDialog();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)

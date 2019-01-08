@@ -77,6 +77,7 @@
             this.textBoxStringToWrite.Name = "textBoxStringToWrite";
             this.textBoxStringToWrite.Size = new System.Drawing.Size(287, 20);
             this.textBoxStringToWrite.TabIndex = 9;
+            this.textBoxStringToWrite.TextChanged += new System.EventHandler(this.textBoxStringToWrite_TextChanged);
             // 
             // btnConnectNew
             // 

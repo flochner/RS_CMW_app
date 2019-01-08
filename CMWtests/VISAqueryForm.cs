@@ -13,7 +13,9 @@ namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        ViSession connection = null;
+        private ViSession connection = null;
+        private ViStatus status = 0;
+        private int vi = 0;
 
         public VISAqueryForm()
         {
@@ -22,79 +24,45 @@ namespace CMWtests
             btnQueryVISA.Enabled = false;
         }
 
-         private void btnQueryVISA_Click(object sender, EventArgs e)
+        private void btnQueryVISA_Click(object sender, EventArgs e)
         {
-            string response;
 
-            int session;
-            txtResult.Text = String.Empty;
+            textBoxResponse.Text = string.Empty;
             Update();
-            ViStatus status = visa32.viOpen(m_defRM, item, 0, 0, out session);
-            if (status < ViStatus.VI_SUCCESS)
-            {
-                ShowErrorText(status);
-                return;
-            }
 
             string sAnswer;
-            status = sesn.Query(session, "*IDN?\n", out sAnswer);
-            visa32.viClose(session);
+            status = connection.Query(vi, textBoxStringToWrite.Text, out sAnswer);
 
             if (status < ViStatus.VI_SUCCESS)
-            {
                 ShowErrorText(status);
-            }
             else
-            {
-                textBoxResponse.Text = "Identification: " + sAnswer.ToString();
-            }
-
-
-
-
-            //if (_session != null)
-            //{
-            //    response = _session.Query(TextBoxStringToWrite.Text);
-            //    TextBoxResponse.Text = response;
-            //}
-            //else
-            //{
-            //    TextBoxResponse.Text = "VISA Resource Not Connected";
-            //}
+                textBoxResponse.Text = sAnswer;
         }
 
-       private void btnWriteVISA_Click(object sender, EventArgs e)
+        private void btnWriteVISA_Click(object sender, EventArgs e)
         {
-            //if (_session != null)
-            //{
-            //    TextBoxResponse.Text = "";
-            //    _session.Write(TextBoxStringToWrite.Text);
-            //}
-            //else
-            //{
-            //    TextBoxResponse.Text = "VISA Resource Not Connected";
-            //}
+            status = connection.Write(vi, textBoxStringToWrite.ToString());
+            connection.CloseSession(vi);
         }
 
         private void ShowErrorText(ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            ViStatus err = visa32.viStatusDesc(m_defRM, status, text);
-            txtResult.Text += Environment.NewLine + text.ToString();
+            visa32.viStatusDesc(connection.ResourceMgr, status, text);
+            textBoxResponse.Text += Environment.NewLine + text.ToString();
         }
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
             ViStatus status;
-            int session;
             string[] modelSer;
             string idn;
-            string resource = "";
+            string resource = string.Empty;
 
             labelResource.Text = "No Resource Selected";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
-            textBoxResponse.Text = "";
+            textBoxResponse.Text = string.Empty;
 
             connection = new ViSession();
 
@@ -103,29 +71,51 @@ namespace CMWtests
 
             // get resource string, create session, get session ID
             resource = resForm.Resource;
-            status = connection.OpenSession(resource, out session);
-
-            if (status < 0)
-                MessageBox.Show("Something went wrong opening session. Try again.");
+            status = connection.OpenSession(resource, out vi);
             resForm.Dispose();
 
-            if (resource != null)
+            if (status != ViStatus.VI_SUCCESS)
+                MessageBox.Show("Something went wrong opening session. Try again.");
+
+            if (resource != string.Empty)
             {
-                status = connection.Query("*IDN?", out idn);
-                modelSer = idn.Split(',');
-                if (modelSer[2].Contains(@"/"))
-                    modelSer[2] = modelSer[2].Split('/')[1];
-                labelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
-                btnQueryVISA.Enabled = true;
-                btnWriteVISA.Enabled = true;
+                status = connection.Query(vi, "*IDN?", out idn);
+                if (status == ViStatus.VI_SUCCESS)
+                {
+                    modelSer = idn.Split(',');
+                    if (modelSer.Length >= 3)
+                    {
+                        if (modelSer[2].Contains("/"))
+                            modelSer[2] = modelSer[2].Split('/')[1];
+                        labelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
+                    }
+                }
+                else
+                {
+                    ShowErrorText(status);
+                }
             }
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-
+            connection.CloseSession(vi);
             connection.CloseResMgr();
-            //Close();
         }
+
+        private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
+        {
+            if (textBoxStringToWrite.Text == string.Empty)
+            {
+                btnWriteVISA.Enabled = false;
+                btnQueryVISA.Enabled = false;
+            }
+            else
+            {
+                btnWriteVISA.Enabled = true;
+                btnQueryVISA.Enabled = true;
+            }
+        }
+
     }
 }

@@ -10,10 +10,9 @@ namespace CMWtests
 {
     public class ViSession
     {
-        public int ResourceMgr { get => _defRM; private set { } } // => _defRM = value
+        public int ResourceMgr { get => _defRM; private set { } }
 
         private int _defRM = visa32.VI_NULL;
-        private int vi = 0;
 
         public ViSession()
         {
@@ -49,10 +48,15 @@ namespace CMWtests
             RsVisa.RsViUnloadVisaLibrary();
         }
 
-        public ViStatus OpenSession(string resource, out int session)
+        public ViStatus OpenSession(string resource, out int vi)
         {
-            ViStatus status = visa32.viOpen(_defRM, resource, 0, 0, out session);
+            ViStatus status = visa32.viOpen(_defRM, resource, 0, 0, out vi);
+            return status;
+        }
 
+        public ViStatus CloseSession(int vi)
+        {
+            ViStatus status = visa32.viClose(vi);
             return status;
         }
 
@@ -60,29 +64,6 @@ namespace CMWtests
         {
             return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
         }
-
-        private void ShowIDN(string item)
-        {
-            ViStatus status = visa32.viOpen(_defRM, item, 0, 0, out vi);
-            if (status < ViStatus.VI_SUCCESS)
-            {
-                ShowErrorText(status);
-            }
-
-            string sAnswer;
-            status = Query("*IDN?\n", out sAnswer);
-            visa32.viClose(vi);
-
-            if (status < ViStatus.VI_SUCCESS)
-            {
-                ShowErrorText(status);
-            }
-            else
-            {
-                MessageBox.Show(sAnswer.ToString());
-            }
-            return;
-        } 
 
         private void ShowErrorText(ViStatus status)
         {
@@ -102,24 +83,24 @@ namespace CMWtests
             return status;
         }
 
-        public ViStatus Query(string sQuery, out string sAnswer)
+        public ViStatus Query(int vi, string sQuery, out string sAnswer)
         {
             sAnswer = "";
-            ViStatus status = Write(sQuery);
+            ViStatus status = Write(vi, sQuery);
             if (status < 0) return status;
-            return Read(out sAnswer);
+            return Read(vi, out sAnswer);
         }
 
-        public ViStatus Write(string buffer)
+        public ViStatus Write(int vi, string buffer)
         {
             int retCount;
             return visa32.viWrite(vi, buffer, buffer.Length, out retCount);
         }
 
-        public ViStatus Read(out string buffer)
+        public ViStatus Read(int vi, out string buffer)
         {
             ViStatus status;
-            buffer = "";
+            buffer = string.Empty;
             StringBuilder sTemp = new StringBuilder(1024);
             do
             {
