@@ -50,13 +50,43 @@ namespace CMWtests
 
         public ViStatus OpenSession(string resource, out int vi)
         {
-            ViStatus status = visa32.viOpen(_defRM, resource, 0, 0, out vi);
-            return status;
+            return visa32.viOpen(_defRM, resource, 0, 0, out vi);
         }
 
         public ViStatus CloseSession(int vi)
         {
-            ViStatus status = visa32.viClose(vi);
+            return visa32.viClose(vi);
+        }
+
+        public ViStatus Query(int vi, string sQuery, out string sAnswer)
+        {
+            sAnswer = "";
+            ViStatus status = Write(vi, sQuery);
+            if (status < 0) return status;
+            return Read(vi, out sAnswer);
+        }
+
+        public ViStatus Write(int vi, string buffer)
+        {
+            int retCount;
+            return visa32.viWrite(vi, buffer+"\n", buffer.Length, out retCount);
+        }
+
+        public ViStatus Read(int vi, out string buffer)
+        {
+            ViStatus status;
+            buffer = string.Empty;
+            StringBuilder sTemp = new StringBuilder(1024);
+            do
+            {
+                int retCount;
+                status = visa32.viRead(vi, sTemp, sTemp.Capacity, out retCount);
+                if (retCount > 0)
+                {
+                    buffer += sTemp.ToString(0, retCount);
+                }
+            } while (status == ViStatus.VI_SUCCESS_MAX_CNT);
+
             return status;
         }
 
@@ -80,38 +110,6 @@ namespace CMWtests
             string text = "EventHandler: Event " + inEventType.ToString() +
                           " occurred with STB = 0x" + stb.ToString("X");
             MessageBox.Show(text);
-            return status;
-        }
-
-        public ViStatus Query(int vi, string sQuery, out string sAnswer)
-        {
-            sAnswer = "";
-            ViStatus status = Write(vi, sQuery);
-            if (status < 0) return status;
-            return Read(vi, out sAnswer);
-        }
-
-        public ViStatus Write(int vi, string buffer)
-        {
-            int retCount;
-            return visa32.viWrite(vi, buffer, buffer.Length, out retCount);
-        }
-
-        public ViStatus Read(int vi, out string buffer)
-        {
-            ViStatus status;
-            buffer = string.Empty;
-            StringBuilder sTemp = new StringBuilder(1024);
-            do
-            {
-                int retCount;
-                status = visa32.viRead(vi, sTemp, sTemp.Capacity, out retCount);
-                if (retCount > 0)
-                {
-                    buffer += sTemp.ToString(0, retCount);
-                }
-            } while (status == ViStatus.VI_SUCCESS_MAX_CNT);
-
             return status;
         }
 

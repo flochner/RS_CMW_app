@@ -13,7 +13,7 @@ namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        private ViSession connection = null;
+        private ViSession session = null;
         private ViStatus status = 0;
         private int vi = 0;
 
@@ -26,12 +26,11 @@ namespace CMWtests
 
         private void btnQueryVISA_Click(object sender, EventArgs e)
         {
-
             textBoxResponse.Text = string.Empty;
             Update();
 
             string sAnswer;
-            status = connection.Query(vi, textBoxStringToWrite.Text, out sAnswer);
+            status = session.Query(vi, textBoxStringToWrite.Text, out sAnswer);
 
             if (status < ViStatus.VI_SUCCESS)
                 ShowErrorText(status);
@@ -41,45 +40,36 @@ namespace CMWtests
 
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
-            status = connection.Write(vi, textBoxStringToWrite.ToString());
-            connection.CloseSession(vi);
-        }
-
-        private void ShowErrorText(ViStatus status)
-        {
-            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            visa32.viStatusDesc(connection.ResourceMgr, status, text);
-            textBoxResponse.Text += Environment.NewLine + text.ToString();
+            status = session.Write(vi, textBoxStringToWrite.Text);
+            if (status < ViStatus.VI_SUCCESS)
+                ShowErrorText(status);
         }
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
             ViStatus status;
             string[] modelSer;
-            string idn;
-            string resource = string.Empty;
+            string resource = "";
 
             labelResource.Text = "No Resource Selected";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
             textBoxResponse.Text = string.Empty;
 
-            connection = new ViSession();
+            session = new ViSession();
 
-            var resForm = new VISAresourceForm(connection.ResourceMgr);
+            var resForm = new VISAresourceForm(session.ResourceMgr);
             resForm.ShowDialog();
-
-            // get resource string, create session, get session ID
             resource = resForm.Resource;
-            status = connection.OpenSession(resource, out vi);
+            status = session.OpenSession(resource, out vi);
             resForm.Dispose();
 
-            if (status != ViStatus.VI_SUCCESS)
+            if (status < ViStatus.VI_SUCCESS)
                 MessageBox.Show("Something went wrong opening session. Try again.");
 
             if (resource != string.Empty)
             {
-                status = connection.Query(vi, "*IDN?", out idn);
+                status = session.Query(vi, "*IDN?", out string idn);
                 if (status == ViStatus.VI_SUCCESS)
                 {
                     modelSer = idn.Split(',');
@@ -99,8 +89,10 @@ namespace CMWtests
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            connection.CloseSession(vi);
-            connection.CloseResMgr();
+            status = session.CloseSession(vi);
+            //if (status < ViStatus.VI_SUCCESS)
+            ShowErrorText(status);
+            session.CloseResMgr();
         }
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
@@ -117,5 +109,11 @@ namespace CMWtests
             }
         }
 
+        private void ShowErrorText(ViStatus status)
+        {
+            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
+            visa32.viStatusDesc(session.ResourceMgr, status, text);
+            textBoxResponse.Text += Environment.NewLine + text.ToString();
+        }
     }
 }

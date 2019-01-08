@@ -143,19 +143,6 @@ namespace CMWtests
             try { _cts.Cancel(); }
             catch (NullReferenceException) { TestsDone = true; }
             catch (ObjectDisposedException) { }
-            //catch
-            //(NationalInstruments.VisaNS.VisaException exc)
-            //{
-            //    MessageBox.Show(exc.Message, exc.GetType().ToString());
-            //}
-
-            int i = 0;
-            while (TestsDone != true)
-            {
-                i++;
-                Console.WriteLine("sleeping {0}", i);
-                Thread.Sleep(500);
-            }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
