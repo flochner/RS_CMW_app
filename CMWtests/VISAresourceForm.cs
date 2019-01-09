@@ -30,6 +30,7 @@ namespace CMWtests
             BtnSelect.Enabled = false;
             Label1.Visible = false;
 
+
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);
 
