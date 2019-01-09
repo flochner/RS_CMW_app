@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using RsVisaLoader;
 
@@ -31,6 +32,14 @@ namespace CMWtests
 
             string sAnswer;
             status = session.Query(vi, textBoxStringToWrite.Text, out sAnswer);
+            Thread.Sleep(15000);
+
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+
+
+
+            status = session.Query(vi, "*OPC?", out sAnswer);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
 
             if (status < ViStatus.VI_SUCCESS)
                 ShowErrorText(status);
@@ -41,8 +50,7 @@ namespace CMWtests
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             status = session.Write(vi, textBoxStringToWrite.Text);
-            if (status < ViStatus.VI_SUCCESS)
-                ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
         }
 
         private void btnConnectNew_Click(object sender, EventArgs e)

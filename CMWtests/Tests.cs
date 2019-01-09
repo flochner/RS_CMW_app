@@ -508,7 +508,7 @@ namespace CMWtests
 
                 _parent.SetHead2Text("Zeroing Sensor...");
                 session.Write(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO");
-                Thread.Sleep(5000);
+                Thread.Sleep(15000);
                 session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
 
                 if (!visaResponse.Contains("PASS"))

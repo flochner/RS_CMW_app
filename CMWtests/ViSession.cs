@@ -75,16 +75,12 @@ namespace CMWtests
         public ViStatus Read(int vi, out string buffer)
         {
             ViStatus status;
-            ViEventType outEventType;
-            int outEventContext;
             buffer = string.Empty;
             StringBuilder sTemp = new StringBuilder(1024);
             do
             {
                 int retCount;
                 status = visa32.viRead(vi, sTemp, sTemp.Capacity, out retCount);
-                status = visa32.viWaitOnEvent(vi, ViEventType.VI_EVENT_IO_COMPLETION, 20000, out outEventType, out outEventContext); 
-
                 if (retCount > 0)
                 {
                     buffer += sTemp.ToString(0, retCount);
