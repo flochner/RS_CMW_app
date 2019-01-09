@@ -14,7 +14,7 @@ namespace CMWtests
     public partial class VISAresourceForm : Form
     {
         public string Resource { get; private set; }
-        
+
         public VISAresourceForm(int resourceMgr)
         {
             InitializeComponent();
@@ -25,11 +25,10 @@ namespace CMWtests
         {
             int retCount = 0;
             int vi = 0;
-            
+
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
             Label1.Visible = false;
-
 
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);

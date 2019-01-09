@@ -72,8 +72,8 @@ namespace CMWtests
             status = session.OpenSession(resource, out vi);
             resForm.Dispose();
 
-            if (status < ViStatus.VI_SUCCESS)
-                MessageBox.Show("Something went wrong opening session. Try again.");
+            //if (status < ViStatus.VI_SUCCESS)
+            //    MessageBox.Show("Something went wrong opening session. Try again.");
 
             if (resource != string.Empty)
             {
@@ -93,6 +93,13 @@ namespace CMWtests
                     ShowErrorText(status);
                 }
             }
+
+            if (textBoxStringToWrite.Text != string.Empty && session != null)
+            {
+                btnWriteVISA.Enabled = true;
+                btnQueryVISA.Enabled = true;
+            }
+
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -105,7 +112,7 @@ namespace CMWtests
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
         {
-            if (textBoxStringToWrite.Text == string.Empty)
+            if (textBoxStringToWrite.Text == string.Empty || session == null)
             {
                 btnWriteVISA.Enabled = false;
                 btnQueryVISA.Enabled = false;
