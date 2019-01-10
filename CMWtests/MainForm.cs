@@ -19,8 +19,6 @@ namespace CMWtests
         delegate bool VoidArgReturningBoolDelegate();
         private CancellationTokenSource _cts = null;
 
-        public bool TestsDone { get; set; } = false;
-
         public MainForm()
         {
             InitializeComponent();
@@ -137,7 +135,7 @@ namespace CMWtests
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
             try { _cts.Cancel(); }
-            catch (NullReferenceException) { TestsDone = true; }
+            catch (NullReferenceException) { }
             catch (ObjectDisposedException) { }
         }
 

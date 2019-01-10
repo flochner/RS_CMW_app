@@ -18,7 +18,8 @@ namespace CMWtests
         private ViStatus status = 0;
         private int vi = 0;
 
-        public enum TestStatus : int { Abort = -1, Failure, Success };
+        public enum TestStatus : int { Abort = -1, Success, Completed };
+        private TestStatus exitStatus = TestStatus.Success;
         private CancellationTokenSource _cts;
         private MainForm _parent = null;
         private StreamWriter _csvStream = null;
@@ -41,10 +42,16 @@ namespace CMWtests
 
         public void Begin()
         {
-            if (Sequencer() == TestStatus.Abort)
+            TestStatus exitStatus;
+
+            exitStatus = Sequencer();
+
+            if (exitStatus == TestStatus.Abort)
                 _parent.AddToResults(Environment.NewLine + "Tests Aborted.");
+            else if (exitStatus == TestStatus.Success)
+                _parent.AddToResults(Environment.NewLine + "Tests Complete.");
         }
-        
+
         private TestStatus Sequencer()
         {
             int[] amplList = { };
@@ -71,6 +78,8 @@ namespace CMWtests
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit();
+
+
 
             /////
             return GracefulExit();
@@ -333,7 +342,9 @@ namespace CMWtests
             do  ///// Main Loop
             {
                 if (_cts.IsCancellationRequested)
+                {
                     return GracefulExit();
+                }
 
                 #region Set up loop
                 pointsCount += 1;
@@ -516,9 +527,13 @@ namespace CMWtests
                 _parent.SetHead2Text("Zeroing Sensor...");
                 status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO;*OPC?", out visaResponse);
                 if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero.", status);
-                Thread.Sleep(10000);
-                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
-                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero?", status);
+
+                
+                //Thread.Sleep(10000);
+                //status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
+                //if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero?", status);
+                visaResponse = "FAIL";
+
 
                 if (!visaResponse.Contains("PASS"))
                 {
@@ -683,7 +698,14 @@ namespace CMWtests
 
         private TestStatus GracefulExit()
         {
+            if (exitStatus == TestStatus.Completed)
+                return TestStatus.Completed;
+
             _parent.SetBtnCancelEnabled(false);
+            _parent.SetHead1Text("");
+            _parent.SetHead2Text("");
+
+            //_parent.AddToResults("In graceful");
 
             status = session.Query(vi, "*RST;*OPC?", out string visaResponse);
             if (status < ViStatus.VI_SUCCESS) ShowErrorText("GracefulExit.*RST", status);
@@ -712,7 +734,7 @@ namespace CMWtests
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
             }
 
-            _parent.TestsDone = true;
+            exitStatus = TestStatus.Completed;
             return TestStatus.Abort;
         }
 
