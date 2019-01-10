@@ -62,7 +62,7 @@ namespace CMWtests
         {
             sAnswer = "";
             ViStatus status = Write(vi, sQuery);
-            if (status < 0) return status;
+            if (status < ViStatus.VI_SUCCESS) return status;
             return Read(vi, out sAnswer);
         }
 
@@ -95,12 +95,11 @@ namespace CMWtests
             return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
         }
 
-        private void ShowErrorText(ViStatus status)
+        private void ShowErrorText(string source, ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
             ViStatus err = visa32.viStatusDesc(_defRM, status, text);
-            //txtResult.Text += Environment.NewLine + text.ToString();
-            MessageBox.Show(text.ToString());
+            MessageBox.Show(Environment.NewLine + source + Environment.NewLine + text.ToString());
         }
 
         private ViStatus EventHandler(int vi, ViEventType inEventType, int inContext, int inUserHandle)

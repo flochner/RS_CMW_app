@@ -515,11 +515,10 @@ namespace CMWtests
 
                 _parent.SetHead2Text("Zeroing Sensor...");
                 status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO;*OPC?", out visaResponse);
-                if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
-                MessageBox.Show("starting sleep");
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero.", status);
                 Thread.Sleep(10000);
                 status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
-                if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero?", status);
 
                 if (!visaResponse.Contains("PASS"))
                 {
@@ -567,16 +566,16 @@ namespace CMWtests
             status = session.OpenSession(resource, out vi);
             if (status < ViStatus.VI_SUCCESS)
             {
-                ShowErrorText(status);
+                ShowErrorText("ConnectIdentify.OpenSession", status);
                 return TestStatus.Abort;
             }
             resForm.Dispose();
 
             // CMW Identification
             status = session.Query(vi, "*RST;*OPC?", out visaResponse);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("ConnectIdentify.*RST", status);
             status = session.Query(vi, "*CLS;*OPC?", out visaResponse);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("ConnectIdentify.*CLS", status);
 
             session.Query(vi, "*IDN?", out visaResponse);
             identFields = visaResponse.Split(',');
@@ -687,12 +686,12 @@ namespace CMWtests
             _parent.SetBtnCancelEnabled(false);
 
             status = session.Query(vi, "*RST;*OPC?", out string visaResponse);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("GracefulExit.*RST", status);
             status = session.Query(vi, "*CLS;*OPC?", out visaResponse);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("GracefulExit.*CLS", status);
 
             status = session.CloseSession(vi);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("GracefulExit.CloseSesion", status);
             session.CloseResMgr();
 
             if (_csvStream != null)
@@ -717,11 +716,11 @@ namespace CMWtests
             return TestStatus.Abort;
         }
 
-        private void ShowErrorText(ViStatus status)
+        private void ShowErrorText(string source, ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
             ViStatus err = visa32.viStatusDesc(session.ResourceMgr, status, text);
-            _parent.AddToResults(Environment.NewLine + text.ToString());
+            _parent.AddToResults(Environment.NewLine + source + Environment.NewLine + text.ToString());
         }
     }
 }

@@ -32,15 +32,9 @@ namespace CMWtests
 
             string sAnswer;
             status = session.Query(vi, textBoxStringToWrite.Text, out sAnswer);
-            Thread.Sleep(15000);
-
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
-
-            status = session.Query(vi, "*OPC?", out sAnswer);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
 
             if (status < ViStatus.VI_SUCCESS)
-                ShowErrorText(status);
+                ShowErrorText("btnQuery", status);
             else
                 textBoxResponse.Text = sAnswer;
         }
@@ -48,7 +42,7 @@ namespace CMWtests
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             status = session.Write(vi, textBoxStringToWrite.Text);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("btnWrite", status);
         }
 
         private void btnConnectNew_Click(object sender, EventArgs e)
@@ -85,7 +79,7 @@ namespace CMWtests
                 }
                 else
                 {
-                    ShowErrorText(status);
+                    ShowErrorText("ConnectNew.Query IDN", status);
                 }
             }
 
@@ -100,7 +94,7 @@ namespace CMWtests
         private void btnClose_Click(object sender, EventArgs e)
         {
             status = session.CloseSession(vi);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText("btnClose.CloseSession", status);
             session.CloseResMgr();
         }
 
@@ -118,11 +112,11 @@ namespace CMWtests
             }
         }
 
-        private void ShowErrorText(ViStatus status)
+        private void ShowErrorText(string source, ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
             visa32.viStatusDesc(session.ResourceMgr, status, text);
-            textBoxResponse.Text += Environment.NewLine + text.ToString();
+            textBoxResponse.Text += Environment.NewLine + source + Environment.NewLine + text.ToString();
         }
     }
 }
