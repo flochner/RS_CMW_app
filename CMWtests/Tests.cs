@@ -58,7 +58,10 @@ namespace CMWtests
             string testName = "";
 
             if (ConnectIdentifyDUT() == TestStatus.Abort)
+            {
+                _parent.SetBtnBeginEnabled(true);
                 return TestStatus.Abort;
+            }
 
             _parent.SetBtnCancelEnabled(true);
             _parent.SetHead1Text("GPRF CW Measurement Tests");
@@ -66,7 +69,7 @@ namespace CMWtests
             /// -------------------------------------------------------------
             chartLimits3 = ",-0.7,-0.5,0,0.5,0.7";
             chartLimits6 = ",-1.2,-1.0,0,1.0,1.2";
-            amplList = new int[] { 0, -8 };//, -20 };
+            amplList = new int[] { 0 };//, -8 };//, -20 };
 
             testName = "RF1COM_RX";
             if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -342,9 +345,7 @@ namespace CMWtests
             do  ///// Main Loop
             {
                 if (_cts.IsCancellationRequested)
-                {
                     return GracefulExit();
-                }
 
                 #region Set up loop
                 pointsCount += 1;
@@ -372,6 +373,17 @@ namespace CMWtests
                 {
                     retry = false;
                     status = session.Query(vi, "READ:GPRF:MEAS:EPSensor?", out visaResponse);
+                    if (status < ViStatus.VI_SUCCESS) ShowErrorText("Measure.SensorReading", status);
+
+                    try
+                    {
+                        visaResponse.Split('~');
+                    }
+                    catch (IndexOutOfRangeException e)
+                    {
+                        exitStatus = TestStatus.Abort;
+                        return GracefulExit();
+                    }
 
                     if (visaResponse.Split(',')[2].Contains("INV") ||
                         visaResponse.Split(',')[2].Contains("NAV"))
@@ -525,14 +537,14 @@ namespace CMWtests
                     return TestStatus.Abort;
 
                 _parent.SetHead2Text("Zeroing Sensor...");
-                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO;*OPC?", out visaResponse);
+                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO", out visaResponse);
                 if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero.", status);
 
-                
-                //Thread.Sleep(10000);
-                //status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
-                //if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero?", status);
-                visaResponse = "FAIL";
+
+                Thread.Sleep(10000);
+                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Zero?", status);
+                //visaResponse = "PASS";
 
 
                 if (!visaResponse.Contains("PASS"))
