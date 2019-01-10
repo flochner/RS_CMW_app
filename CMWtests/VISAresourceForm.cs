@@ -14,6 +14,7 @@ namespace CMWtests
     public partial class VISAresourceForm : Form
     {
         public string Resource { get; private set; }
+        public Tests.TestStatus Status { get; private set; }
 
         public VISAresourceForm(int resourceMgr)
         {
@@ -69,24 +70,17 @@ namespace CMWtests
 
         private void listBoxResources_DoubleClick(object sender, MouseEventArgs e)
         {
-            int index = listBoxResources.IndexFromPoint(e.Location);
-            if (index != ListBox.NoMatches)
-            {
+            if (listBoxResources.IndexFromPoint(e.Location) != ListBox.NoMatches)
                 btnSelect_Click(sender, e);
-            }
+            this.Close();
         }
 
         private void btnSelect_Click(object sender, EventArgs e)
         {
-            if (listBoxResources.Visible == true &&
-                listBoxResources.SelectedIndex >= 0)
-            {
+            if (listBoxResources.Visible == true && listBoxResources.SelectedIndex >= 0)
                 Resource = listBoxResources.SelectedItem.ToString();
-            }
             else
-            {
                 Resource = null;
-            }
         }
 
         private void listBoxResources_SelectedIndexChanged(object sender, EventArgs e)
@@ -94,6 +88,9 @@ namespace CMWtests
             BtnSelect.Enabled = true;
         }
 
-        private void btnCancel_Click(object sender, EventArgs e) { }
+        private void btnCancel_Click(object sender, EventArgs e)
+        {
+            Status = Tests.TestStatus.Abort;
+        }
     }
 }

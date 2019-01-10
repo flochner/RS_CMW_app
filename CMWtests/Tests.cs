@@ -39,12 +39,19 @@ namespace CMWtests
             _cts = cts;
         }
 
-        public TestStatus Sequencer()
+        public void Begin()
+        {
+            if (Sequencer() == TestStatus.Abort)
+                _parent.AddToResults(Environment.NewLine + "Tests Aborted.");
+        }
+        
+        private TestStatus Sequencer()
         {
             int[] amplList = { };
             string testName = "";
 
-            ConnectIdentifyDUT();
+            if (ConnectIdentifyDUT() == TestStatus.Abort)
+                return TestStatus.Abort;
 
             _parent.SetBtnCancelEnabled(true);
             _parent.SetHead1Text("GPRF CW Measurement Tests");
@@ -394,7 +401,7 @@ namespace CMWtests
 
                 #region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
-                if ((currentFreq <= 200e6) && (Math.Abs(amplError) > 0.0003) && !_ignoreAmplError)
+                if ((currentFreq <= 200e6) && (Math.Abs(amplError) > 3) && !_ignoreAmplError)
                 {
                     session.Write(vi, "SOURce:GPRF:GEN:STATe OFF");
                     session.Write(vi, "SYSTem:MEASurement:ALL:OFF");
@@ -408,13 +415,13 @@ namespace CMWtests
                     img.SetImage(testName + "-" + numOfFrontEnds);
                     img.ShowDialog();
 
-                    //DialogResult resp = MessageBox.Show("(Retry) after fixing the connections" + Environment.NewLine +
-                    //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
-                    //                                    "(Abort) all testing",
-                    //                                    "MEASURING - Check Connections",
-                    //                                     MessageBoxButtons.AbortRetryIgnore,
-                    //                                     MessageBoxIcon.Question,
-                    //                                     MessageBoxDefaultButton.Button3);
+                    DialogResult resp = MessageBox.Show("(Retry) after fixing the connections" + Environment.NewLine +
+                                                        "(Ignore) further level errors and continue test" + Environment.NewLine +
+                                                        "(Abort) all testing",
+                                                        "MEASURING - Check Connections",
+                                                         MessageBoxButtons.AbortRetryIgnore,
+                                                         MessageBoxIcon.Question,
+                                                         MessageBoxDefaultButton.Button3);
 
                     _ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
 
@@ -507,9 +514,12 @@ namespace CMWtests
                     return TestStatus.Abort;
 
                 _parent.SetHead2Text("Zeroing Sensor...");
-                session.Write(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO");
-                Thread.Sleep(15000);
-                session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
+                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO;*OPC?", out visaResponse);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
+                MessageBox.Show("starting sleep");
+                Thread.Sleep(10000);
+                status = session.Query(vi, "CALibration:GPRF:MEAS:EPSensor:ZERO?", out visaResponse);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
 
                 if (!visaResponse.Contains("PASS"))
                 {
@@ -542,17 +552,25 @@ namespace CMWtests
             string visaResponse = "";
             string[] identFields = { };
             string[] hwOptions = { };
+            string resource = "";
 
             session = new ViSession();
 
-            //var resForm = new VISAresourceForm(session.ResourceMgr);
-            //resForm.ShowDialog();
-            //resource = resForm.Resource;
-            //status = session.OpenSession(resource, out vi);
-            //resForm.Dispose();
-            // fml
-            status = session.OpenSession("USB0::0x0AAD::0x0057::0142591::INSTR", out vi);
-
+            var resForm = new VISAresourceForm(session.ResourceMgr);
+            resForm.ShowDialog();
+            resource = resForm.Resource;
+            if (resForm.Status == TestStatus.Abort || resource == null)
+            {
+                MessageBox.Show("No resource selected.");
+                return TestStatus.Abort;
+            }
+            status = session.OpenSession(resource, out vi);
+            if (status < ViStatus.VI_SUCCESS)
+            {
+                ShowErrorText(status);
+                return TestStatus.Abort;
+            }
+            resForm.Dispose();
 
             // CMW Identification
             status = session.Query(vi, "*RST;*OPC?", out visaResponse);
@@ -685,14 +703,17 @@ namespace CMWtests
                 try { File.Delete(csvFileName); }
                 catch { MessageBox.Show("Temp file delete Exception"); }
 
-            _parent.SetBtnBeginEnabled(true);
-
-            try { _cts.Dispose(); }
-            catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
+            try
+            {
+                _cts.Dispose();
+                _parent.SetBtnBeginEnabled(true);
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, exc.GetType().ToString());
+            }
 
             _parent.TestsDone = true;
-
-            MessageBox.Show("aborted!");
             return TestStatus.Abort;
         }
 

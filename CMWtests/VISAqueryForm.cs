@@ -36,8 +36,6 @@ namespace CMWtests
 
             if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
 
-
-
             status = session.Query(vi, "*OPC?", out sAnswer);
             if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
 
@@ -72,9 +70,6 @@ namespace CMWtests
             status = session.OpenSession(resource, out vi);
             resForm.Dispose();
 
-            //if (status < ViStatus.VI_SUCCESS)
-            //    MessageBox.Show("Something went wrong opening session. Try again.");
-
             if (resource != string.Empty)
             {
                 status = session.Query(vi, "*IDN?", out string idn);
@@ -105,8 +100,7 @@ namespace CMWtests
         private void btnClose_Click(object sender, EventArgs e)
         {
             status = session.CloseSession(vi);
-            //if (status < ViStatus.VI_SUCCESS)
-            ShowErrorText(status);
+            if (status < ViStatus.VI_SUCCESS) ShowErrorText(status);
             session.CloseResMgr();
         }
 

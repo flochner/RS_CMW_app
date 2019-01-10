@@ -35,7 +35,7 @@ namespace CMWtests
             _cts = null ?? new CancellationTokenSource();
             tests = null ?? new Tests(this, _cts);
 
-            var seq = Task.Run(() => tests.Sequencer());
+            var seq = Task.Run(() => tests.Begin());
         }
 
         public void SetBtnBeginEnabled(bool v)
@@ -121,11 +121,7 @@ namespace CMWtests
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //var commWindow = new VISAqueryForm();
-            //commWindow.ShowDialog();
-            //commWindow = null;
-
-            new VISAqueryForm().ShowDialog();
+            using (var query = new VISAqueryForm()) { query.ShowDialog(); }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
