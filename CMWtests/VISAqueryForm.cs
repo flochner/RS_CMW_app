@@ -93,9 +93,12 @@ namespace CMWtests
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            status = session.CloseSession(vi);
+            try { status = session.CloseSession(vi); }
+            catch (NullReferenceException) { }
             if (status < ViStatus.VI_SUCCESS) ShowErrorText("btnClose.CloseSession", status);
-            session.CloseResMgr();
+            try { session.CloseResMgr(); }
+            catch (NullReferenceException) { }
+            
         }
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)

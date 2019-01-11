@@ -527,8 +527,10 @@ namespace CMWtests
             do
             {
                 retryZero = false;
-                session.Query(vi, "*RST;*OPC?", out visaResponse);
-                session.Query(vi, "*CLS;*OPC?", out visaResponse);
+                status = session.Query(vi, "*RST;*OPC?", out visaResponse);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Connection.*RST, status", status);
+                status = session.Query(vi, "*CLS;*OPC?", out visaResponse);
+                if (status < ViStatus.VI_SUCCESS) ShowErrorText("Connection.*CLS, status", status);
 
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
                 img.SetImage(connection + "-" + numOfFrontEnds);
