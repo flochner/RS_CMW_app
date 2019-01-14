@@ -58,7 +58,7 @@ namespace CMWtests
 
             session = new ViSession();
 
-            var resForm = new VISAresourceForm(session.ResourceMgr);
+            var resForm = new VISAresourceForm();
             resForm.ShowDialog();
             resource = resForm.Resource;
             status = session.OpenSession(resource, out vi);

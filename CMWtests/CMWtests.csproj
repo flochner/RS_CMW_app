@@ -89,6 +89,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CMWgraphs\lib\EPPlus.dll</HintPath>
     </Reference>
+    <Reference Include="Ivi.Visa, Version=5.8.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\IVI Foundation\VISA\Microsoft.NET\Framework32\v2.0.50727\VISA.NET Shared Components 5.8.0\Ivi.Visa.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -116,6 +120,7 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="graph.cs" />
+    <Compile Include="IviVisaExtended.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
