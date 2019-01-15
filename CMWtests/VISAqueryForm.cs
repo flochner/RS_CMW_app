@@ -1,14 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
 using System.Windows.Forms;
-using RsVisaLoader;
 using Ivi.Visa;
 using IviVisaExtended;
 
@@ -18,7 +9,6 @@ namespace CMWtests
     {
         public Tests.TestStatus Status { get; private set; }
         private IMessageBasedSession session = null;
-        private int vi = 0;
 
         public VISAqueryForm()
         {
@@ -44,8 +34,9 @@ namespace CMWtests
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
             string[] modelSer;
-            string resource;
+            string resource = null;
 
+            session = null;
             labelResource.Text = "No Resource Selected";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
@@ -54,8 +45,10 @@ namespace CMWtests
             var resForm = new VISAresourceForm();
             resForm.ShowDialog();
             resource = resForm.Resource;
-                resForm.Dispose();
-            if (resForm.Status == Tests.TestStatus.Abort || string.IsNullOrEmpty(resource))
+            var status = resForm.Status;
+            resForm.Dispose();
+
+            if (status == Tests.TestStatus.Abort || string.IsNullOrEmpty(resource))
                 return;
 
             try

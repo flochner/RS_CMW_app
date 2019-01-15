@@ -143,7 +143,6 @@
     <Compile Include="VISAqueryForm.Designer.cs">
       <DependentUpon>VISAqueryForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="ViSession.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>
