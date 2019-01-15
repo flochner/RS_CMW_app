@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Windows.Forms;
+using Ivi.Visa;
 using RsVisaLoader;
 
 namespace CMWtests
@@ -53,6 +54,10 @@ namespace CMWtests
 
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);
+
+
+            var ff = GlobalResourceManager.Find();
+            int u = ff.Count();
 
             if (retCount > 0)
             {
