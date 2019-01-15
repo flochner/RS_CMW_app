@@ -21,6 +21,7 @@ namespace CMWtests
         {
             InitializeComponent();
             GetResources();
+            Resource = null;
         }
 
         public void GetResources()
@@ -54,10 +55,6 @@ namespace CMWtests
 
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);
-
-
-            var ff = GlobalResourceManager.Find();
-            int u = ff.Count();
 
             if (retCount > 0)
             {

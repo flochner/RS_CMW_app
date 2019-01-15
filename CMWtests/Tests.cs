@@ -598,16 +598,11 @@ namespace CMWtests
 
             try // Separate try-catch for scope initialization prevents accessing uninitialized object
             {
-                IResourceManager sesh = null;
-
-                sesh = GlobalResourceManager.Find() as IResourceManager;
-
-
                 cmw = GlobalResourceManager.Open(resource) as IMessageBasedSession;
             }
             catch (Ivi.Visa.NativeVisaException e)
             {
-                MessageBox.Show("Error initializing the session:\n{0}", e.Message);
+                MessageBox.Show(String.Format("Error initializing the session:\n{0}", e.Message), e.GetType().ToString());
                 return TestStatus.Abort;
             }
             // CMW Identification
@@ -616,7 +611,6 @@ namespace CMWtests
             cmw.Write("*RST;*CLS");
             cmw.Write("*ESE 1");
             cmw.ErrorChecking();
-
 
             visaResponse = cmw.QueryString("*IDN?");
             try
@@ -770,15 +764,15 @@ namespace CMWtests
             }
             catch (InstrumentErrorException e)
             {
-                MessageBox.Show("Instrument reports error(s):\n{0}", e.Message);
+                MessageBox.Show(string.Format("Instrument reports error(s):\n{0}", e.Message), e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                MessageBox.Show("OPC timeout error:\n{0}", e.Message);
+                MessageBox.Show(String.Format("OPC timeout error:\n{0}", e.Message), e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                MessageBox.Show("VISA exception:\n{0}", e.Message);
+                MessageBox.Show(String.Format("VISA exception:\n{0}", e.Message), e.GetType().ToString());
             }
         }
 
@@ -791,15 +785,15 @@ namespace CMWtests
             }
             catch (InstrumentErrorException e)
             {
-                MessageBox.Show("Instrument reports error(s):\n{0}", e.Message);
+                MessageBox.Show(String.Format("Instrument reports error(s):\n{0}", e.Message), e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                MessageBox.Show("OPC timeout error:\n{0}", e.Message);
+                MessageBox.Show(String.Format("OPC timeout error:\n{0}", e.Message), e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                MessageBox.Show("VISA exception:\n{0}", e.Message);
+                MessageBox.Show(String.Format("VISA exception:\n{0}", e.Message), e.GetType().ToString());
             }
         }
     }

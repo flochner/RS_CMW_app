@@ -9,13 +9,15 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.Windows.Forms;
 using RsVisaLoader;
+using Ivi.Visa;
+using IviVisaExtended;
 
 namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        private ViSession session = null;
-        private ViStatus status = 0;
+        public Tests.TestStatus Status { get; private set; }
+        private IMessageBasedSession session = null;
         private int vi = 0;
 
         public VISAqueryForm()
@@ -30,80 +32,86 @@ namespace CMWtests
             textBoxResponse.Text = string.Empty;
             Update();
 
-            string sAnswer;
-            status = session.Query(vi, textBoxStringToWrite.Text, out sAnswer);
-
-            if (status < ViStatus.VI_SUCCESS)
-                ShowErrorText("btnQuery", status);
-            else
-                textBoxResponse.Text = sAnswer;
+            QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
+            textBoxResponse.Text = response;
         }
 
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
-            status = session.Write(vi, textBoxStringToWrite.Text);
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText("btnWrite", status);
+            WriteSTB(textBoxStringToWrite.Text, 20000);
         }
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
-            ViStatus status;
             string[] modelSer;
-            string resource = "";
+            string resource;
 
             labelResource.Text = "No Resource Selected";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
             textBoxResponse.Text = string.Empty;
 
-            session = new ViSession();
-
             var resForm = new VISAresourceForm();
             resForm.ShowDialog();
             resource = resForm.Resource;
-            status = session.OpenSession(resource, out vi);
-            resForm.Dispose();
+                resForm.Dispose();
+            if (resForm.Status == Tests.TestStatus.Abort || string.IsNullOrEmpty(resource))
+                return;
 
-            if (resource != string.Empty)
+            try
             {
-                status = session.Query(vi, "*IDN?", out string idn);
-                if (status == ViStatus.VI_SUCCESS)
-                {
-                    modelSer = idn.Split(',');
-                    if (modelSer.Length >= 3)
-                    {
-                        if (modelSer[2].Contains("/"))
-                            modelSer[2] = modelSer[2].Split('/')[1];
-                        labelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
-                    }
-                }
-                else
-                {
-                    ShowErrorText("ConnectNew.Query IDN", status);
-                }
+                session = GlobalResourceManager.Open(resource) as IMessageBasedSession;
+            }
+            catch (Ivi.Visa.NativeVisaException exc)
+            {
+                MessageBox.Show(exc.Message, exc.GetType().ToString());
+                return;
             }
 
-            if (textBoxStringToWrite.Text != string.Empty && session != null)
+            session.Clear();
+            session.Write("*RST;*CLS");
+            session.Write("*ESE 1");
+            session.ErrorChecking();
+
+            QuerySTB("*IDN?", 20000, out string idn);
+            try
+            {
+                modelSer = idn.Split(',');
+                if (modelSer.Length >= 3)
+                {
+                    if (modelSer[2].Contains("/"))
+                        modelSer[2] = modelSer[2].Split('/')[1];
+                    labelResource.Text = modelSer[1].Trim() + " - " + modelSer[2].Trim();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, exc.GetType().ToString());
+                return;
+            }
+
+            if (!string.IsNullOrWhiteSpace(textBoxStringToWrite.Text) && session != null)
             {
                 btnWriteVISA.Enabled = true;
                 btnQueryVISA.Enabled = true;
             }
-
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            try { status = session.CloseSession(vi); }
-            catch (NullReferenceException) { }
-            if (status < ViStatus.VI_SUCCESS) ShowErrorText("btnClose.CloseSession", status);
-            try { session.CloseResMgr(); }
-            catch (NullReferenceException) { }
-            
+            if (session != null)
+            {
+                session.Clear();
+                session.Write("*RST;*CLS");
+                session.Write("*ESE 1");
+                session.ErrorChecking();
+                session.Dispose();
+            }
         }
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
         {
-            if (textBoxStringToWrite.Text == string.Empty || session == null)
+            if (string.IsNullOrWhiteSpace(textBoxStringToWrite.Text) || session == null)
             {
                 btnWriteVISA.Enabled = false;
                 btnQueryVISA.Enabled = false;
@@ -115,11 +123,45 @@ namespace CMWtests
             }
         }
 
-        private void ShowErrorText(string source, ViStatus status)
+        private void WriteSTB(string command, int timeout)
         {
-            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            visa32.viStatusDesc(session.ResourceMgr, status, text);
-            textBoxResponse.Text += Environment.NewLine + source + Environment.NewLine + text.ToString();
+            try
+            {
+                session.WriteWithSTBpollSync(command, timeout);
+            }
+            catch (InstrumentErrorException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
+            catch (InstrumentOPCtimeoutException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
+            catch (Ivi.Visa.VisaException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
+        }
+
+        private void QuerySTB(string query, int timeout, out string response)
+        {
+            response = null;
+            try
+            {
+                response = session.QueryWithSTBpollSync(query, timeout);
+            }
+            catch (InstrumentErrorException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
+            catch (InstrumentOPCtimeoutException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
+            catch (Ivi.Visa.VisaException e)
+            {
+                MessageBox.Show(e.Message, e.GetType().ToString());
+            }
         }
     }
 }
