@@ -16,7 +16,6 @@ namespace CMWtests
     {
         private IMessageBasedSession cmw = null;
         public enum TestStatus : int { Abort = -1, Success, Complete };
-        private TestStatus exitStatus = TestStatus.Success;
         private CancellationTokenSource _cts;
         private MainForm _parent = null;
         private StreamWriter _csvStream = null;
@@ -599,6 +598,11 @@ namespace CMWtests
 
             try // Separate try-catch for scope initialization prevents accessing uninitialized object
             {
+                IResourceManager sesh = null;
+
+                sesh = GlobalResourceManager.Find() as IResourceManager;
+
+
                 cmw = GlobalResourceManager.Open(resource) as IMessageBasedSession;
             }
             catch (Ivi.Visa.NativeVisaException e)
@@ -735,6 +739,7 @@ namespace CMWtests
             cmw.Write("*RST;*CLS");
             cmw.Write("*ESE 1");
             cmw.ErrorChecking();
+            cmw.Dispose();
 
             if (_csvStream != null)
                 try { _csvStream.Dispose(); }
