@@ -292,6 +292,7 @@ namespace CMWtests
 
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
+            int pmStatus = 0;
             bool retry = false;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
@@ -302,6 +303,7 @@ namespace CMWtests
             string chartLimits = "";
             string testHeader = "";
             string visaResponse = "";
+            string[] pmResponse = { };
 
             testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             _parent.AddToResults(Environment.NewLine + testHeader);
@@ -355,7 +357,7 @@ namespace CMWtests
                 if (_cts.IsCancellationRequested)
                     return GracefulExit(TestStatus.Abort);
 
-                #region Set up loop
+                #region Set up this loop - set freqs - get GPRF Measure Power
                 pointsCount += 1;
                 _parent.SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
@@ -377,23 +379,23 @@ namespace CMWtests
                 #endregion
 
                 #region Take sensor reading
-                do
+                do  //while (retry)
                 {
                     retry = false;
-                    visaResponse = cmw.QueryString("READ:GPRF:MEAS:EPSensor?");
 
+                    visaResponse = cmw.QueryString("READ:GPRF:MEAS:EPSensor?");
                     try
                     {
-                        visaResponse.Split('~');
+                        pmResponse = visaResponse.Split(',');
+                        int.TryParse(pmResponse[0], out pmStatus);
+                        double.TryParse(pmResponse[1], out pmPower);
                     }
-                    catch (IndexOutOfRangeException e)
+                    catch (Exception e)
                     {
-                        MessageBox.Show("why am i trying to split on \"~\"?");
-                        return GracefulExit(TestStatus.Abort);
+                        MessageBox.Show(e.Message, e.Source);
                     }
-
-                    if (visaResponse.Split(',')[2].Contains("INV") ||
-                        visaResponse.Split(',')[2].Contains("NAV"))
+                    
+                    if ( pmStatus != 0 )
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF");
 
@@ -413,15 +415,6 @@ namespace CMWtests
                         cmw.Write("SOURce:GPRF:GEN:STATe ON");
                     }
                 } while (retry);
-
-                try
-                {
-                    pmPower = Convert.ToDouble(visaResponse.Split(',')[2]);
-                }
-                catch (Exception e)
-                {
-                    MessageBox.Show(e.Message, e.Source);
-                }
 
                 if (testName.Contains("RX"))
                     amplError = cmwMeasPower - pmPower;
@@ -445,13 +438,13 @@ namespace CMWtests
                     img.SetImage(testName + "-" + numOfFrontEnds);
                     img.ShowDialog();
 
-                    DialogResult resp = MessageBox.Show("(Retry) after fixing the connections" + Environment.NewLine +
-                                                        "(Ignore) further level errors and continue test" + Environment.NewLine +
-                                                        "(Abort) all testing",
-                                                        "MEASURING - Check Connections",
-                                                         MessageBoxButtons.AbortRetryIgnore,
-                                                         MessageBoxIcon.Question,
-                                                         MessageBoxDefaultButton.Button3);
+                    //DialogResult resp = MessageBox.Show("(Retry) after fixing the connections" + Environment.NewLine +
+                    //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
+                    //                                    "(Abort) all testing",
+                    //                                    "MEASURING - Check Connections",
+                    //                                     MessageBoxButtons.AbortRetryIgnore,
+                    //                                     MessageBoxIcon.Question,
+                    //                                     MessageBoxDefaultButton.Button3);
 
                     _ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
 
@@ -526,12 +519,14 @@ namespace CMWtests
 
         private TestStatus ConnectionMessage(string connection)
         {
+            int pmStatus = -1;
             bool retryZero = false;
             string visaResponse = "";
+            string[] pmResponse = { };
 
             _parent.SetBtnCancelEnabled(false);
 
-            do
+            do //while retryZero
             {
                 retryZero = false;
 
@@ -546,25 +541,54 @@ namespace CMWtests
                 if (img.DialogResult == DialogResult.Abort)
                     return TestStatus.Abort;
 
-                _parent.SetHead2Text("Zeroing Sensor...");
-                WriteSTB("CALibration:GPRF:MEAS:EPSensor:ZERO", 0);
-                QuerySTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000, out visaResponse);
-
-                //fml
-                //visaResponse = "PASS";
-
-                if (!visaResponse.Contains("PASS"))
+                visaResponse = cmw.QueryString("READ:GPRF:MEAS:EPSensor?");
+                try
                 {
-                    var result = MessageBox.Show("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
-                                                 "(Retry) after verifying the connections" + Environment.NewLine +
-                                                 "(Cancel) all testing",
-                                                 "Sensor Zero Failure",
+                    pmResponse = visaResponse.Split(',');
+                    int.TryParse(pmResponse[0], out pmStatus);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show(e.Message, e.Source);
+                }
+
+                if (pmStatus == 0 || pmStatus == 4)
+                {
+                    _parent.SetHead2Text("Zeroing Sensor...");
+                    WriteSTB("CALibration:GPRF:MEAS:EPSensor:ZERO", 0);
+                    QuerySTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000, out visaResponse);
+
+                    //fml
+                 //   visaResponse = "FAIL";
+
+                    if (!visaResponse.Contains("PASS"))
+                    {
+                        var verifyConnection = MessageBox.Show("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
+                                                     "(Retry) after verifying all outputs are off." + Environment.NewLine +
+                                                     "(Cancel) all testing.",
+                                                     "Sensor Zero Failure",
+                                                      MessageBoxButtons.RetryCancel,
+                                                      MessageBoxIcon.Exclamation,
+                                                      MessageBoxDefaultButton.Button1);
+
+                        retryZero = (verifyConnection == DialogResult.Retry);
+                        if (verifyConnection == DialogResult.Cancel)
+                            return TestStatus.Abort;
+                    }
+                }
+                else if (pmStatus == 27)
+                {
+                    var verifyConnection = MessageBox.Show("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
+                                                 "(Retry) after verifying the connection." + Environment.NewLine +
+                                                 "(Cancel) all testing.",
+                                                 "Sensor Status Error",
                                                   MessageBoxButtons.RetryCancel,
                                                   MessageBoxIcon.Exclamation,
                                                   MessageBoxDefaultButton.Button1);
 
-                    retryZero = (result == DialogResult.Retry);
-                    if (result == DialogResult.Cancel)
+                    if (verifyConnection == DialogResult.Retry)
+                        retryZero = true;
+                    else
                         return TestStatus.Abort;
                 }
             } while (retryZero);
@@ -596,7 +620,7 @@ namespace CMWtests
             }
             resForm.Dispose();
 
-            try // Separate try-catch for scope initialization prevents accessing uninitialized object
+            try
             {
                 cmw = GlobalResourceManager.Open(resource) as IMessageBasedSession;
             }
@@ -605,8 +629,8 @@ namespace CMWtests
                 MessageBox.Show(String.Format("Error initializing the session:\n{0}", e.Message), e.GetType().ToString());
                 return TestStatus.Abort;
             }
-            // CMW Identification
 
+            // CMW Identification
             cmw.Clear();
             cmw.Write("*RST;*CLS");
             cmw.Write("*ESE 1");
@@ -764,36 +788,36 @@ namespace CMWtests
             }
             catch (InstrumentErrorException e)
             {
-                MessageBox.Show(string.Format("Instrument reports error(s):\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                MessageBox.Show(String.Format("OPC timeout error:\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                MessageBox.Show(String.Format("VISA exception:\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
         }
 
         private void QuerySTB(string query, int timeout, out string response)
         {
             response = null;
-            try // try block to catch any InstrumentErrorException() or InstrumentOPCtimeoutException()
+            try
             {
                 response = cmw.QueryWithSTBpollSync(query, timeout);
             }
             catch (InstrumentErrorException e)
             {
-                MessageBox.Show(String.Format("Instrument reports error(s):\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                MessageBox.Show(String.Format("OPC timeout error:\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                MessageBox.Show(String.Format("VISA exception:\n{0}", e.Message), e.GetType().ToString());
+                MessageBox.Show(e.Message, e.GetType().ToString());
             }
         }
     }
