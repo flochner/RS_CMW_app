@@ -28,10 +28,14 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
+            this.toolTipAbort = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipRetry = new System.Windows.Forms.ToolTip(this.components);
+            this.toolTipIgnore = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -74,6 +78,18 @@
             this.button3.UseVisualStyleBackColor = true;
             this.button3.Click += new System.EventHandler(this.button3_Click);
             // 
+            // toolTipAbort
+            // 
+            this.toolTipAbort.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipAbort_Popup);
+            // 
+            // toolTipRetry
+            // 
+            this.toolTipRetry.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipRetry_Popup);
+            // 
+            // toolTipIgnore
+            // 
+            this.toolTipIgnore.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipIgnore_Popup);
+            // 
             // ConnectionImageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -97,5 +113,8 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.ToolTip toolTipAbort;
+        private System.Windows.Forms.ToolTip toolTipRetry;
+        private System.Windows.Forms.ToolTip toolTipIgnore;
     }
 }

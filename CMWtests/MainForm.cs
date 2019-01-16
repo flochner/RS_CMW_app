@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,6 +11,7 @@ namespace CMWtests
         delegate void BoolArgReturningVoidDelegate(bool v);
         delegate bool VoidArgReturningBoolDelegate();
         private CancellationTokenSource _cts = null;
+        private bool showAbortMessage = true;
 
         public MainForm()
         {
@@ -50,6 +44,11 @@ namespace CMWtests
             }
         }
 
+        public bool GetBtnCancelEnabled()
+        {
+            return btnCancelTests.Enabled;
+        }
+
         public void SetBtnCancelEnabled(bool v)
         {
             if (this.btnCancelTests.InvokeRequired)
@@ -62,20 +61,6 @@ namespace CMWtests
                 this.btnCancelTests.Enabled = v;
                 this.Refresh();
             }
-        }
-
-        public bool GetBtnBeginEnabled()
-        {
-            //if (this.BtnBeginTests.InvokeRequired)
-            //{
-            //    VoidArgReturningBoolDelegate d = new VoidArgReturningBoolDelegate(GetBtnBeginEnabled);
-            //    this.Invoke(d, new object[] { });
-            //    return false;
-            //}
-            //else
-            //{
-            return this.btnBeginTests.Enabled;
-            //}
         }
 
         public void AddToResults(string item)
@@ -128,15 +113,26 @@ namespace CMWtests
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            showAbortMessage = false;
             btnCancelTests_Click(sender, e);
             Application.Exit();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            try { _cts.Cancel(); }
-            catch (NullReferenceException) { }
-            catch (ObjectDisposedException) { }
+            var abort = DialogResult.Yes;
+
+            if (showAbortMessage == true)
+                abort = MessageBox.Show("Really abort testing?",
+                                        "Warning",
+                                         MessageBoxButtons.YesNo,
+                                         MessageBoxIcon.Warning,
+                                         MessageBoxDefaultButton.Button2);
+
+            if (abort == DialogResult.Yes)
+                try { _cts.Cancel(); }
+                catch (NullReferenceException) { }
+                catch (ObjectDisposedException) { }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
