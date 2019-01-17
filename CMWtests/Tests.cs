@@ -38,6 +38,15 @@ namespace CMWtests
 
         public void Begin()
         {
+            _parent.SetBtnCancelEnabled(true);
+            var verifyConnection = ModalMessageBox("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
+                             "(Retry) after verifying the connection." + Environment.NewLine +
+                             "(Cancel) all testing.",
+                             "Sensor Status Error",
+                              MessageBoxButtons.RetryCancel,
+                              MessageBoxIcon.Exclamation,
+                              MessageBoxDefaultButton.Button1);
+
             var status = Sequencer();
 
             if (status == TestStatus.Abort)
@@ -351,10 +360,7 @@ namespace CMWtests
                 endFreq = (long)3300e6;
             #endregion
 
-            var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-            _parent.SetBtnCancelEnabled(false);
-            MessageBox.Show(_parent, "tol set for 0.003");
-            _parent.SetBtnCancelEnabled(btnCancelEnabled);
+            ModalMessageBox("tol set for 0.003");
 
             do  ///// Main Loop
             {
@@ -377,10 +383,7 @@ namespace CMWtests
                     }
                     catch (Exception e)
                     {
-                        btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                        _parent.SetBtnCancelEnabled(false);
-                        MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                        _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                        ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
                 #endregion
@@ -399,25 +402,19 @@ namespace CMWtests
                     }
                     catch (Exception e)
                     {
-                        btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                        _parent.SetBtnCancelEnabled(false);
-                        MessageBox.Show(_parent, e.Message, e.Source);
-                        _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                        ModalMessageBox(e.Message, e.Source);
                     }
                     
                     if ( pmStatus != 0 )
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF");
 
-                        btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                        _parent.SetBtnCancelEnabled(false);
-                        MessageBox.Show(_parent, "Re-check connections using the following diagram.",
+                        ModalMessageBox("Re-check connections using the following diagram.",
                                         "Test Setup",
                                          MessageBoxButtons.OK,
                                          MessageBoxIcon.Asterisk);
-                        _parent.SetBtnCancelEnabled(btnCancelEnabled);
 
-                        btnCancelEnabled = _parent.GetBtnCancelEnabled();
+                        var btnCancelEnabled = _parent.GetBtnCancelEnabled();
                         _parent.SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "-" + numOfFrontEnds);
@@ -449,31 +446,25 @@ namespace CMWtests
                     cmw.Write("SOURce:GPRF:GEN:STATe OFF");
                     cmw.Write("SYSTem:MEASurement:ALL:OFF");
 
-                    btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    MessageBox.Show(_parent, "Re-check connections using the following diagram.",
+                    ModalMessageBox("Re-check connections using the following diagram.",
                                     "Test Setup",
                                      MessageBoxButtons.OK,
                                      MessageBoxIcon.Asterisk);
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
 
-                    btnCancelEnabled = _parent.GetBtnCancelEnabled();
+                    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
                     _parent.SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
                     img.SetImage(testName + "-" + numOfFrontEnds);
                     img.ShowDialog();
                     _parent.SetBtnCancelEnabled(btnCancelEnabled);
 
-                    //btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    //_parent.SetBtnCancelEnabled(false);
-                    //DialogResult resp = MessageBox.Show(_parent, "(Retry) after fixing the connections" + Environment.NewLine +
+                    //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
                     //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
                     //                                    "(Abort) all testing",
                     //                                    "MEASURING - Check Connections",
                     //                                     MessageBoxButtons.AbortRetryIgnore,
                     //                                     MessageBoxIcon.Question,
                     //                                     MessageBoxDefaultButton.Button3);
-                    //_parent.SetBtnCancelEnabled(btnCancelEnabled);
 
                     _ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
 
@@ -581,10 +572,7 @@ namespace CMWtests
                 }
                 catch (Exception e)
                 {
-                    btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    MessageBox.Show(_parent, e.Message, e.Source);
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                    ModalMessageBox(e.Message, e.Source);
                 }
 
                 if (pmStatus == 0 || pmStatus == 4)
@@ -598,16 +586,13 @@ namespace CMWtests
 
                     if (!visaResponse.Contains("PASS"))
                     {
-                        btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                        _parent.SetBtnCancelEnabled(false);
-                        var verifyConnection = MessageBox.Show(_parent, "Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
+                        var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
                                                      "(Retry) after verifying all outputs are off." + Environment.NewLine +
                                                      "(Cancel) all testing.",
                                                      "Sensor Zero Failure",
                                                       MessageBoxButtons.RetryCancel,
                                                       MessageBoxIcon.Exclamation,
                                                       MessageBoxDefaultButton.Button1);
-                        _parent.SetBtnCancelEnabled(btnCancelEnabled);
 
                         retryZero = (verifyConnection == DialogResult.Retry);
                         if (verifyConnection == DialogResult.Cancel)
@@ -616,16 +601,13 @@ namespace CMWtests
                 }
                 else if (pmStatus == 27)
                 {
-                    btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    var verifyConnection = MessageBox.Show(_parent, "Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
+                    var verifyConnection = ModalMessageBox("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
                                                  "(Retry) after verifying the connection." + Environment.NewLine +
                                                  "(Cancel) all testing.",
                                                  "Sensor Status Error",
                                                   MessageBoxButtons.RetryCancel,
                                                   MessageBoxIcon.Exclamation,
                                                   MessageBoxDefaultButton.Button1);
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
 
                     if (verifyConnection == DialogResult.Retry)
                         retryZero = true;
@@ -671,10 +653,7 @@ namespace CMWtests
                 }
                 catch (Exception e)
                 {
-                    btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    MessageBox.Show(_parent, String.Format("Error initializing the session:\n{0}", e.Message), e.GetType().ToString());
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                    ModalMessageBox(String.Format("Error initializing the session:\n{0}", e.Message), e.GetType().ToString());
                     return TestStatus.Abort;
                 }
             }
@@ -693,10 +672,7 @@ namespace CMWtests
             }
             catch (ArgumentOutOfRangeException e)
             {
-                btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, String.Format("Error identifying instrument:\n{0}", e.Message), e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(String.Format("Error identifying instrument:\n{0}", e.Message), e.GetType().ToString());
                 return TestStatus.Abort;
             }
 
@@ -727,18 +703,12 @@ namespace CMWtests
             else if (visaResponse.Contains("1201.0002k") ||
                      visaResponse.Contains("1201.0002K"))
             {
-                btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, "DUT Not Yet Covered under this procedure.");
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox("DUT Not Yet Covered under this procedure.");
                 return TestStatus.Abort;
             }
             else
             {
-                btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, "This is not a CMW.");
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox("This is not a CMW.");
                 return TestStatus.Abort;
             }
 
@@ -772,10 +742,7 @@ namespace CMWtests
             }
             catch (IOException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, "IO Exception");
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, "IO Exception");
                 return null;
             }
         }
@@ -828,20 +795,14 @@ namespace CMWtests
                 try { _csvStream.Dispose(); }
                 catch
                 {
-                    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    MessageBox.Show(_parent, "Dispose csvStream Exception");
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                    ModalMessageBox("Dispose csvStream Exception");
                 }
 
             if (File.Exists(csvFileName))
                 try { File.Delete(csvFileName); }
                 catch
                 {
-                    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
-                    MessageBox.Show(_parent, "Temp file delete Exception");
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                    ModalMessageBox("Temp file delete Exception");
                 }
 
             try
@@ -851,10 +812,7 @@ namespace CMWtests
             }
             catch (Exception exc)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, exc.Message, exc.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(exc.Message, exc.GetType().ToString());
             }
 
             return exitStatus;
@@ -868,24 +826,15 @@ namespace CMWtests
             }
             catch (InstrumentErrorException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
         }
 
@@ -898,33 +847,46 @@ namespace CMWtests
             }
             catch (InstrumentErrorException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
             catch (InstrumentOPCtimeoutException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
             catch (Ivi.Visa.VisaException e)
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
-                MessageBox.Show(_parent, e.Message, e.GetType().ToString());
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                ModalMessageBox(e.Message, e.GetType().ToString());
             }
         }
 
-        private void ModalMessageBox(string message)
+        private DialogResult ModalMessageBox(string message, 
+                                     string title = "", 
+                                     MessageBoxButtons buttons = MessageBoxButtons.OK, 
+                                     MessageBoxIcon icon = MessageBoxIcon.None, 
+                                     MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
         {
+            DialogResult result = DialogResult.OK;
             if (_parent.InvokeRequired)
             {
-                _parent.Invoke((Action)delegate { MessageBox.Show(_parent, message); });
+                _parent.Invoke((Action)delegate {
+                    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
+                    _parent.SetBtnCancelEnabled(false);
+                    result = MessageBox.Show(message, title, buttons, icon, defaultButton);
+                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                });
             }
+            else
+            {
+                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
+                _parent.SetBtnCancelEnabled(false);
+                result = MessageBox.Show(message, title, buttons, icon, defaultButton);
+                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+            }
+            return result;
+            //var btnCancelEnabled = _parent.GetBtnCancelEnabled();
+            //_parent.SetBtnCancelEnabled(false);
+            //MessageBox.Show();
+            //_parent.SetBtnCancelEnabled(btnCancelEnabled);
         }
     }
 }
