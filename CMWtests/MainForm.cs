@@ -11,7 +11,6 @@ namespace CMWtests
         delegate void BoolArgReturningVoidDelegate(bool v);
         delegate bool VoidArgReturningBoolDelegate();
         private CancellationTokenSource _cts = null;
-        private bool showAbortMessage = true;
 
         public MainForm()
         {
@@ -20,12 +19,11 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            Tests tests;
             SetBtnBeginEnabled(false);
             textBoxResults.Clear();
 
             _cts = null ?? new CancellationTokenSource();
-            tests = null ?? new Tests(this, _cts);
+            Tests tests = null ?? new Tests(this, _cts);
 
             var seq = Task.Run(() => tests.Begin());
         }
@@ -113,26 +111,16 @@ namespace CMWtests
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            showAbortMessage = false;
             btnCancelTests_Click(sender, e);
-            Application.Exit();
+            AddToResults("Out of exit.");
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            var abort = DialogResult.Yes;
-
-            if (showAbortMessage == true)
-                abort = MessageBox.Show("Really abort testing?",
-                                        "Warning",
-                                         MessageBoxButtons.YesNo,
-                                         MessageBoxIcon.Warning,
-                                         MessageBoxDefaultButton.Button2);
-
-            if (abort == DialogResult.Yes)
-                try { _cts.Cancel(); }
-                catch (NullReferenceException) { }
-                catch (ObjectDisposedException) { }
+            try { _cts.Cancel(); }
+            catch (NullReferenceException) { }
+            catch (ObjectDisposedException) { }
+            catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
