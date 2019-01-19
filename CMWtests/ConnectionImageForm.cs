@@ -20,6 +20,8 @@ namespace CMWtests
 
             if (_buttons == MessageBoxButtons.AbortRetryIgnore)
             {
+                toolTipAbort.InitialDelay = 0;
+                toolTipAbort.SetToolTip(button1, "test");
                 button1.Visible = true;
                 button1.Text = "Abort";
                 button2.Text = "Retry";
@@ -95,6 +97,21 @@ namespace CMWtests
                 if (_result == DialogResult.Yes)
                     this.DialogResult = DialogResult.Abort;
             }
+        }
+
+        private void toolTipAbort_Popup(object sender, PopupEventArgs e)
+        {
+
+        }
+
+        private void toolTipRetry_Popup(object sender, PopupEventArgs e)
+        {
+
+        }
+
+        private void toolTipIgnore_Popup(object sender, PopupEventArgs e)
+        {
+
         }
     }
 }

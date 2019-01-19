@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.IO;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -26,12 +19,11 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            Tests tests;
             SetBtnBeginEnabled(false);
             textBoxResults.Clear();
 
             _cts = null ?? new CancellationTokenSource();
-            tests = null ?? new Tests(this, _cts);
+            Tests tests = null ?? new Tests(this, _cts);
 
             var seq = Task.Run(() => tests.Begin());
         }
@@ -50,6 +42,11 @@ namespace CMWtests
             }
         }
 
+        public bool GetBtnCancelEnabled()
+        {
+            return btnCancelTests.Enabled;
+        }
+
         public void SetBtnCancelEnabled(bool v)
         {
             if (this.btnCancelTests.InvokeRequired)
@@ -62,20 +59,6 @@ namespace CMWtests
                 this.btnCancelTests.Enabled = v;
                 this.Refresh();
             }
-        }
-
-        public bool GetBtnBeginEnabled()
-        {
-            //if (this.BtnBeginTests.InvokeRequired)
-            //{
-            //    VoidArgReturningBoolDelegate d = new VoidArgReturningBoolDelegate(GetBtnBeginEnabled);
-            //    this.Invoke(d, new object[] { });
-            //    return false;
-            //}
-            //else
-            //{
-            return this.btnBeginTests.Enabled;
-            //}
         }
 
         public void AddToResults(string item)
@@ -129,7 +112,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             btnCancelTests_Click(sender, e);
-            Application.Exit();
+            AddToResults("Out of exit.");
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
@@ -137,6 +120,7 @@ namespace CMWtests
             try { _cts.Cancel(); }
             catch (NullReferenceException) { }
             catch (ObjectDisposedException) { }
+            catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
