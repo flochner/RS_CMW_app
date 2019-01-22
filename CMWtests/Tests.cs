@@ -29,7 +29,7 @@ namespace CMWtests
         public Tests(MainForm parent, CancellationTokenSource cts)
         {
             _parent = parent;
-           _cts = cts;
+            _cts = cts;
         }
 
         public void Begin()
@@ -40,6 +40,11 @@ namespace CMWtests
                 _parent.AddToResults(Environment.NewLine + "Tests Aborted.");
             else if (status == TestStatus.Complete)
                 _parent.AddToResults(Environment.NewLine + "Tests Complete.");
+
+            if (_parent.IsExitRequested)
+                _parent.AppExit();
+
+            _parent.SetBtnBeginEnabled(true);
         }
 
         private TestStatus Sequencer()
@@ -48,10 +53,7 @@ namespace CMWtests
             string testName = "";
 
             if (ConnectIdentifyDUT() == TestStatus.Abort)
-            {
-                _parent.SetBtnBeginEnabled(true);
                 return GracefulExit(TestStatus.Abort);
-            }
 
             _parent.SetBtnCancelEnabled(true);
             _parent.SetHead1Text("GPRF CW Measurement Tests");
@@ -62,7 +64,6 @@ namespace CMWtests
             chartLimits6 = ",-1.2,-1.0,0,1.0,1.2";
             amplList = new int[] { 0, -8, -20 };
 
-            _parent.AddToResults(Environment.NewLine);
             testName = "RF1COM_RX";
 
             if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -87,7 +88,6 @@ namespace CMWtests
             }
 
             /// -------------------------------------------------------------
-            _parent.AddToResults(Environment.NewLine);
             testName = "RF2COM_RX";
 
             if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -118,7 +118,6 @@ namespace CMWtests
             /// -------------------------------------------------------------
             if (numOfFrontEnds > 1)
             {
-                _parent.AddToResults(Environment.NewLine);
                 testName = "RF3COM_RX";
 
                 if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -137,7 +136,6 @@ namespace CMWtests
                         return GracefulExit(TestStatus.Abort);
 
                 /// -------------------------------------------------------------
-                _parent.AddToResults(Environment.NewLine);
                 testName = "RF4COM_RX";
 
                 if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -195,7 +193,6 @@ namespace CMWtests
             chartLimits6 = (",-1.8,-1.6,0,1.6,1.8");
             amplList = new int[] { -0, -36 };
 
-            _parent.AddToResults(Environment.NewLine);
             testName = "RF1OUT_TX";
 
             if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -223,7 +220,6 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 
-            _parent.AddToResults(Environment.NewLine);
             testName = "RF2COM_TX";
 
             if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -253,7 +249,6 @@ namespace CMWtests
                 chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
                 amplList = new int[] { -8, -44 };
 
-                _parent.AddToResults(Environment.NewLine);
                 testName = "RF3COM_TX";
 
                 if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -275,7 +270,6 @@ namespace CMWtests
                 chartLimits6 = (",-1.8,-1.6,0,1.6,1.8");
                 amplList = new int[] { -0, -36 };
 
-                _parent.AddToResults(Environment.NewLine);
                 testName = "RF3OUT_TX";
 
                 if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -297,7 +291,6 @@ namespace CMWtests
                 chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
                 amplList = new int[] { -8, -44 };
 
-                _parent.AddToResults(Environment.NewLine);
                 testName = "RF4COM_TX";
 
                 if (ConnectionMessage(testName) == TestStatus.Abort)
@@ -334,7 +327,7 @@ namespace CMWtests
             string[] pmResponse = { };
 
             testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
-            _parent.AddToResults(testHeader + Environment.NewLine);
+            _parent.AddToResults(Environment.NewLine + testHeader);
 
         start:
 
@@ -381,17 +374,11 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                var abort = DialogResult.No;
+                while (_parent.PauseTesting == true && _cts.IsCancellationRequested == false)
+                    Thread.Sleep(500);
+
                 if (_cts.IsCancellationRequested)
-                {
-                    abort = ModalMessageBox("Really abort testing?",
-                                            "Warning",
-                                             MessageBoxButtons.YesNo,
-                                             MessageBoxIcon.Warning,
-                                             MessageBoxDefaultButton.Button2);
-                    if (abort == DialogResult.Yes)
                         return TestStatus.Abort;
-                }
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
                 pointsCount += 1;
@@ -761,6 +748,7 @@ namespace CMWtests
             _parent.AddToResults("hasKB036: " + hasKB036.ToString());
             _parent.AddToResults("numOfTRX: " + numOfTRX.ToString());
             _parent.AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
+
             return TestStatus.Success;
         }
 
@@ -844,7 +832,6 @@ namespace CMWtests
                 ModalMessageBox(exc.Message, exc.GetType().ToString());
             }
 
-            _parent.AddToResults("out of grace");
             return exitStatus;
         }
 

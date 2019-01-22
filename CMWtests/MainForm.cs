@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -7,10 +8,11 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        delegate void StringArgReturningVoidDelegate(string text);
-        delegate void BoolArgReturningVoidDelegate(bool v);
-        delegate bool VoidArgReturningBoolDelegate();
+        delegate void StringDelegate(string text);
+        delegate void BoolDelegate(bool v);
         private CancellationTokenSource _cts = null;
+        public bool IsExitRequested { get; private set; } = false;
+        public bool PauseTesting { get; private set; } = false;
 
         public MainForm()
         {
@@ -21,6 +23,7 @@ namespace CMWtests
         {
             SetBtnBeginEnabled(false);
             textBoxResults.Clear();
+            PauseTesting = false;
 
             _cts = null ?? new CancellationTokenSource();
             Tests tests = null ?? new Tests(this, _cts);
@@ -32,8 +35,8 @@ namespace CMWtests
         {
             if (this.btnBeginTests.InvokeRequired)
             {
-                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnBeginEnabled);
-                this.Invoke(d, new object[] { v });
+                BoolDelegate d = new BoolDelegate(SetBtnBeginEnabled);
+                this.BeginInvoke(d, new object[] { v });
             }
             else
             {
@@ -51,8 +54,8 @@ namespace CMWtests
         {
             if (this.btnCancelTests.InvokeRequired)
             {
-                BoolArgReturningVoidDelegate d = new BoolArgReturningVoidDelegate(SetBtnCancelEnabled);
-                this.Invoke(d, new object[] { v });
+                BoolDelegate d = new BoolDelegate(SetBtnCancelEnabled);
+                this.BeginInvoke(d, new object[] { v });
             }
             else
             {
@@ -65,8 +68,8 @@ namespace CMWtests
         {
             if (this.textBoxResults.InvokeRequired)
             {
-                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(AddToResults);
-                this.Invoke(d, new object[] { item });
+                StringDelegate d = new StringDelegate(AddToResults);
+                this.BeginInvoke(d, new object[] { item });
             }
             else
             {
@@ -78,8 +81,8 @@ namespace CMWtests
         {
             if (this.labelHead1.InvokeRequired)
             {
-                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(SetHead1Text);
-                this.Invoke(d, new object[] { text });
+                StringDelegate d = new StringDelegate(SetHead1Text);
+                this.BeginInvoke(d, new object[] { text });
             }
             else
             {
@@ -91,8 +94,8 @@ namespace CMWtests
         {
             if (this.labelHead1.InvokeRequired)
             {
-                StringArgReturningVoidDelegate d = new StringArgReturningVoidDelegate(SetHead2Text);
-                this.Invoke(d, new object[] { text });
+                StringDelegate d = new StringDelegate(SetHead2Text);
+                this.BeginInvoke(d, new object[] { text });
             }
             else
             {
@@ -111,16 +114,33 @@ namespace CMWtests
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            IsExitRequested = true;
             btnCancelTests_Click(sender, e);
-            AddToResults("Out of exit.");
+        }
+
+        public void AppExit()
+        {
+            Application.Exit();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            try { _cts.Cancel(); }
-            catch (NullReferenceException) { }
-            catch (ObjectDisposedException) { }
-            catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
+            if (_cts == null && IsExitRequested == true)
+                AppExit();
+
+            PauseTesting = true;
+            var abort = MessageBox.Show("Really abort testing?",
+                                    "Warning",
+                                     MessageBoxButtons.YesNo,
+                                     MessageBoxIcon.Warning,
+                                     MessageBoxDefaultButton.Button2);
+            if (abort == DialogResult.Yes)
+                try { _cts.Cancel(); _cts = null; }
+                catch (NullReferenceException) { }
+                catch (ObjectDisposedException) { }
+                catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
+            else
+                PauseTesting = false;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
