@@ -154,9 +154,9 @@ namespace CMWtests
         private void MainForm_Load(object sender, EventArgs e) { }
         private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) { }
-        private void textBoxResults_TextChanged(object sender, EventArgs e) { this.Refresh(); }
-        private void labelHead1_TextChanged(object sender, EventArgs e) { this.Refresh(); }
-        private void labelHead2_TextChanged(object sender, EventArgs e) { this.Refresh(); }
+        private void textBoxResults_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
+        private void labelHead1_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
+        private void labelHead2_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
 
         #region Code for future use
         //string[] args = new string[]

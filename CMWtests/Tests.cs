@@ -749,6 +749,10 @@ namespace CMWtests
             _parent.AddToResults("numOfTRX: " + numOfTRX.ToString());
             _parent.AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
 
+            ///// fml
+            hasKB036 = false;
+            numOfFrontEnds = 1;
+
             return TestStatus.Success;
         }
 
