@@ -22,7 +22,6 @@ namespace CMWgraph
 
             if (book.Exists)
             {
-                // testing branch commit
                 CheckOpenFile(book);
                 if (isFirstTest)
                 {
@@ -156,7 +155,7 @@ namespace CMWgraph
                 }
                 catch (IOException)
                 {
-                    MessageBox.Show("Close the Workbook!", "CMW graphs",
+                    MessageBox.Show("Close the Workbook to continue testing", "CMW graphs",
                         MessageBoxButtons.OK, MessageBoxIcon.Exclamation,
                         MessageBoxDefaultButton.Button1, MessageBoxOptions.ServiceNotification);
                     fileIsOpen = true;
