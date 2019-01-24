@@ -15,8 +15,8 @@ namespace CMWtests
         delegate void VoidDelegate();
         private CancellationTokenSource _cts = null;
         private Tests tests = null;
-        public bool IsExitRequested { get; private set; } = false;
-        public bool PauseTesting { get; private set; } = false;
+        public bool IsExitRequested { get => false; private set { } }
+        public bool PauseTesting { get => false; private set { } }
 
         public MainForm()
         {
@@ -142,7 +142,12 @@ namespace CMWtests
                                      MessageBoxIcon.Warning,
                                      MessageBoxDefaultButton.Button2);
             if (abort == DialogResult.Yes)
-                try { _cts.Cancel(); _cts = null; }
+                try
+                {
+                    _cts.Cancel();
+                    _cts = null;
+                    tests = null;
+                }
                 catch (NullReferenceException) { }
                 catch (ObjectDisposedException) { }
                 catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
@@ -161,6 +166,20 @@ namespace CMWtests
             {
                 progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
+            }
+        }
+
+        public void progressBar2_Settings(int maxValue)
+        {
+            if (this.progressBar2.InvokeRequired)
+            {
+                IntDelegate d = new IntDelegate(progressBar2_Settings);
+                this.BeginInvoke(d, new object[] { maxValue });
+            }
+            else
+            {
+                progressBar2.Maximum = maxValue;
+                progressBar2.Value = 0;
             }
         }
 

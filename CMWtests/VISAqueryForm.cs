@@ -7,7 +7,6 @@ namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        public Tests.TestStatus Status { get; private set; }
         private IMessageBasedSession session = null;
 
         public VISAqueryForm()
