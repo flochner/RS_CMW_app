@@ -15,8 +15,8 @@ namespace CMWtests
         delegate void VoidDelegate();
         private CancellationTokenSource _cts = null;
         private Tests tests = null;
-        public bool IsExitRequested { get => false; private set { } }
-        public bool PauseTesting { get => false; private set { } }
+        public bool IsExitRequested { get; private set; } = false;
+        public bool PauseTesting { get; private set; } = false;
 
         public MainForm()
         {
@@ -119,7 +119,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IsExitRequested = true;
-            if (tests == null || tests.Status == Tests.TestStatus.Complete)
+           if (tests == null || tests.Status == Tests.TestStatus.Complete)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
@@ -145,8 +145,8 @@ namespace CMWtests
                 try
                 {
                     _cts.Cancel();
-                    _cts = null;
-                    tests = null;
+             //       _cts = null;
+             //       tests = null;
                 }
                 catch (NullReferenceException) { }
                 catch (ObjectDisposedException) { }
