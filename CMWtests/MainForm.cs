@@ -148,9 +148,9 @@ namespace CMWtests
              //       _cts = null;
              //       tests = null;
                 }
-                catch (NullReferenceException) { }
-                catch (ObjectDisposedException) { }
-                catch (Exception exc) { MessageBox.Show(exc.Message, exc.GetType().ToString()); }
+                catch (NullReferenceException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+                catch (ObjectDisposedException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+                catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
             else
                 PauseTesting = false;
         }
@@ -188,7 +188,7 @@ namespace CMWtests
             if (this.progressBar1.InvokeRequired)
             {
                 VoidDelegate d = new VoidDelegate(progressBar1_Update);
-                this.BeginInvoke(d, new object[] { });
+                this.Invoke(d, new object[] { });
             }
             else
             {
@@ -201,7 +201,7 @@ namespace CMWtests
             if (this.progressBar2.InvokeRequired)
             {
                 VoidDelegate d = new VoidDelegate(progressBar2_Update);
-                this.BeginInvoke(d, new object[] { });
+                this.Invoke(d, new object[] { });
             }
             else
             {
