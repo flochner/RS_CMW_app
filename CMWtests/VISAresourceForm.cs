@@ -8,7 +8,7 @@ namespace CMWtests
     public partial class VISAresourceForm : Form
     {
         public string Resource { get; private set; }
-        public Tests.TestStatus Status { get; private set; }
+        public MainForm.TestStatus Status { get; private set; }
 
         public VISAresourceForm()
         {
@@ -108,7 +108,7 @@ namespace CMWtests
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            Status = Tests.TestStatus.Abort;
+            Status = MainForm.TestStatus.Abort;
         }
 
         private static bool IsVisaLibraryInstalled(UInt16 iManfId)

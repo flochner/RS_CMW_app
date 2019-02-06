@@ -47,7 +47,7 @@ namespace CMWtests
             var status = resForm.Status;
             resForm.Dispose();
 
-            if (status == Tests.TestStatus.Abort || string.IsNullOrEmpty(resource))
+            if (status == MainForm.TestStatus.Abort || string.IsNullOrEmpty(resource))
                 return;
 
             try

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,7 +13,6 @@ namespace CMWtests
         delegate void IntDelegate(int n);
         delegate void VoidDelegate();
         private CancellationTokenSource cts = null;
-        private Tests tests = null;
         public bool IsExitRequested { get; private set; } = false;
         public bool PauseTesting { get; private set; } = false;
 
@@ -30,9 +28,8 @@ namespace CMWtests
             PauseTesting = false;
 
             cts = null ?? new CancellationTokenSource();
-            tests = null ?? new Tests(this, cts);
 
-            Task.Run(() => tests.Begin());
+            Task.Run(() => Begin());
         }
 
         public void SetBtnBeginEnabled(bool v)
@@ -80,7 +77,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IsExitRequested = true;
-            if (tests.Status == Tests.TestStatus.Complete)
+            if (Status == TestStatus.Complete)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
@@ -127,18 +124,18 @@ namespace CMWtests
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (tests == null)
-            {
-                MessageBox.Show("no excel sheet");
-                return;
-            }
+            //if (tests == null)
+            //{
+            //    MessageBox.Show("no excel sheet");
+            //    return;
+            //}
 
-            try
-            {
-                string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests?.cmwID + ".xlsx";
-                FileInfo book = new FileInfo(bookName);
-            }
-            catch { }
+            //try
+            //{
+            //    string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests?.cmwID + ".xlsx";
+            //    FileInfo book = new FileInfo(bookName);
+            //}
+            //catch { }
 
         }
 

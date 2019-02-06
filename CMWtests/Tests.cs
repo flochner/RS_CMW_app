@@ -8,12 +8,10 @@ using IviVisaExtended; //Custom extention functions for Ivi.Visa
 
 namespace CMWtests
 {
-    public class Tests
+    public partial class MainForm
     {
-        private IMessageBasedSession cmw = null;
         public enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
-        private CancellationTokenSource _cts;
-        private MainForm _parent = null;
+        private IMessageBasedSession cmw = null;
         private StreamWriter _csvStream = null;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
@@ -25,14 +23,8 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string csvFileName = "";
 
-        public TestStatus Status { get; private set; } // = TestStatus.Complete;
-        public string cmwID { get; private set; } = "";
-
-        public Tests(MainForm parent, CancellationTokenSource cts)
-        {
-            _parent = parent;
-            _cts = cts;
-        }
+        public TestStatus Status = TestStatus.Complete;
+        public string cmwID = "";
 
         public void Begin()
         {
@@ -44,10 +36,10 @@ namespace CMWtests
             else if (Status == TestStatus.Complete)
                 AddToResults(Environment.NewLine + "Tests Complete.");
 
-            if (_parent.IsExitRequested)
-                _parent.AppExit();
+            if (IsExitRequested)
+                AppExit();
 
-            _parent.SetBtnBeginEnabled(true);
+            SetBtnBeginEnabled(true);
         }
 
         private TestStatus Sequencer()
@@ -58,7 +50,7 @@ namespace CMWtests
             if (ConnectIdentifyDUT() == TestStatus.Abort)
                 return GracefulExit(TestStatus.Abort);
 
-            _parent.SetBtnCancelEnabled(true);
+            SetBtnCancelEnabled(true);
             ProgressBar2_Settings(12 * numOfTRX);
 
             /// fml
@@ -195,7 +187,7 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 #if DEBUG
-            amplList = new int[] { -36 };
+            amplList = new int[] { -44 };
 #endif
 
             testName = "RF1COM_TX";
@@ -407,7 +399,7 @@ namespace CMWtests
             testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            ProgressBar1_Settings(hasKB036 ? 59 : 32);
+            ProgressBar1_Settings(hasKB036 ? 60 : 33);
 
         start:
 
@@ -457,15 +449,17 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                while (_parent.PauseTesting == true && _cts.IsCancellationRequested == false)
+                while (PauseTesting == true && cts.IsCancellationRequested == false)
                     Thread.Sleep(500);
 
-                if (_cts.IsCancellationRequested)
+                if (cts.IsCancellationRequested)
                     return TestStatus.Abort;
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
+                ProgressBar1_Update();
+
 
                 cmw.Write("SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq, true);
                 cmw.Write("CONFigure:GPRF:MEAS:EPSensor:FREQuency " + currentFreq, true);
@@ -510,27 +504,27 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        while (_parent.PauseTesting)
+                        while (PauseTesting)
                         {
                             Thread.Sleep(100);
-                            if (_cts.IsCancellationRequested)
+                            if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
                         ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                        var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                        _parent.SetBtnCancelEnabled(false);
+                        var btnCancelEnabled = GetBtnCancelEnabled();
+                        SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "-" + numOfFrontEnds);
-                        while (_parent.PauseTesting)
+                        while (PauseTesting)
                         {
                             Thread.Sleep(100);
-                            if (_cts.IsCancellationRequested)
+                            if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
                         img.ShowDialog();
-                        _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                        SetBtnCancelEnabled(btnCancelEnabled);
 
                         if (img.DialogResult == DialogResult.Abort)
                             return TestStatus.Abort;
@@ -556,12 +550,12 @@ namespace CMWtests
                     ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
 
-                    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                    _parent.SetBtnCancelEnabled(false);
+                    var btnCancelEnabled = GetBtnCancelEnabled();
+                    SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
                     img.SetImage(testName + "-" + numOfFrontEnds);
                     img.ShowDialog();
-                    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                    SetBtnCancelEnabled(btnCancelEnabled);
 
                     //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
                     //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
@@ -616,8 +610,6 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-
-                ProgressBar1_Update();
                 #endregion
 
             } while (currentFreq <= endFreq);
@@ -664,7 +656,7 @@ namespace CMWtests
             string visaResponse = "";
             string[] pmResponse = { };
 
-            _parent.SetBtnCancelEnabled(false);
+            SetBtnCancelEnabled(false);
 
             do //while retryZero
             {
@@ -675,12 +667,12 @@ namespace CMWtests
                 cmw.Write("*ESE 1", true);
                 cmw.ErrorChecking();
 
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
+                var btnCancelEnabled = GetBtnCancelEnabled();
+                SetBtnCancelEnabled(false);
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
                 img.SetImage(connection + "-" + numOfFrontEnds);
                 img.ShowDialog();
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                SetBtnCancelEnabled(btnCancelEnabled);
                 if (img.DialogResult == DialogResult.Abort)
                     return TestStatus.Abort;
 
@@ -741,7 +733,7 @@ namespace CMWtests
             _ignoreAmplError = false;
 
            SetHead2Text("");
-           _parent.SetBtnCancelEnabled(true);
+           SetBtnCancelEnabled(true);
 
             return TestStatus.Success;
         }
@@ -755,11 +747,11 @@ namespace CMWtests
             string[] hwOptions = { };
             string[] identFields = { };
 
-            var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-            _parent.SetBtnCancelEnabled(false);
+            var btnCancelEnabled = GetBtnCancelEnabled();
+            SetBtnCancelEnabled(false);
             var resForm = new VISAresourceForm();
             resForm.ShowDialog();
-            _parent.SetBtnCancelEnabled(btnCancelEnabled);
+            SetBtnCancelEnabled(btnCancelEnabled);
             resource = resForm.Resource;
             resForm.Dispose();
 
@@ -904,7 +896,7 @@ namespace CMWtests
 
         private TestStatus GracefulExit(TestStatus exitStatus)
         {
-            _parent.SetBtnCancelEnabled(false);
+            SetBtnCancelEnabled(false);
             SetHead1Text("");
             SetHead2Text("");
 
@@ -940,14 +932,16 @@ namespace CMWtests
 
             try
             {
-                _cts.Dispose();
-                _parent.SetBtnBeginEnabled(true);
+                cts.Dispose();
+                SetBtnBeginEnabled(true);
             }
             catch (Exception exc)
             {
                 ModalMessageBox(exc.Message, exc.GetType().ToString());
             }
-
+            
+            if (exitStatus != TestStatus.Complete)
+                ProgressBars_Reset();
             return exitStatus;
         }
 
@@ -994,67 +988,67 @@ namespace CMWtests
 
         private void ProgressBar1_Update()
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.progressBar1.Increment(1);
+                progressBar1.Increment(1);
             }));
         }
 
         private void ProgressBar2_Update()
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.progressBar2.Increment(1);
+                progressBar2.Increment(1);
             }));
         }
 
         private void ProgressBar1_Settings(int maxValue)
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.progressBar1.Maximum = maxValue;
-                _parent.progressBar1.Value = 0;
+                progressBar1.Maximum = maxValue;
+                progressBar1.Value = 0;
             }));
         }
 
         private void ProgressBar2_Settings(int maxValue)
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.progressBar2.Maximum = maxValue;
-                _parent.progressBar2.Value = 0;
+                progressBar2.Maximum = maxValue;
+                progressBar2.Value = 0;
             }));
         }
 
-        private void progressBars_Reset()
+        private void ProgressBars_Reset()
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.progressBar1.Value = 0;
-                _parent.progressBar2.Value = 0;
+                progressBar1.Value = 0;
+                progressBar2.Value = 0;
             }));
         }
         private void SetHead1Text(string text)
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.labelHead1.Text = text;
+                labelHead1.Text = text;
             }));
         }
 
         private void SetHead2Text(string text)
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.labelHead2.Text = text;
+                labelHead2.Text = text;
             }));
         }
 
         private void AddToResults(string item)
         {
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                _parent.textBoxResults.AppendText(item + Environment.NewLine);
+                textBoxResults.AppendText(item + Environment.NewLine);
             }));
         }
 
@@ -1064,30 +1058,30 @@ namespace CMWtests
                                      MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
         {
             DialogResult result = DialogResult.OK;
-            _parent.Invoke((MethodInvoker)(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-                _parent.SetBtnCancelEnabled(false);
+                var btnCancelEnabled = GetBtnCancelEnabled();
+                SetBtnCancelEnabled(false);
                 result = MessageBox.Show(message, title, buttons, icon, defaultButton);
-                _parent.SetBtnCancelEnabled(btnCancelEnabled);
+                SetBtnCancelEnabled(btnCancelEnabled);
             }));
 
 
-            //if (_parent.InvokeRequired)
+            //if (InvokeRequired)
             //{
-            //    _parent.Invoke((Action)delegate {
-            //        var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-            //        _parent.SetBtnCancelEnabled(false);
+            //    Invoke((Action)delegate {
+            //        var btnCancelEnabled = GetBtnCancelEnabled();
+            //        SetBtnCancelEnabled(false);
             //        result = MessageBox.Show(message, title, buttons, icon, defaultButton);
-            //        _parent.SetBtnCancelEnabled(btnCancelEnabled);
+            //        SetBtnCancelEnabled(btnCancelEnabled);
             //    });
             //}
             //else
             //{
-            //    var btnCancelEnabled = _parent.GetBtnCancelEnabled();
-            //    _parent.SetBtnCancelEnabled(false);
+            //    var btnCancelEnabled = GetBtnCancelEnabled();
+            //    SetBtnCancelEnabled(false);
             //    result = MessageBox.Show(message, title, buttons, icon, defaultButton);
-            //    _parent.SetBtnCancelEnabled(btnCancelEnabled);
+            //    SetBtnCancelEnabled(btnCancelEnabled);
             //}
             return result;
         }
