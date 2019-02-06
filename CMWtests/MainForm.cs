@@ -80,7 +80,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IsExitRequested = true;
-            if (tests == null || tests.Status == Tests.TestStatus.Complete)
+            if (tests.Status == Tests.TestStatus.Complete)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
@@ -98,17 +98,17 @@ namespace CMWtests
 
             PauseTesting = true;
             var abort = MessageBox.Show("Really abort testing?",
-                                    "Warning",
-                                     MessageBoxButtons.YesNo,
-                                     MessageBoxIcon.Warning,
-                                     MessageBoxDefaultButton.Button2);
+                                        "Warning",
+                                         MessageBoxButtons.YesNo,
+                                         MessageBoxIcon.Warning,
+                                         MessageBoxDefaultButton.Button2);
             if (abort == DialogResult.Yes)
                 try
                 {
                     cts.Cancel();
                 }
-                catch (NullReferenceException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
-                catch (ObjectDisposedException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+                catch (NullReferenceException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+                catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
             else
                 PauseTesting = false;

@@ -44,8 +44,8 @@ namespace CMWtests
             else if (Status == TestStatus.Complete)
                 AddToResults(Environment.NewLine + "Tests Complete.");
 
-            //if (_parent.IsExitRequested)
-            //    _parent.AppExit();
+            if (_parent.IsExitRequested)
+                _parent.AppExit();
 
             _parent.SetBtnBeginEnabled(true);
         }
@@ -1026,6 +1026,14 @@ namespace CMWtests
             }));
         }
 
+        private void progressBars_Reset()
+        {
+            _parent.Invoke((MethodInvoker)(() =>
+            {
+                _parent.progressBar1.Value = 0;
+                _parent.progressBar2.Value = 0;
+            }));
+        }
         private void SetHead1Text(string text)
         {
             _parent.Invoke((MethodInvoker)(() =>
