@@ -13,7 +13,7 @@ namespace CMWtests
         delegate void BoolDelegate(bool v);
         delegate void IntDelegate(int n);
         delegate void VoidDelegate();
-        private CancellationTokenSource _cts = null;
+        private CancellationTokenSource cts = null;
         private Tests tests = null;
         public bool IsExitRequested { get; private set; } = false;
         public bool PauseTesting { get; private set; } = false;
@@ -29,10 +29,10 @@ namespace CMWtests
             textBoxResults.Clear();
             PauseTesting = false;
 
-            _cts = null ?? new CancellationTokenSource();
-            tests = null ?? new Tests(this, _cts);
+            cts = null ?? new CancellationTokenSource();
+            tests = null ?? new Tests(this, cts);
 
-            var seq = Task.Run(() => tests.Begin());
+            Task.Run(() => tests.Begin());
         }
 
         public void SetBtnBeginEnabled(bool v)
@@ -68,45 +68,6 @@ namespace CMWtests
             }
         }
 
-        public void AddToResults(string item)
-        {
-            if (this.textBoxResults.InvokeRequired)
-            {
-                StringDelegate d = new StringDelegate(AddToResults);
-                this.BeginInvoke(d, new object[] { item });
-            }
-            else
-            {
-                this.textBoxResults.AppendText(item + Environment.NewLine);
-            }
-        }
-
-        public void SetHead1Text(string text)
-        {
-            if (this.labelHead1.InvokeRequired)
-            {
-                StringDelegate d = new StringDelegate(SetHead1Text);
-                this.BeginInvoke(d, new object[] { text });
-            }
-            else
-            {
-                this.labelHead1.Text = text;
-            }
-        }
-
-        public void SetHead2Text(string text)
-        {
-            if (this.labelHead1.InvokeRequired)
-            {
-                StringDelegate d = new StringDelegate(SetHead2Text);
-                this.BeginInvoke(d, new object[] { text });
-            }
-            else
-            {
-                this.labelHead2.Text = text;
-            }
-        }
-
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var query = new VISAqueryForm()) { query.ShowDialog(); }
@@ -119,7 +80,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IsExitRequested = true;
-           if (tests == null || tests.Status == Tests.TestStatus.Complete)
+            if (tests == null || tests.Status == Tests.TestStatus.Complete)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
@@ -132,7 +93,7 @@ namespace CMWtests
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            if (_cts == null && IsExitRequested == true)
+            if (cts.IsCancellationRequested && IsExitRequested)
                 AppExit();
 
             PauseTesting = true;
@@ -144,69 +105,13 @@ namespace CMWtests
             if (abort == DialogResult.Yes)
                 try
                 {
-                    _cts.Cancel();
-             //       _cts = null;
-             //       tests = null;
+                    cts.Cancel();
                 }
                 catch (NullReferenceException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (ObjectDisposedException exc) {MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
             else
                 PauseTesting = false;
-        }
-
-        public void progressBar1_Settings(int maxValue)
-        {
-            if (this.progressBar1.InvokeRequired)
-            {
-                IntDelegate d = new IntDelegate(progressBar1_Settings);
-                this.BeginInvoke(d, new object[] { maxValue });
-            }
-            else
-            {
-                progressBar1.Maximum = maxValue;
-                progressBar1.Value = 0;
-            }
-        }
-
-        public void progressBar2_Settings(int maxValue)
-        {
-            if (this.progressBar2.InvokeRequired)
-            {
-                IntDelegate d = new IntDelegate(progressBar2_Settings);
-                this.BeginInvoke(d, new object[] { maxValue });
-            }
-            else
-            {
-                progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-            }
-        }
-
-        public void progressBar1_Update()
-        {
-            if (this.progressBar1.InvokeRequired)
-            {
-                VoidDelegate d = new VoidDelegate(progressBar1_Update);
-                this.Invoke(d, new object[] { });
-            }
-            else
-            {
-                progressBar1.Increment(1);
-            }
-        }
-
-        public void progressBar2_Update()
-        {
-            if (this.progressBar2.InvokeRequired)
-            {
-                VoidDelegate d = new VoidDelegate(progressBar2_Update);
-                this.Invoke(d, new object[] { });
-            }
-            else
-            {
-                progressBar2.Increment(1);
-            }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -230,7 +135,7 @@ namespace CMWtests
 
             try
             {
-                string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests.cmwID + ".xlsx";
+                string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests?.cmwID + ".xlsx";
                 FileInfo book = new FileInfo(bookName);
             }
             catch { }

@@ -591,13 +591,13 @@ namespace CMWtests
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem communicateWithInstrumentToolStripMenuItem;
-        private System.Windows.Forms.TextBox textBoxResults;
+        public System.Windows.Forms.TextBox textBoxResults;
         private System.Windows.Forms.Button btnBeginTests;
-        private System.Windows.Forms.Label labelHead1;
-        private System.Windows.Forms.Label labelHead2;
+        public System.Windows.Forms.Label labelHead1;
+        public System.Windows.Forms.Label labelHead2;
         private System.Windows.Forms.Button btnCancelTests;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.ProgressBar progressBar2;
+        public System.Windows.Forms.ProgressBar progressBar1;
+        public System.Windows.Forms.ProgressBar progressBar2;
     }
 }
 
