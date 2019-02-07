@@ -13,27 +13,28 @@ namespace CMWtests
         public enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
         private IMessageBasedSession cmw = null;
         private StreamWriter _csvStream = null;
+        private TestStatus status = TestStatus.Complete;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
+        private int pointsCount = 0;
+        private int testCount = 0;
         private long minFreq = 0;
         private bool hasKB036 = false;
-        private bool _ignoreAmplError = false;
+        private bool ignoreAmplError = false;
         private bool isFirstTest = true;
         private string chartLimits3 = "";
         private string chartLimits6 = "";
+        private string cmwID = "";
         private string csvFileName = "";
-
-        public TestStatus Status = TestStatus.Complete;
-        public string cmwID = "";
 
         public void Begin()
         {
-            Status = TestStatus.InProgress;
-            Status = Sequencer();
+            status = TestStatus.InProgress;
+            status = Sequencer();
 
-            if (Status == TestStatus.Abort)
+            if (status == TestStatus.Abort)
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-            else if (Status == TestStatus.Complete)
+            else if (status == TestStatus.Complete)
                 AddToResults(Environment.NewLine + "Tests Complete.");
 
             if (IsExitRequested)
@@ -46,6 +47,7 @@ namespace CMWtests
         {
             int[] amplList = { };
             string testName = "";
+            testCount = 0;
 
             if (ConnectIdentifyDUT() == TestStatus.Abort)
                 return GracefulExit(TestStatus.Abort);
@@ -187,7 +189,7 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 #if DEBUG
-            amplList = new int[] { -44 };
+            amplList = new int[] { 0 };
 #endif
 
             testName = "RF1COM_TX";
@@ -384,13 +386,14 @@ namespace CMWtests
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
             int pmStatus = 0;
-            bool retry = false;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
             double maxError = 0.0;
             double pmPower = 0.0;
             long currentFreq = 0;
             long endFreq = 0;
+            bool retry = false;
+            bool hasExcessiveError = false;
             string chartLimits = "";
             string testHeader = "";
             string visaResponse = "";
@@ -403,7 +406,7 @@ namespace CMWtests
 
         start:
 
-            int pointsCount = 0;
+            pointsCount = 0;
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
@@ -414,19 +417,19 @@ namespace CMWtests
             #region Config RX / TX
             ///// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; " +
-                      "TOUT 15; ATTenuation:STATe OFF; RESolution PD2", true);
+                      "TOUT 15; ATTenuation:STATe OFF; RESolution PD2");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
             {
                 _csvStream.WriteLine("    GPRF CW Measurement Tests - " + cmwID);
-                cmw.Write("INIT:GPRF:MEAS:POWer", true);
-                cmw.Write("CONFigure:GPRF:MEAS:RFSettings:ENPower " + testAmpl, true);
+                cmw.Write("INIT:GPRF:MEAS:POWer");
+                cmw.Write("CONFigure:GPRF:MEAS:RFSettings:ENPower " + testAmpl);
                 if (testName.Contains("1COM") || testName.Contains("2COM"))
                     cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1", true);
                 else
                     cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2", true);
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + (testAmpl + 6.5), true);
+                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + (testAmpl + 6.5));
             }
             else if (testName.Contains("TX"))
             {
@@ -434,9 +437,9 @@ namespace CMWtests
 
              //   int statsCount = (testAmpl == -44) ? 2 : 1;
                 int statsCount = 1; //// fml
-                AddToResults("" + testAmpl + ", " + statsCount);
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount, true);
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl, true);
+             //   AddToResults("" + testAmpl + ", " + statsCount);
+                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
+                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
                 minFreq = 70;
             }
 
@@ -458,14 +461,12 @@ namespace CMWtests
                 #region Set up this loop - set freqs - get GPRF Measure Power
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
-                ProgressBar1_Update();
 
-
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq, true);
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:FREQuency " + currentFreq, true);
+                cmw.Write("SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq);
+                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:FREQuency " + currentFreq);
                 if (testName.Contains("RX"))
                 {
-                    cmw.Write("CONFigure:GPRF:MEAS:RFSettings:FREQuency " + currentFreq, true);
+                    cmw.Write("CONFigure:GPRF:MEAS:RFSettings:FREQuency " + currentFreq);
                     QuerySTB("READ:GPRF:MEAS:POWer:AVERage?", 5000, out visaResponse);
                     try
                     {
@@ -535,14 +536,20 @@ namespace CMWtests
                 } while (retry);
 
                 if (testName.Contains("RX"))
+                {
                     amplError = cmwMeasPower - pmPower;
+                    hasExcessiveError = Math.Abs(pmPower + 6.5 - testAmpl) > 3;
+                }
                 else
+                {
                     amplError = pmPower - testAmpl;
+                    hasExcessiveError = Math.Abs(pmPower - testAmpl) > 3;
+                }
                 #endregion
 
                 #region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
-                if ((currentFreq <= 200e6) && (Math.Abs(amplError) > 3) && !_ignoreAmplError)
+                if ((currentFreq <= 200e6) && hasExcessiveError && !ignoreAmplError)
                 {
                     cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
                     cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -565,7 +572,7 @@ namespace CMWtests
                     //                                     MessageBoxIcon.Question,
                     //                                     MessageBoxDefaultButton.Button3);
 
-                    _ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
+                    ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
 
                     if (img.DialogResult == DialogResult.Abort)
                         return TestStatus.Abort;
@@ -580,7 +587,7 @@ namespace CMWtests
                         goto start;
                     }
 
-                    if (_ignoreAmplError)
+                    if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
                 #endregion
@@ -610,6 +617,8 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
+
+                ProgressBar1_Update();
                 #endregion
 
             } while (currentFreq <= endFreq);
@@ -641,7 +650,7 @@ namespace CMWtests
             isFirstTest = false;
 
             // Suppress connection error message until the next connection change.
-            _ignoreAmplError = true;
+            ignoreAmplError = true;
 
             return TestStatus.Success;
 
@@ -730,7 +739,7 @@ namespace CMWtests
                 }
             } while (retryZero);
 
-            _ignoreAmplError = false;
+            ignoreAmplError = false;
 
            SetHead2Text("");
            SetBtnCancelEnabled(true);
@@ -747,13 +756,16 @@ namespace CMWtests
             string[] hwOptions = { };
             string[] identFields = { };
 
+            numOfFrontEnds = 0;
+            numOfTRX = 0;
+
             var btnCancelEnabled = GetBtnCancelEnabled();
             SetBtnCancelEnabled(false);
-            var resForm = new VISAresourceForm();
-            resForm.ShowDialog();
+            var resourceForm = new VISAresourceForm();
+            resourceForm.ShowDialog();
             SetBtnCancelEnabled(btnCancelEnabled);
-            resource = resForm.Resource;
-            resForm.Dispose();
+            resource = resourceForm.Resource;
+            resourceForm.Dispose();
 
             if (!string.IsNullOrWhiteSpace(resource))
             {
@@ -778,7 +790,6 @@ namespace CMWtests
             }
 
             // CMW Identification
-
             visaResponse = cmw.QueryString("*IDN?");
             try
             {
@@ -890,8 +901,8 @@ namespace CMWtests
 
         private void InitMeasureSettings()
         {
-            cmw.Write("CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6", true);
-            cmw.Write("TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6", true);
+            cmw.Write("CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6");
+            cmw.Write("TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
         }
 
         private TestStatus GracefulExit(TestStatus exitStatus)
@@ -909,6 +920,7 @@ namespace CMWtests
                 cmw.Dispose();
             }
             catch (NullReferenceException) { }
+            catch (ObjectDisposedException) { }
 
             if (_csvStream != null)
                 try
@@ -990,7 +1002,7 @@ namespace CMWtests
         {
             Invoke((MethodInvoker)(() =>
             {
-                progressBar1.Increment(1);
+                progressBar1.SetProgressNoAnimation(pointsCount);
             }));
         }
 
@@ -998,7 +1010,7 @@ namespace CMWtests
         {
             Invoke((MethodInvoker)(() =>
             {
-                progressBar2.Increment(1);
+                progressBar2.SetProgressNoAnimation(++testCount);
             }));
         }
 
@@ -1008,6 +1020,7 @@ namespace CMWtests
             {
                 progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
+                Refresh();
             }));
         }
 
@@ -1028,6 +1041,7 @@ namespace CMWtests
                 progressBar2.Value = 0;
             }));
         }
+
         private void SetHead1Text(string text)
         {
             Invoke((MethodInvoker)(() =>
@@ -1041,6 +1055,7 @@ namespace CMWtests
             Invoke((MethodInvoker)(() =>
             {
                 labelHead2.Text = text;
+                Refresh();
             }));
         }
 
@@ -1065,24 +1080,6 @@ namespace CMWtests
                 result = MessageBox.Show(message, title, buttons, icon, defaultButton);
                 SetBtnCancelEnabled(btnCancelEnabled);
             }));
-
-
-            //if (InvokeRequired)
-            //{
-            //    Invoke((Action)delegate {
-            //        var btnCancelEnabled = GetBtnCancelEnabled();
-            //        SetBtnCancelEnabled(false);
-            //        result = MessageBox.Show(message, title, buttons, icon, defaultButton);
-            //        SetBtnCancelEnabled(btnCancelEnabled);
-            //    });
-            //}
-            //else
-            //{
-            //    var btnCancelEnabled = GetBtnCancelEnabled();
-            //    SetBtnCancelEnabled(false);
-            //    result = MessageBox.Show(message, title, buttons, icon, defaultButton);
-            //    SetBtnCancelEnabled(btnCancelEnabled);
-            //}
             return result;
         }
     }

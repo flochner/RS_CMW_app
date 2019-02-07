@@ -8,13 +8,13 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        delegate void StringDelegate(string text);
-        delegate void BoolDelegate(bool v);
-        delegate void IntDelegate(int n);
-        delegate void VoidDelegate();
+        //delegate void StringDelegate(string text);
+        //delegate void BoolDelegate(bool v);
+        //delegate void IntDelegate(int n);
+        //delegate void VoidDelegate();
         private CancellationTokenSource cts = null;
-        public bool IsExitRequested { get; private set; } = false;
-        public bool PauseTesting { get; private set; } = false;
+        private bool IsExitRequested = false;
+        private bool PauseTesting = false;
 
         public MainForm()
         {
@@ -23,7 +23,7 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            SetBtnBeginEnabled(false);
+            btnBeginTests.Enabled = false;
             textBoxResults.Clear();
             PauseTesting = false;
 
@@ -34,16 +34,22 @@ namespace CMWtests
 
         public void SetBtnBeginEnabled(bool v)
         {
-            if (this.btnBeginTests.InvokeRequired)
+            //if (this.btnBeginTests.InvokeRequired)
+            //{
+            //    BoolDelegate d = new BoolDelegate(SetBtnBeginEnabled);
+            //    this.BeginInvoke(d, new object[] { v });
+            //}
+            //else
+            //{
+            //    this.btnBeginTests.Enabled = v;
+            //    this.Refresh();
+            //}
+
+            Invoke((MethodInvoker)(() =>
             {
-                BoolDelegate d = new BoolDelegate(SetBtnBeginEnabled);
-                this.BeginInvoke(d, new object[] { v });
-            }
-            else
-            {
-                this.btnBeginTests.Enabled = v;
-                this.Refresh();
-            }
+                btnBeginTests.Enabled = v;
+            }));
+
         }
 
         public bool GetBtnCancelEnabled()
@@ -53,16 +59,23 @@ namespace CMWtests
 
         public void SetBtnCancelEnabled(bool v)
         {
-            if (this.btnCancelTests.InvokeRequired)
+            //if (this.btnCancelTests.InvokeRequired)
+            //{
+            //    BoolDelegate d = new BoolDelegate(SetBtnCancelEnabled);
+            //    this.BeginInvoke(d, new object[] { v });
+            //}
+            //else
+            //{
+            //    this.btnCancelTests.Enabled = v;
+            //    this.Refresh();
+            //}
+
+            Invoke((MethodInvoker)(() =>
             {
-                BoolDelegate d = new BoolDelegate(SetBtnCancelEnabled);
-                this.BeginInvoke(d, new object[] { v });
-            }
-            else
-            {
-                this.btnCancelTests.Enabled = v;
-                this.Refresh();
-            }
+                btnCancelTests.Enabled = v;
+            }));
+
+
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -77,7 +90,7 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             IsExitRequested = true;
-            if (Status == TestStatus.Complete)
+            if (status == TestStatus.Complete || status == TestStatus.Abort)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
@@ -154,5 +167,31 @@ namespace CMWtests
         //};
         //CMWgraph.Graph graph = new CMWgraph.Graph(args);    }
         #endregion
+    }
+
+    public static class ExtensionMethods
+    {
+        /// <summary>
+        /// Sets the progress bar value, without using 'Windows Aero' animation.
+        /// This is to work around a known WinForms issue where the progress bar 
+        /// is slow to update. 
+        /// </summary>
+        public static void SetProgressNoAnimation(this ProgressBar pb, int value)
+        {
+            // To get around the progressive animation, we need to move the 
+            // progress bar backwards.
+            if (value == pb.Maximum)
+            {
+                // Special case as value can't be set greater than Maximum.
+                pb.Maximum = value + 1;     // Temporarily Increase Maximum
+                pb.Value = value + 1;       // Move past
+                pb.Maximum = value;         // Reset maximum
+            }
+            else
+            {
+                pb.Value = value + 1;       // Move past
+                pb.Value = value;           // Move to correct value
+            }
+        }
     }
 }
