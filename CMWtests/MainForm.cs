@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,8 +14,9 @@ namespace CMWtests
         //delegate void IntDelegate(int n);
         //delegate void VoidDelegate();
         private CancellationTokenSource cts = null;
-        private bool IsExitRequested = false;
-        private bool PauseTesting = false;
+        private bool isExitRequested = false;
+        private bool isExitOK = true;
+        private bool pauseTesting = false;
 
         public MainForm()
         {
@@ -25,7 +27,7 @@ namespace CMWtests
         {
             btnBeginTests.Enabled = false;
             textBoxResults.Clear();
-            PauseTesting = false;
+            pauseTesting = false;
 
             cts = null ?? new CancellationTokenSource();
 
@@ -89,7 +91,7 @@ namespace CMWtests
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            IsExitRequested = true;
+            isExitRequested = true;
             if (status == TestStatus.Complete || status == TestStatus.Abort)
                 AppExit();
             else
@@ -98,15 +100,17 @@ namespace CMWtests
 
         public void AppExit()
         {
+            while (!isExitOK)
+                Thread.Sleep(100);
             Application.Exit();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            if (cts.IsCancellationRequested && IsExitRequested)
+            if (cts.IsCancellationRequested && isExitRequested)
                 AppExit();
 
-            PauseTesting = true;
+            pauseTesting = true;
             var abort = MessageBox.Show("Really abort testing?",
                                         "Warning",
                                          MessageBoxButtons.YesNo,
@@ -121,7 +125,7 @@ namespace CMWtests
                 catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
             else
-                PauseTesting = false;
+                pauseTesting = false;
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -192,6 +196,13 @@ namespace CMWtests
                 pb.Value = value + 1;       // Move past
                 pb.Value = value;           // Move to correct value
             }
+
+            pb.CreateGraphics().DrawString(((int)((double)pb.Value / (double)pb.Maximum * 100)).ToString() + "%",
+                new Font("Arial", (float)8.25, FontStyle.Regular),
+                Brushes.Black,
+                new PointF(pb.Width / 2 - 10, pb.Height / 2 - 7));
+            pb.Refresh();
+
         }
     }
 }

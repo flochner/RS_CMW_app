@@ -29,6 +29,7 @@ namespace CMWtests
 
         public void Begin()
         {
+            isExitOK = false;
             status = TestStatus.InProgress;
             status = Sequencer();
 
@@ -37,10 +38,12 @@ namespace CMWtests
             else if (status == TestStatus.Complete)
                 AddToResults(Environment.NewLine + "Tests Complete.");
 
-            if (IsExitRequested)
-                AppExit();
+            isExitOK = true;
 
-            SetBtnBeginEnabled(true);
+            if (isExitRequested)
+                AppExit();
+            else
+                SetBtnBeginEnabled(true);
         }
 
         private TestStatus Sequencer()
@@ -55,9 +58,10 @@ namespace CMWtests
             SetBtnCancelEnabled(true);
             ProgressBar2_Settings(12 * numOfTRX);
 
+#if DEBUG
             /// fml
-            goto gentests;
-            
+          //  goto gentests;
+#endif         
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
 
@@ -178,9 +182,10 @@ namespace CMWtests
         ///
         /// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         /// 
-       
+#if DEBUG
         //fml
         gentests:
+#endif
 
             SetHead1Text("GPRF CW Generator Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Generator Tests");
@@ -189,7 +194,7 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 #if DEBUG
-            amplList = new int[] { 0 };
+            amplList = new int[] { -44 };
 #endif
 
             testName = "RF1COM_TX";
@@ -414,7 +419,7 @@ namespace CMWtests
             if (_csvStream == null)
                 return TestStatus.Abort;
 
-            #region Config RX / TX
+#region Config RX / TX
             ///// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; " +
                       "TOUT 15; ATTenuation:STATe OFF; RESolution PD2");
@@ -448,17 +453,17 @@ namespace CMWtests
 
             currentFreq = minFreq * (long)1e6;
             endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-            #endregion
+#endregion
 
             do  ///// Main Loop
             {
-                while (PauseTesting == true && cts.IsCancellationRequested == false)
+                while (pauseTesting == true && cts.IsCancellationRequested == false)
                     Thread.Sleep(500);
 
                 if (cts.IsCancellationRequested)
                     return TestStatus.Abort;
 
-                #region Set up this loop - set freqs - get GPRF Measure Power
+#region Set up this loop - set freqs - get GPRF Measure Power
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
@@ -477,9 +482,9 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-                #endregion
+#endregion
 
-                #region Take sensor reading
+#region Take sensor reading
                 do  //while (retry)
                 {
                     retry = false;
@@ -505,7 +510,7 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        while (PauseTesting)
+                        while (pauseTesting)
                         {
                             Thread.Sleep(100);
                             if (cts.IsCancellationRequested)
@@ -518,7 +523,7 @@ namespace CMWtests
                         SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "-" + numOfFrontEnds);
-                        while (PauseTesting)
+                        while (pauseTesting)
                         {
                             Thread.Sleep(100);
                             if (cts.IsCancellationRequested)
@@ -536,20 +541,14 @@ namespace CMWtests
                 } while (retry);
 
                 if (testName.Contains("RX"))
-                {
                     amplError = cmwMeasPower - pmPower;
-                    hasExcessiveError = Math.Abs(pmPower + 6.5 - testAmpl) > 3;
-                }
                 else
-                {
                     amplError = pmPower - testAmpl;
-                    hasExcessiveError = Math.Abs(pmPower - testAmpl) > 3;
-                }
-                #endregion
+#endregion
 
-                #region Handle excessive error
+#region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
-                if ((currentFreq <= 200e6) && hasExcessiveError && !ignoreAmplError)
+                if ((currentFreq <= 200e6) && (Math.Abs(pmPower - testAmpl) > 3) && !ignoreAmplError)
                 {
                     cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
                     cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -590,9 +589,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-                #endregion
+#endregion
 
-                #region Record results - setup next loop
+#region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -619,7 +618,7 @@ namespace CMWtests
                     currentFreq += (long)100e6;
 
                 ProgressBar1_Update();
-                #endregion
+#endregion
 
             } while (currentFreq <= endFreq);
 
@@ -627,7 +626,7 @@ namespace CMWtests
             if (hasKB036)
                 AddToResults(string.Format("Max error 3.3 GHz to 6 GHz: {0} dB", maxError6.ToString("F2")));
 
-            #region Cleanup - close files - create graph
+#region Cleanup - close files - create graph
             ///// Set instruments to standby.
             cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
             cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -655,7 +654,7 @@ namespace CMWtests
             return TestStatus.Success;
 
 
-            #endregion
+#endregion
         }
 
         private TestStatus ConnectionMessage(string connection)
@@ -685,11 +684,15 @@ namespace CMWtests
                 if (img.DialogResult == DialogResult.Abort)
                     return TestStatus.Abort;
 
+#if DEBUG
+                visaResponse = "0,0";
+#endif
+#if !DEBUG
                 QuerySTB("READ:GPRF:MEAS:EPSensor?", 1000000000, out visaResponse);
+#endif
                 try
                 {
-                    pmResponse = visaResponse.Split(',');
-                    int.TryParse(pmResponse[0], out pmStatus);
+                    int.TryParse(visaResponse.Split(',')[0], out pmStatus);
                 }
                 catch (Exception e)
                 {
@@ -699,6 +702,7 @@ namespace CMWtests
                 if (pmStatus == 0 || pmStatus == 4)
                 {
                     SetHead2Text("Zeroing Sensor...");
+
 #if !DEBUG
                     cmw.Write("ABORt:GPRF:MEAS:EPSensor", true);
                     WriteSTB("CALibration:GPRF:MEAS:EPSensor:ZERO", 20000);
@@ -736,6 +740,10 @@ namespace CMWtests
                         retryZero = true;
                     else
                         return TestStatus.Abort;
+                }
+                else
+                {
+                    MessageBox.Show(string.Format("pmStatus: {0}", pmStatus.ToString()));
                 }
             } while (retryZero);
 
