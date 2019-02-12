@@ -51,12 +51,11 @@ namespace CMWtests
             {
                 btnBeginTests.Enabled = v;
             }));
-
         }
 
-        public bool GetBtnCancelEnabled()
+        public bool GetBtnBeginEnabled()
         {
-            return btnCancelTests.Enabled;
+            return btnBeginTests.Enabled;
         }
 
         public void SetBtnCancelEnabled(bool v)
@@ -76,8 +75,11 @@ namespace CMWtests
             {
                 btnCancelTests.Enabled = v;
             }));
+        }
 
-
+        public bool GetBtnCancelEnabled()
+        {
+            return btnCancelTests.Enabled;
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -128,12 +130,6 @@ namespace CMWtests
                 pauseTesting = false;
         }
 
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            AboutBox about = new AboutBox();
-            about.ShowDialog();
-        }
-
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             btnBeginTests_Click(sender, e);
@@ -153,7 +149,81 @@ namespace CMWtests
             //    FileInfo book = new FileInfo(bookName);
             //}
             //catch { }
+        }
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutBox about = new AboutBox();
+            about.ShowDialog();
+        }
+
+        private void ProgressBar1_Update()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                progressBar1.SetProgressNoAnimation(pointsCount);
+            }));
+        }
+
+        private void ProgressBar2_Update()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                progressBar2.SetProgressNoAnimation(++testCount);
+            }));
+        }
+
+        private void ProgressBar1_Settings(int maxValue)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                progressBar1.Maximum = maxValue;
+                progressBar1.Value = 0;
+                Refresh();
+            }));
+        }
+
+        private void ProgressBar2_Settings(int maxValue)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                progressBar2.Maximum = maxValue;
+                progressBar2.Value = 0;
+            }));
+        }
+
+        private void ProgressBars_Reset()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                progressBar1.Value = 0;
+                progressBar2.Value = 0;
+            }));
+        }
+
+        private void SetHead1Text(string text)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                labelHead1.Text = text;
+            }));
+        }
+
+        private void SetHead2Text(string text)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                labelHead2.Text = text;
+                Refresh();
+            }));
+        }
+
+        private void AddToResults(string item)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                textBoxResults.AppendText(item + Environment.NewLine);
+            }));
         }
 
         private void MainForm_Load(object sender, EventArgs e) { }

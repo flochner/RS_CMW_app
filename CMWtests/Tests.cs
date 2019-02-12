@@ -301,9 +301,9 @@ namespace CMWtests
                 chartLimits3 = (",-0.8,-0.6,0,0.6,0.8");
                 chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
                 amplList = new int[] { -8, -44 };
-//#if DEBUG
-//                amplList = new int[] { -44 };
-//#endif
+#if DEBUG
+                amplList = new int[] { -44 };
+#endif
 
                 testName = "RF3COM_TX";
 
@@ -659,7 +659,6 @@ namespace CMWtests
 
         private TestStatus ConnectionMessage(string connection)
         {
-            int pmStatus = -1;
             bool retryZero = false;
             string visaResponse = "";
             string[] pmResponse = { };
@@ -684,23 +683,6 @@ namespace CMWtests
                 if (img.DialogResult == DialogResult.Abort)
                     return TestStatus.Abort;
 
-#if DEBUG
-                visaResponse = "0,0";
-#endif
-#if !DEBUG
-                QuerySTB("READ:GPRF:MEAS:EPSensor?", 1000000000, out visaResponse);
-#endif
-                try
-                {
-                    int.TryParse(visaResponse.Split(',')[0], out pmStatus);
-                }
-                catch (Exception e)
-                {
-                    ModalMessageBox(e.Message, e.GetType().ToString());
-                }
-
-                if (pmStatus == 0 || pmStatus == 4)
-                {
                     SetHead2Text("Zeroing Sensor...");
 
 #if !DEBUG
@@ -725,26 +707,6 @@ namespace CMWtests
                         if (verifyConnection == DialogResult.Cancel)
                             return TestStatus.Abort;
                     }
-                }
-                else if (pmStatus == 27)
-                {
-                    var verifyConnection = ModalMessageBox("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
-                                                 "(Retry) after verifying the connection." + Environment.NewLine +
-                                                 "(Cancel) all testing.",
-                                                 "Sensor Status Error",
-                                                  MessageBoxButtons.RetryCancel,
-                                                  MessageBoxIcon.Exclamation,
-                                                  MessageBoxDefaultButton.Button1);
-
-                    if (verifyConnection == DialogResult.Retry)
-                        retryZero = true;
-                    else
-                        return TestStatus.Abort;
-                }
-                else
-                {
-                    MessageBox.Show(string.Format("pmStatus: {0}", pmStatus.ToString()));
-                }
             } while (retryZero);
 
             ignoreAmplError = false;
@@ -757,6 +719,8 @@ namespace CMWtests
 
         private TestStatus ConnectIdentifyDUT()
         {
+            int pmStatus = -1;
+            bool retrySensor = false;
             string cmwModel = "";
             string cmwSerNum = "";
             string resource = "";
@@ -865,9 +829,48 @@ namespace CMWtests
             AddToResults("numOfTRX: " + numOfTRX.ToString());
             AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
 
+            // Check Sensor connection
+            do
+            {
+#if !DEBUG
+                QuerySTB("READ:GPRF:MEAS:EPSensor?", 15000, out visaResponse);
+#endif
+#if DEBUG
+                visaResponse = "0,0";
+#endif
+                try
+                {
+                    int.TryParse(visaResponse.Split(',')[0], out pmStatus);
+                }
+                catch (Exception e)
+                {
+                    ModalMessageBox(e.Message, e.GetType().ToString());
+                }
+
+                if (pmStatus == 27)
+                {
+                    var verifyConnection = ModalMessageBox("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
+                                                 "(Retry) after verifying the connection." + Environment.NewLine +
+                                                 "(Cancel) all testing.",
+                                                 "Sensor Status Error",
+                                                  MessageBoxButtons.RetryCancel,
+                                                  MessageBoxIcon.Exclamation,
+                                                  MessageBoxDefaultButton.Button1);
+
+                    if (verifyConnection == DialogResult.Retry)
+                        retrySensor = true;
+                    else
+                        return TestStatus.Abort;
+                }
+                else
+                {
+                    ModalMessageBox(string.Format("pmStatus: {0}", pmStatus.ToString()), "Sensor Error");
+                }
+            } while (retrySensor == false);
+
 #if DEBUG
             hasKB036 = false;
-            //numOfFrontEnds = 1;
+            numOfFrontEnds = 1;
 #endif
 
             return TestStatus.Success;
@@ -967,7 +970,7 @@ namespace CMWtests
 
         private void WriteSTB(string command, int timeout)
         {
-            try // try block to catch any InstrumentErrorException() or InstrumentOPCtimeoutException()
+            try
             {
                 cmw.WriteWithSTBpollSync(command, timeout);
             }
@@ -1004,75 +1007,6 @@ namespace CMWtests
             {
                 ModalMessageBox(e.Message, e.GetType().ToString());
             }
-        }
-
-        private void ProgressBar1_Update()
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                progressBar1.SetProgressNoAnimation(pointsCount);
-            }));
-        }
-
-        private void ProgressBar2_Update()
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                progressBar2.SetProgressNoAnimation(++testCount);
-            }));
-        }
-
-        private void ProgressBar1_Settings(int maxValue)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                progressBar1.Maximum = maxValue;
-                progressBar1.Value = 0;
-                Refresh();
-            }));
-        }
-
-        private void ProgressBar2_Settings(int maxValue)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-            }));
-        }
-
-        private void ProgressBars_Reset()
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                progressBar1.Value = 0;
-                progressBar2.Value = 0;
-            }));
-        }
-
-        private void SetHead1Text(string text)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                labelHead1.Text = text;
-            }));
-        }
-
-        private void SetHead2Text(string text)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                labelHead2.Text = text;
-                Refresh();
-            }));
-        }
-
-        private void AddToResults(string item)
-        {
-            Invoke((MethodInvoker)(() =>
-            {
-                textBoxResults.AppendText(item + Environment.NewLine);
-            }));
         }
 
         private DialogResult ModalMessageBox(string message, string title = "",
