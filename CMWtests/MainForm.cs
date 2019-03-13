@@ -165,11 +165,11 @@ namespace CMWtests
             }));
         }
 
-        private void ProgressBar2_Update()
+        private void ProgressBar2_Update(int value)
         {
             Invoke((MethodInvoker)(() =>
             {
-                progressBar2.SetProgressNoAnimation(++testCount);
+                progressBar2.SetProgressNoAnimation(value);
             }));
         }
 
@@ -192,11 +192,18 @@ namespace CMWtests
             }));
         }
 
-        private void ProgressBars_Reset()
+        private void ProgressBar1_Reset()
         {
             Invoke((MethodInvoker)(() =>
             {
                 progressBar1.Value = 0;
+            }));
+        }
+
+        private void ProgressBar2_Reset()
+        {
+            Invoke((MethodInvoker)(() =>
+            {
                 progressBar2.Value = 0;
             }));
         }

@@ -84,7 +84,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update();
+                ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -97,7 +97,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -113,7 +113,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update();
+                ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -126,7 +126,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -144,7 +144,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX4", true);
@@ -152,7 +152,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 /// -------------------------------------------------------------
@@ -167,7 +167,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX4", true);
@@ -175,7 +175,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -207,7 +207,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update();
+                ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -220,7 +220,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -243,7 +243,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update();
+                ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -256,7 +256,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -278,7 +278,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                     return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update();
+                ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -291,7 +291,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -315,7 +315,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX4", true);
@@ -323,7 +323,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 /// -------------------------------------------------------------
@@ -344,7 +344,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX4", true);
@@ -352,7 +352,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
             /// -------------------------------------------------------------
@@ -373,7 +373,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX4", true);
@@ -381,7 +381,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                         return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update();
+                    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -422,7 +422,7 @@ namespace CMWtests
 #region Config RX / TX
             ///// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; " +
-                      "TOUT 15; ATTenuation:STATe OFF; RESolution PD2");
+                      "TOUT 15; RESolution PD2; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -664,6 +664,7 @@ namespace CMWtests
             string[] pmResponse = { };
 
             SetBtnCancelEnabled(false);
+            ProgressBar2_Reset();
 
             do //while retryZero
             {
@@ -734,7 +735,8 @@ namespace CMWtests
             var btnCancelEnabled = GetBtnCancelEnabled();
             SetBtnCancelEnabled(false);
             var resourceForm = new VISAresourceForm();
-            resourceForm.ShowDialog();
+            if (resourceForm.ResourcesCount != 1)
+                resourceForm.ShowDialog();
             SetBtnCancelEnabled(btnCancelEnabled);
             resource = resourceForm.Resource;
             resourceForm.Dispose();
@@ -830,13 +832,14 @@ namespace CMWtests
             AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
 
             // Check Sensor connection
+            SetHead2Text("Please wait...");
             do
             {
-#if !DEBUG
-                QuerySTB("READ:GPRF:MEAS:EPSensor?", 15000, out visaResponse);
-#endif
 #if DEBUG
                 visaResponse = "0,0";
+#endif
+#if !DEBUG
+                QuerySTB("READ:GPRF:MEAS:EPSensor?", 15000, out visaResponse);
 #endif
                 try
                 {
@@ -858,21 +861,28 @@ namespace CMWtests
                                                   MessageBoxDefaultButton.Button1);
 
                     if (verifyConnection == DialogResult.Retry)
+                    {
                         retrySensor = true;
+                        Thread.Sleep(5000);
+                    }
                     else
                         return TestStatus.Abort;
+                }
+                else if (pmStatus == 0 || pmStatus == 4)
+                {
+                    retrySensor = false;
                 }
                 else
                 {
                     ModalMessageBox(string.Format("pmStatus: {0}", pmStatus.ToString()), "Sensor Error");
                 }
-            } while (retrySensor == false);
+            } while (retrySensor == true);
 
 #if DEBUG
             hasKB036 = false;
             numOfFrontEnds = 1;
 #endif
-
+            SetHead2Text("");
             return TestStatus.Success;
         }
 
@@ -962,10 +972,13 @@ namespace CMWtests
             {
                 ModalMessageBox(exc.Message, exc.GetType().ToString());
             }
-            
+
             if (exitStatus != TestStatus.Complete)
-                ProgressBars_Reset();
-            return exitStatus;
+            {
+                ProgressBar1_Reset();
+                ProgressBar2_Reset();
+            }
+                return exitStatus;
         }
 
         private void WriteSTB(string command, int timeout)

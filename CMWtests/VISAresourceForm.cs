@@ -7,14 +7,14 @@ namespace CMWtests
 {
     public partial class VISAresourceForm : Form
     {
-        public string Resource { get; private set; }
-        public MainForm.TestStatus Status { get; private set; }
+        public string Resource { get; private set; } = "";
+        public int ResourcesCount { get; private set; } = 0;
+        public MainForm.TestStatus Status { get; private set; } = MainForm.TestStatus.InProgress;
 
         public VISAresourceForm()
         {
             InitializeComponent();
             GetResources();
-            Resource = null;
         }
 
         public void GetResources()
@@ -74,6 +74,8 @@ namespace CMWtests
 
             if (listBoxResources.Items.Count == 1)
             {
+                ResourcesCount = 1;
+                Resource = desc.ToString();
                 listBoxResources.SelectedIndex = 0;
                 BtnSelect.Enabled = true;
             }
