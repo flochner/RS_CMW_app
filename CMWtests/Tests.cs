@@ -712,8 +712,8 @@ namespace CMWtests
 
             ignoreAmplError = false;
 
-           SetHead2Text("");
-           SetBtnCancelEnabled(true);
+            SetHead2Text("");
+            SetBtnCancelEnabled(true);
 
             return TestStatus.Success;
         }
