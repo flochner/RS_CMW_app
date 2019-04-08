@@ -2,6 +2,7 @@
 using System.Text;
 using System.Windows.Forms;
 using RsVisaLoader;
+using Ivi.Visa;
 
 namespace CMWtests
 {
@@ -10,6 +11,7 @@ namespace CMWtests
         public string Resource { get; private set; } = "";
         public int ResourcesCount { get; private set; } = 0;
         public MainForm.TestStatus Status { get; private set; } = MainForm.TestStatus.InProgress;
+        private IMessageBasedSession session = null;
 
         public VISAresourceForm()
         {
@@ -47,14 +49,28 @@ namespace CMWtests
             Label1.Visible = false;
 
             StringBuilder desc = new StringBuilder(256);
-            visa32.viFindRsrc(resourceMgr, "USB?*", out vi, out retCount, desc);
+            //visa32.viFindRsrc(resourceMgr, "?*", out vi, out retCount, desc);
+            visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out vi, out retCount, desc);
 
             if (retCount > 0)
             {
                 for (int i = 0; i < retCount; ++i)
                 {
-                    if (!desc.ToString().Contains("::1::"))
-                        listBoxResources.Items.Add(desc.ToString());
+                    var resource = desc.ToString();
+                    if (!resource.Contains("::1::"))
+                    {
+                        // Open connection to the instrument
+                        session = GlobalResourceManager.Open(resource) as IMessageBasedSession;
+                        // Clear device buffers
+                        session.Clear();
+                        // Send the identification query (LF at the end)
+                        session.RawIO.Write("*IDN?\n");
+                        // Read the response from the instrument, trim the LF at the end
+                        var idnResponse = session.RawIO.ReadString().TrimEnd();
+
+                        //listBoxResources.Items.Add(idnResponse);
+                        listBoxResources.Items.Add(resource);
+                    }
                     visa32.viFindNext(vi, desc);
                 }
             }

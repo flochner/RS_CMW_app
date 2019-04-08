@@ -398,7 +398,6 @@ namespace CMWtests
             long currentFreq = 0;
             long endFreq = 0;
             bool retry = false;
-            bool hasExcessiveError = false;
             string chartLimits = "";
             string testHeader = "";
             string visaResponse = "";
@@ -802,7 +801,7 @@ namespace CMWtests
             else if (visaResponse.Contains("1201.0002k") ||
                      visaResponse.Contains("1201.0002K"))
             {
-                ModalMessageBox("DUT Not Yet Covered under this procedure.");
+                ModalMessageBox("DUT not yet covered under this procedure.");
                 return TestStatus.Abort;
             }
             else

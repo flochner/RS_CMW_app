@@ -41,10 +41,10 @@ namespace CMWtests
 
         public void SetImage(string imageFile)
         {
-            var img = Image.FromFile(@imageFile);
+            var img = (Image)Properties.Resources.ResourceManager.GetObject(imageFile);
             this.Size = new Size(img.Width + 18, img.Height + 91);
             pictureBox1.Size = new Size(img.Width, img.Height);
-            pictureBox1.Image = (Image)Properties.Resources.ResourceManager.GetObject(imageFile);
+            pictureBox1.Image = img;
             pictureBox1.Visible = true;
         }
 
