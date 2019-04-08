@@ -16,30 +16,15 @@ namespace CMWtests
             btnQueryVISA.Enabled = false;
         }
 
-        private void btnQueryVISA_Click(object sender, EventArgs e)
-        {
-            textBoxResponse.Text = string.Empty;
-            Update();
-
-            QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
-            textBoxResponse.Text = response;
-        }
-
-        private void btnWriteVISA_Click(object sender, EventArgs e)
-        {
-            WriteSTB(textBoxStringToWrite.Text, 20000);
-        }
-
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
             string[] modelSer;
             string resource = null;
 
             session = null;
-            labelResource.Text = "No Resource Selected";
+            labelResource.Text = "";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
-            textBoxResponse.Text = string.Empty;
 
             var resForm = new VISAresourceForm();
             resForm.ShowDialog();
@@ -48,7 +33,10 @@ namespace CMWtests
             resForm.Dispose();
 
             if (status == MainForm.TestStatus.Abort || string.IsNullOrEmpty(resource))
+            {
+                labelResource.Text = "No Resource Selected";
                 return;
+            }
 
             try
             {
@@ -59,6 +47,8 @@ namespace CMWtests
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
                 return;
             }
+
+            btnClear_Click(sender, e);
 
             session.Clear();
             session.Write("*RST;*CLS");
@@ -82,36 +72,42 @@ namespace CMWtests
                 return;
             }
 
-            if (!string.IsNullOrWhiteSpace(textBoxStringToWrite.Text) && session != null)
-            {
-                btnWriteVISA.Enabled = true;
-                btnQueryVISA.Enabled = true;
-            }
+            textBoxStringToWrite_TextChanged(sender, e);
         }
 
-        private void btnClose_Click(object sender, EventArgs e)
+        private void btnQueryVISA_Click(object sender, EventArgs e)
         {
-            if (session != null)
-            {
-                session.Clear();
-                session.Write("*RST;*CLS");
-                session.Write("*ESE 1");
-                session.ErrorChecking();
-                session.Dispose();
-            }
+            btnQueryVISA.Enabled = false;
+            QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
+            textBoxResponse.AppendText(response + Environment.NewLine);
+            textBoxStringToWrite_TextChanged(sender, e);
+        }
+
+        private void btnWriteVISA_Click(object sender, EventArgs e)
+        {
+            btnWriteVISA.Enabled = false;
+            WriteSTB(textBoxStringToWrite.Text, 20000);
+            textBoxStringToWrite_TextChanged(sender, e);
         }
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(textBoxStringToWrite.Text) || session == null)
+            if (String.IsNullOrWhiteSpace(textBoxStringToWrite.Text) || session == null)
             {
                 btnWriteVISA.Enabled = false;
                 btnQueryVISA.Enabled = false;
+                return;
+            }
+
+            if (textBoxStringToWrite.Text.Contains("?"))
+            {
+                btnQueryVISA.Enabled = true;
+                btnWriteVISA.Enabled = false;
             }
             else
             {
+                btnQueryVISA.Enabled = false;
                 btnWriteVISA.Enabled = true;
-                btnQueryVISA.Enabled = true;
             }
         }
 
@@ -133,6 +129,10 @@ namespace CMWtests
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
+
+            QuerySTB("SYST:ERR?", 5000, out string response);
+            if (Convert.ToInt64(response.Split(',')[0]) != 0)
+                textBoxResponse.AppendText(response + Environment.NewLine);
         }
 
         private void QuerySTB(string query, int timeout, out string response)
@@ -150,10 +150,33 @@ namespace CMWtests
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
+            catch (Ivi.Visa.IOTimeoutException)
+            {
+                QuerySTB("SYST:ERR?", 5000, out response);
+                //textBoxResponse.AppendText(response + Environment.NewLine);
+            }
             catch (Ivi.Visa.VisaException e)
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
+        }
+
+        private void btnClose_Click(object sender, EventArgs e)
+        {
+            if (session != null)
+            {
+                session.Clear();
+                session.Write("*RST;*CLS");
+                session.Write("*ESE 1");
+                session.ErrorChecking();
+                session.Dispose();
+            }
+        }
+
+        private void btnClear_Click(object sender, EventArgs e)
+        {
+            textBoxResponse.Text = string.Empty;
+
         }
     }
 }
