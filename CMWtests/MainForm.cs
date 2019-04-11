@@ -26,12 +26,15 @@ namespace CMWtests
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
             btnBeginTests.Enabled = false;
+            newToolStripMenuItem.Enabled = false;
             textBoxResults.Clear();
             pauseTesting = false;
 
             cts = null ?? new CancellationTokenSource();
 
-            Task.Run(() => Begin());
+            Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
+            //Task.Factory.StartNewOnDefaultScheduler(() => Begin());
+            //Task.Run(() => Begin());
         }
 
         public void SetBtnBeginEnabled(bool v)
@@ -50,6 +53,7 @@ namespace CMWtests
             Invoke((MethodInvoker)(() =>
             {
                 btnBeginTests.Enabled = v;
+                newToolStripMenuItem.Enabled = v;
             }));
         }
 

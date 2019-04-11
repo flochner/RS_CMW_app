@@ -39,19 +39,12 @@ namespace CMWtests
             }
         }
 
-        public void SetImage(string img)
+        public void SetImage(string imageFile)
         {
-            if (img.Contains("RX"))
-            {
-                pictureBox1.Size = new Size(900, 377);
-                this.Size = new Size(918, 468);
-            }
-            else
-            {
-                pictureBox1.Size = new Size(702, 377);
-                this.Size = new Size(720, 468);
-            }
-            pictureBox1.Image = (Image)Properties.Resources.ResourceManager.GetObject(img);
+            var img = (Image)Properties.Resources.ResourceManager.GetObject(imageFile);
+            this.Size = new Size(img.Width + 18, img.Height + 91);
+            pictureBox1.Size = new Size(img.Width, img.Height);
+            pictureBox1.Image = img;
             pictureBox1.Visible = true;
         }
 

@@ -398,7 +398,6 @@ namespace CMWtests
             long currentFreq = 0;
             long endFreq = 0;
             bool retry = false;
-            bool hasExcessiveError = false;
             string chartLimits = "";
             string testHeader = "";
             string visaResponse = "";
@@ -522,7 +521,7 @@ namespace CMWtests
                         var btnCancelEnabled = GetBtnCancelEnabled();
                         SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
-                        img.SetImage(testName + "-" + numOfFrontEnds);
+                        img.SetImage(testName + "_" + numOfFrontEnds);
                         while (pauseTesting)
                         {
                             Thread.Sleep(100);
@@ -559,7 +558,7 @@ namespace CMWtests
                     var btnCancelEnabled = GetBtnCancelEnabled();
                     SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
-                    img.SetImage(testName + "-" + numOfFrontEnds);
+                    img.SetImage(testName + "_" + numOfFrontEnds);
                     img.ShowDialog();
                     SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -678,7 +677,7 @@ namespace CMWtests
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
-                img.SetImage(connection + "-" + numOfFrontEnds);
+                img.SetImage(connection + "_" + numOfFrontEnds);
                 img.ShowDialog();
                 SetBtnCancelEnabled(btnCancelEnabled);
                 if (img.DialogResult == DialogResult.Abort)
@@ -712,8 +711,8 @@ namespace CMWtests
 
             ignoreAmplError = false;
 
-           SetHead2Text("");
-           SetBtnCancelEnabled(true);
+            SetHead2Text("");
+            SetBtnCancelEnabled(true);
 
             return TestStatus.Success;
         }
@@ -802,7 +801,7 @@ namespace CMWtests
             else if (visaResponse.Contains("1201.0002k") ||
                      visaResponse.Contains("1201.0002K"))
             {
-                ModalMessageBox("DUT Not Yet Covered under this procedure.");
+                ModalMessageBox("DUT not yet covered under this procedure.");
                 return TestStatus.Abort;
             }
             else

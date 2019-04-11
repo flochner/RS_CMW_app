@@ -36,6 +36,7 @@
             this.labelResource = new System.Windows.Forms.Label();
             this.btnClose = new System.Windows.Forms.Button();
             this.textBoxResponse = new System.Windows.Forms.TextBox();
+            this.btnClear = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnQueryVISA
@@ -119,8 +120,20 @@
             this.textBoxResponse.Location = new System.Drawing.Point(12, 120);
             this.textBoxResponse.Multiline = true;
             this.textBoxResponse.Name = "textBoxResponse";
+            this.textBoxResponse.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxResponse.Size = new System.Drawing.Size(287, 154);
             this.textBoxResponse.TabIndex = 17;
+            // 
+            // btnClear
+            // 
+            this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnClear.Location = new System.Drawing.Point(13, 288);
+            this.btnClear.Name = "btnClear";
+            this.btnClear.Size = new System.Drawing.Size(75, 23);
+            this.btnClear.TabIndex = 18;
+            this.btnClear.Text = "Clear";
+            this.btnClear.UseVisualStyleBackColor = true;
+            this.btnClear.Click += new System.EventHandler(this.btnClear_Click);
             // 
             // VISAqueryForm
             // 
@@ -129,6 +142,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
             this.ClientSize = new System.Drawing.Size(311, 323);
+            this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.textBoxResponse);
             this.Controls.Add(this.labelResource);
@@ -154,5 +168,6 @@
         private System.Windows.Forms.Label labelResource;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.TextBox textBoxResponse;
+        private System.Windows.Forms.Button btnClear;
     }
 }
