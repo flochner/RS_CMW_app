@@ -521,7 +521,7 @@ namespace CMWtests
                         var btnCancelEnabled = GetBtnCancelEnabled();
                         SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
-                        img.SetImage(testName + "-" + numOfFrontEnds);
+                        img.SetImage(testName + "_" + numOfFrontEnds);
                         while (pauseTesting)
                         {
                             Thread.Sleep(100);
@@ -558,7 +558,7 @@ namespace CMWtests
                     var btnCancelEnabled = GetBtnCancelEnabled();
                     SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
-                    img.SetImage(testName + "-" + numOfFrontEnds);
+                    img.SetImage(testName + "_" + numOfFrontEnds);
                     img.ShowDialog();
                     SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -677,7 +677,7 @@ namespace CMWtests
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
-                img.SetImage(connection + "-" + numOfFrontEnds);
+                img.SetImage(connection + "_" + numOfFrontEnds);
                 img.ShowDialog();
                 SetBtnCancelEnabled(btnCancelEnabled);
                 if (img.DialogResult == DialogResult.Abort)
