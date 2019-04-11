@@ -29,7 +29,7 @@
     <ApplicationVersion>0.7.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
-    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <BootstrapperEnabled>false</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -192,11 +192,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
-      <Visible>False</Visible>
-      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
-      <Install>true</Install>
-    </BootstrapperPackage>
     <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
       <Visible>False</Visible>
       <ProductName>.NET Framework 3.5 SP1</ProductName>
@@ -207,63 +202,52 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1COM_RX-1.png" />
+    <EmbeddedResource Include="Resources\RF1COM_RX_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1COM_RX-2.png" />
+    <EmbeddedResource Include="Resources\RF1COM_RX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1COM_TX-1.png" />
+    <EmbeddedResource Include="Resources\RF1COM_TX_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1COM_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF1COM_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1OUT_TX-1.png" />
+    <EmbeddedResource Include="Resources\RF1OUT_TX_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF1OUT_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF1OUT_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF2COM_RX-1.png" />
+    <EmbeddedResource Include="Resources\RF2COM_RX_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF2COM_RX-2.png" />
+    <EmbeddedResource Include="Resources\RF2COM_RX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF2COM_TX-1.png" />
+    <EmbeddedResource Include="Resources\RF2COM_TX_1.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF2COM_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF2COM_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF3COM_RX-2.png" />
+    <EmbeddedResource Include="Resources\RF3COM_RX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF3COM_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF3COM_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF3OUT_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF3OUT_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF4COM_RX-2.png" />
+    <EmbeddedResource Include="Resources\RF4COM_RX_2.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\RF4COM_TX-2.png" />
+    <EmbeddedResource Include="Resources\RF4COM_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="RsVisaCOMLib">
-      <Guid>{40629DB3-FFEC-4DB5-A6E5-3EA50B62378A}</Guid>
-      <VersionMajor>3</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

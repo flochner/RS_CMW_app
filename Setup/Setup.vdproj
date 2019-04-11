@@ -131,7 +131,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:.NETFramework,Version=v4.6.1"
+                "FrameworkVersion" = "8:.NETFramework,Version=v4.0"
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=671728"
                 }
@@ -258,7 +258,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CMW GPRF Tests"
         "ProductCode" = "8:{BBEBC376-8558-4FE6-9CDA-C65838AA784A}"
-        "PackageCode" = "8:{17B98AEC-8E4F-4945-935B-2885CB6F03E1}"
+        "PackageCode" = "8:{42C03644-8E6D-4046-8B29-08A10DE10E76}"
         "UpgradeCode" = "8:{707AC201-7104-4614-870A-67F4F73CB23B}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
