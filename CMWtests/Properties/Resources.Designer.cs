@@ -65,7 +65,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1COM_RX_1 {
             get {
-                object obj = ResourceManager.GetObject("RF1COM_RX_1", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1COM_RX-1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -75,7 +75,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1COM_RX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF1COM_RX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1COM_RX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -85,7 +85,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1COM_TX_1 {
             get {
-                object obj = ResourceManager.GetObject("RF1COM_TX_1", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1COM_TX-1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -95,7 +95,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1COM_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF1COM_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1COM_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -105,7 +105,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1OUT_TX_1 {
             get {
-                object obj = ResourceManager.GetObject("RF1OUT_TX_1", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1OUT_TX-1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -115,7 +115,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF1OUT_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF1OUT_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF1OUT_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -125,7 +125,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF2COM_RX_1 {
             get {
-                object obj = ResourceManager.GetObject("RF2COM_RX_1", resourceCulture);
+                object obj = ResourceManager.GetObject("RF2COM_RX-1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -135,7 +135,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF2COM_RX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF2COM_RX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF2COM_RX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -145,7 +145,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF2COM_TX_1 {
             get {
-                object obj = ResourceManager.GetObject("RF2COM_TX_1", resourceCulture);
+                object obj = ResourceManager.GetObject("RF2COM_TX-1", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -155,7 +155,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF2COM_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF2COM_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF2COM_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -165,7 +165,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF3COM_RX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF3COM_RX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF3COM_RX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -175,7 +175,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF3COM_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF3COM_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF3COM_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -185,7 +185,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF3OUT_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF3OUT_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF3OUT_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -195,7 +195,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF4COM_RX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF4COM_RX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF4COM_RX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -205,7 +205,7 @@ namespace CMWtests.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap RF4COM_TX_2 {
             get {
-                object obj = ResourceManager.GetObject("RF4COM_TX_2", resourceCulture);
+                object obj = ResourceManager.GetObject("RF4COM_TX-2", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
