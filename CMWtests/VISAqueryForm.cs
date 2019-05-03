@@ -52,10 +52,9 @@ namespace CMWtests
 
             session.Clear();
             session.Write("*RST;*CLS");
-            session.Write("*ESE 1");
+            session.Write("*ESE 1", true);
             session.ErrorChecking();
-
-            QuerySTB("*IDN?", 20000, out string idn);
+            QuerySTB("*IDN?", 2000, out string idn);
             try
             {
                 modelSer = idn.Split(',');
@@ -71,6 +70,11 @@ namespace CMWtests
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
                 return;
             }
+
+
+            labelResource.Text = resource;
+
+
 
             textBoxStringToWrite_TextChanged(sender, e);
         }
@@ -129,10 +133,12 @@ namespace CMWtests
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
-
-            QuerySTB("SYST:ERR?", 5000, out string response);
-            if (Convert.ToInt64(response.Split(',')[0]) != 0)
-                textBoxResponse.AppendText(response + Environment.NewLine);
+            finally
+            {
+                string errResp = session.QueryString("SYST:ERR?").TrimEnd();
+                if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
+                    textBoxResponse.AppendText(errResp + Environment.NewLine);
+            }
         }
 
         private void QuerySTB(string query, int timeout, out string response)
@@ -150,15 +156,21 @@ namespace CMWtests
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
-            catch (Ivi.Visa.IOTimeoutException)
+            catch (Ivi.Visa.IOTimeoutException e)
             {
-                QuerySTB("SYST:ERR?", 5000, out response);
+                MessageBox.Show(e.Message, e.GetType().ToString());
+                //QuerySTB("SYST:ERR?", 5000, out response);
                 //textBoxResponse.AppendText(response + Environment.NewLine);
             }
             catch (Ivi.Visa.VisaException e)
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
+
+            //session.RawIO.Write("SYST:ERR?\n");
+            //string errResp = session.RawIO.ReadString().TrimEnd();
+            //if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
+            //    textBoxResponse.AppendText(errResp + Environment.NewLine);
         }
 
         private void btnClose_Click(object sender, EventArgs e)
