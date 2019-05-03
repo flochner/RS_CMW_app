@@ -934,8 +934,8 @@ namespace CMWtests
             try
             {
                 cmw.Clear();
-                cmw.Write("*RST;*CLS", true);
-                cmw.Write("*ESE 1", true);
+                cmw.Write("*RST;*CLS");//, true);
+                cmw.Write("*ESE 1");//, true);
                 cmw.ErrorChecking();
                 cmw.Dispose();
             }
