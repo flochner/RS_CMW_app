@@ -76,7 +76,7 @@
             this.textBoxStringToWrite.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBoxStringToWrite.Location = new System.Drawing.Point(12, 64);
             this.textBoxStringToWrite.Name = "textBoxStringToWrite";
-            this.textBoxStringToWrite.Size = new System.Drawing.Size(287, 20);
+            this.textBoxStringToWrite.Size = new System.Drawing.Size(360, 20);
             this.textBoxStringToWrite.TabIndex = 9;
             this.textBoxStringToWrite.TextChanged += new System.EventHandler(this.textBoxStringToWrite_TextChanged);
             // 
@@ -104,7 +104,7 @@
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnClose.Location = new System.Drawing.Point(224, 288);
+            this.btnClose.Location = new System.Drawing.Point(297, 326);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(75, 23);
             this.btnClose.TabIndex = 16;
@@ -121,13 +121,13 @@
             this.textBoxResponse.Multiline = true;
             this.textBoxResponse.Name = "textBoxResponse";
             this.textBoxResponse.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxResponse.Size = new System.Drawing.Size(287, 154);
+            this.textBoxResponse.Size = new System.Drawing.Size(360, 192);
             this.textBoxResponse.TabIndex = 17;
             // 
             // btnClear
             // 
             this.btnClear.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnClear.Location = new System.Drawing.Point(13, 288);
+            this.btnClear.Location = new System.Drawing.Point(13, 326);
             this.btnClear.Name = "btnClear";
             this.btnClear.Size = new System.Drawing.Size(75, 23);
             this.btnClear.TabIndex = 18;
@@ -141,7 +141,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.btnClose;
-            this.ClientSize = new System.Drawing.Size(311, 323);
+            this.ClientSize = new System.Drawing.Size(384, 361);
             this.Controls.Add(this.btnClear);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.textBoxResponse);

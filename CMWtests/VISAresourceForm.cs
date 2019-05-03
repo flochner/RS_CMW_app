@@ -12,6 +12,7 @@ namespace CMWtests
         public int ResourcesCount { get; private set; } = 0;
         public MainForm.TestStatus Status { get; private set; } = MainForm.TestStatus.InProgress;
         private IMessageBasedSession session = null;
+        private string[] resources;
 
         public VISAresourceForm()
         {
@@ -24,6 +25,7 @@ namespace CMWtests
             int resourceMgr = 0;
             int retCount = 0;
             int vi = 0;
+            int i = 0;
 
             if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
@@ -49,27 +51,23 @@ namespace CMWtests
             Label1.Visible = false;
 
             StringBuilder desc = new StringBuilder(256);
-            //visa32.viFindRsrc(resourceMgr, "?*", out vi, out retCount, desc);
             visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out vi, out retCount, desc);
+
+            resources = new string[retCount];
 
             if (retCount > 0)
             {
-                for (int i = 0; i < retCount; ++i)
+                for (int j = 0; j < retCount; j++)
                 {
-                    var resource = desc.ToString();
-                    if (!resource.Contains("::1::"))
+                    if (!desc.ToString().Contains("::1::"))
                     {
-                        // Open connection to the instrument
-                        session = GlobalResourceManager.Open(resource) as IMessageBasedSession;
-                        // Clear device buffers
+                        resources[i] = desc.ToString();
+                        session = GlobalResourceManager.Open(resources[i]) as IMessageBasedSession;
                         session.Clear();
-                        // Send the identification query (LF at the end)
                         session.RawIO.Write("*IDN?\n");
-                        // Read the response from the instrument, trim the LF at the end
-                        var idnResponse = session.RawIO.ReadString().TrimEnd();
-
-                        //listBoxResources.Items.Add(idnResponse);
-                        listBoxResources.Items.Add(resource);
+                        listBoxResources.Items.Add(session.RawIO.ReadString().TrimEnd());
+                        session.Dispose();
+                        i++;
                     }
                     visa32.viFindNext(vi, desc);
                 }
@@ -82,11 +80,9 @@ namespace CMWtests
                 this.Height = 120;
             }
 
-            if (listBoxResources.Items.Count > 0)
-            {
-                listBoxResources.Height = 15 * (listBoxResources.Items.Count + 1);
-                this.Height = this.Height + listBoxResources.Height;
-            }
+            listBoxResources.Height = listBoxResources.Height + 15 * (listBoxResources.Items.Count - 1);
+            this.Height = this.Height + 15 * (listBoxResources.Items.Count - 1);
+            this.MinimumSize = new System.Drawing.Size(this.Width, this.Height);
 
             if (listBoxResources.Items.Count == 1)
             {
@@ -114,7 +110,7 @@ namespace CMWtests
         private void btnSelect_Click(object sender, EventArgs e)
         {
             if (listBoxResources.Visible == true && listBoxResources.SelectedIndex >= 0)
-                Resource = listBoxResources.SelectedItem.ToString();
+                Resource = resources[listBoxResources.SelectedIndex];
             else
                 Resource = null;
         }

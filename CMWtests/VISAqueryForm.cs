@@ -71,11 +71,6 @@ namespace CMWtests
                 return;
             }
 
-
-            labelResource.Text = resource;
-
-
-
             textBoxStringToWrite_TextChanged(sender, e);
         }
 
@@ -148,21 +143,7 @@ namespace CMWtests
             {
                 response = session.QueryWithSTBpollSync(query, timeout);
             }
-            catch (InstrumentErrorException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-            catch (InstrumentOPCtimeoutException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-            catch (Ivi.Visa.IOTimeoutException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-                //QuerySTB("SYST:ERR?", 5000, out response);
-                //textBoxResponse.AppendText(response + Environment.NewLine);
-            }
-            catch (Ivi.Visa.VisaException e)
+            catch (Exception e)
             {
                 MessageBox.Show(e.Message, e.GetType().ToString());
             }
@@ -188,7 +169,6 @@ namespace CMWtests
         private void btnClear_Click(object sender, EventArgs e)
         {
             textBoxResponse.Text = string.Empty;
-
         }
     }
 }

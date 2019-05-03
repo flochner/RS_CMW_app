@@ -41,11 +41,12 @@ namespace CMWtests
             this.listBoxResources.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.listBoxResources.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.listBoxResources.FormattingEnabled = true;
             this.listBoxResources.ItemHeight = 15;
             this.listBoxResources.Location = new System.Drawing.Point(12, 10);
+            this.listBoxResources.MinimumSize = new System.Drawing.Size(0, 19);
             this.listBoxResources.Name = "listBoxResources";
-            this.listBoxResources.Size = new System.Drawing.Size(259, 19);
+            this.listBoxResources.Size = new System.Drawing.Size(319, 19);
+            this.listBoxResources.Sorted = true;
             this.listBoxResources.TabIndex = 1;
             this.listBoxResources.SelectedIndexChanged += new System.EventHandler(this.listBoxResources_SelectedIndexChanged);
             this.listBoxResources.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.listBoxResources_DoubleClick);
@@ -54,7 +55,7 @@ namespace CMWtests
             // 
             this.BtnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnSelect.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.BtnSelect.Location = new System.Drawing.Point(111, 44);
+            this.BtnSelect.Location = new System.Drawing.Point(171, 44);
             this.BtnSelect.Name = "BtnSelect";
             this.BtnSelect.Size = new System.Drawing.Size(80, 23);
             this.BtnSelect.TabIndex = 9;
@@ -66,7 +67,7 @@ namespace CMWtests
             // 
             this.Label1.AutoSize = true;
             this.Label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label1.Location = new System.Drawing.Point(65, 14);
+            this.Label1.Location = new System.Drawing.Point(96, 14);
             this.Label1.Name = "Label1";
             this.Label1.Size = new System.Drawing.Size(150, 15);
             this.Label1.TabIndex = 0;
@@ -76,7 +77,7 @@ namespace CMWtests
             // 
             this.BtnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.BtnCancel.Location = new System.Drawing.Point(197, 44);
+            this.BtnCancel.Location = new System.Drawing.Point(257, 44);
             this.BtnCancel.Name = "BtnCancel";
             this.BtnCancel.Size = new System.Drawing.Size(75, 23);
             this.BtnCancel.TabIndex = 11;
@@ -87,17 +88,16 @@ namespace CMWtests
             // VISAresourceForm
             // 
             this.AcceptButton = this.BtnSelect;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.CancelButton = this.BtnCancel;
-            this.ClientSize = new System.Drawing.Size(284, 79);
+            this.ClientSize = new System.Drawing.Size(344, 79);
             this.ControlBox = false;
             this.Controls.Add(this.BtnCancel);
             this.Controls.Add(this.Label1);
             this.Controls.Add(this.BtnSelect);
             this.Controls.Add(this.listBoxResources);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.KeyPreview = true;
+            this.MinimumSize = new System.Drawing.Size(360, 118);
             this.Name = "VISAresourceForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select VISA Resource";
