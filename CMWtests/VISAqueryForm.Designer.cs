@@ -96,9 +96,9 @@
             this.labelResource.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.labelResource.Location = new System.Drawing.Point(93, 15);
             this.labelResource.Name = "labelResource";
-            this.labelResource.Size = new System.Drawing.Size(130, 15);
+            this.labelResource.Size = new System.Drawing.Size(134, 15);
             this.labelResource.TabIndex = 15;
-            this.labelResource.Text = "No Resource Selected";
+            this.labelResource.Text = "No resource connected";
             // 
             // btnClose
             // 
@@ -156,6 +156,7 @@
             this.Text = "VISAquery";
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion

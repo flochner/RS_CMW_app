@@ -48,7 +48,6 @@ namespace CMWtests
 
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
-            Label1.Visible = false;
 
             StringBuilder desc = new StringBuilder(256);
             visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out vi, out retCount, desc);
@@ -74,10 +73,8 @@ namespace CMWtests
             }
             else
             {
-                listBoxResources.Visible = false;
-                Label1.Visible = true;
-                BtnSelect.Visible = false;
-                this.Height = 120;
+                Resource = null;
+                return;
             }
 
             listBoxResources.Height = listBoxResources.Height + 15 * (listBoxResources.Items.Count - 1);
@@ -121,9 +118,7 @@ namespace CMWtests
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
-        {
-            Status = MainForm.TestStatus.Abort;
-        }
+        { }
 
         private static bool IsVisaLibraryInstalled(UInt16 iManfId)
         {

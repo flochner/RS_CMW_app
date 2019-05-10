@@ -32,7 +32,6 @@ namespace CMWtests
         {
             this.listBoxResources = new System.Windows.Forms.ListBox();
             this.BtnSelect = new System.Windows.Forms.Button();
-            this.Label1 = new System.Windows.Forms.Label();
             this.BtnCancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -43,7 +42,7 @@ namespace CMWtests
             this.listBoxResources.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.listBoxResources.ItemHeight = 15;
             this.listBoxResources.Location = new System.Drawing.Point(12, 10);
-            this.listBoxResources.MinimumSize = new System.Drawing.Size(0, 19);
+            this.listBoxResources.MinimumSize = new System.Drawing.Size(4, 19);
             this.listBoxResources.Name = "listBoxResources";
             this.listBoxResources.Size = new System.Drawing.Size(319, 19);
             this.listBoxResources.Sorted = true;
@@ -55,23 +54,13 @@ namespace CMWtests
             // 
             this.BtnSelect.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.BtnSelect.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.BtnSelect.Location = new System.Drawing.Point(171, 44);
+            this.BtnSelect.Location = new System.Drawing.Point(176, 44);
             this.BtnSelect.Name = "BtnSelect";
-            this.BtnSelect.Size = new System.Drawing.Size(80, 23);
+            this.BtnSelect.Size = new System.Drawing.Size(75, 23);
             this.BtnSelect.TabIndex = 9;
             this.BtnSelect.Text = "Select";
             this.BtnSelect.UseVisualStyleBackColor = true;
             this.BtnSelect.Click += new System.EventHandler(this.btnSelect_Click);
-            // 
-            // Label1
-            // 
-            this.Label1.AutoSize = true;
-            this.Label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Label1.Location = new System.Drawing.Point(96, 14);
-            this.Label1.Name = "Label1";
-            this.Label1.Size = new System.Drawing.Size(150, 15);
-            this.Label1.TabIndex = 0;
-            this.Label1.Text = "No VISA Resources found.";
             // 
             // BtnCancel
             // 
@@ -93,24 +82,20 @@ namespace CMWtests
             this.ClientSize = new System.Drawing.Size(344, 79);
             this.ControlBox = false;
             this.Controls.Add(this.BtnCancel);
-            this.Controls.Add(this.Label1);
             this.Controls.Add(this.BtnSelect);
             this.Controls.Add(this.listBoxResources);
             this.KeyPreview = true;
-            this.MinimumSize = new System.Drawing.Size(360, 118);
             this.Name = "VISAresourceForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Select VISA Resource";
             this.TopMost = true;
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
         #endregion
 
         private System.Windows.Forms.ListBox listBoxResources;
         private System.Windows.Forms.Button BtnSelect;
-        private System.Windows.Forms.Label Label1;
         private System.Windows.Forms.Button BtnCancel;
     }
 }

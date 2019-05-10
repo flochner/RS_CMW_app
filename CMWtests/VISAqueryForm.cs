@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Threading;
 using Ivi.Visa;
 using IviVisaExtended;
 
@@ -27,14 +28,28 @@ namespace CMWtests
             btnQueryVISA.Enabled = false;
 
             var resForm = new VISAresourceForm();
-            resForm.ShowDialog();
+
+            if (resForm.Resource == null)
+            {
+                labelResource.Text = "";
+                Thread.Sleep(250);
+                labelResource.Text = "No VISA resources available";
+                return;
+            }
+            else
+            {
+                resForm.ShowDialog();
+            }
+
             resource = resForm.Resource;
-            var status = resForm.Status;
             resForm.Dispose();
 
-            if (status == MainForm.TestStatus.Abort || string.IsNullOrEmpty(resource))
+//            resource = "USB0::0x0AAD::0x0057::0116578::INSTR";
+//            resource = "TCPIP0::cmw50050-116578::inst0::INSTR";
+
+            if (string.IsNullOrEmpty(resource))
             {
-                labelResource.Text = "No Resource Selected";
+                labelResource.Text = "No resource connected";
                 return;
             }
 
@@ -43,6 +58,11 @@ namespace CMWtests
                 session = GlobalResourceManager.Open(resource) as IMessageBasedSession;
             }
             catch (Ivi.Visa.NativeVisaException exc)
+            {
+                MessageBox.Show(exc.Message, exc.GetType().ToString());
+                return;
+            }
+            catch (Ivi.Visa.VisaException exc)
             {
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
                 return;
