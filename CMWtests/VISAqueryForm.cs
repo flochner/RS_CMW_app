@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Windows.Forms;
+using System.Text;
 using System.Threading;
-using Ivi.Visa;
-using IviVisaExtended;
+//using Ivi.Visa;
+//using IviVisaExtended;
+using RsVisaLoader;
 
 namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        private IMessageBasedSession session = null;
+        private int vi = 0;
 
         public VISAqueryForm()
         {
@@ -19,10 +21,13 @@ namespace CMWtests
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
+            int resourceMgr = 0;
+            int viRetCount = 0;
+            int vi = 0;
             string[] modelSer;
             string resource = null;
+            ViStatus viStat = visa32.VI_NULL;
 
-            session = null;
             labelResource.Text = "";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
@@ -44,31 +49,22 @@ namespace CMWtests
             resource = resForm.Resource;
             resForm.Dispose();
 
-//            resource = "USB0::0x0AAD::0x0057::0116578::INSTR";
-//            resource = "TCPIP0::cmw50050-116578::inst0::INSTR";
-
             if (string.IsNullOrEmpty(resource))
             {
                 labelResource.Text = "No resource connected";
                 return;
             }
 
-            try
-            {
-                session = GlobalResourceManager.Open(resource) as IMessageBasedSession;
-            }
-            catch (Ivi.Visa.NativeVisaException exc)
-            {
-                MessageBox.Show(exc.Message, exc.GetType().ToString());
-                return;
-            }
-            catch (Ivi.Visa.VisaException exc)
-            {
-                MessageBox.Show(exc.Message, exc.GetType().ToString());
-                return;
-            }
+            viStat = visa32.viOpenDefaultRM(out resourceMgr);
+            viStat = visa32.viOpen(resourceMgr, resource, visa32.VI_NULL, 1000, out vi);
 
             btnClear_Click(sender, e);
+
+            viStat = VisaIO.Write(vi, "*IDN?");
+
+            //
+            return;
+            //
 
             session.Clear();
             session.Write("*RST;*CLS");
@@ -128,50 +124,6 @@ namespace CMWtests
                 btnQueryVISA.Enabled = false;
                 btnWriteVISA.Enabled = true;
             }
-        }
-
-        private void WriteSTB(string command, int timeout)
-        {
-            try
-            {
-                session.WriteWithSTBpollSync(command, timeout);
-            }
-            catch (InstrumentErrorException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-            catch (InstrumentOPCtimeoutException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-            catch (Ivi.Visa.VisaException e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-            finally
-            {
-                string errResp = session.QueryString("SYST:ERR?").TrimEnd();
-                if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
-                    textBoxResponse.AppendText(errResp + Environment.NewLine);
-            }
-        }
-
-        private void QuerySTB(string query, int timeout, out string response)
-        {
-            response = null;
-            try
-            {
-                response = session.QueryWithSTBpollSync(query, timeout);
-            }
-            catch (Exception e)
-            {
-                MessageBox.Show(e.Message, e.GetType().ToString());
-            }
-
-            //session.RawIO.Write("SYST:ERR?\n");
-            //string errResp = session.RawIO.ReadString().TrimEnd();
-            //if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
-            //    textBoxResponse.AppendText(errResp + Environment.NewLine);
         }
 
         private void btnClose_Click(object sender, EventArgs e)

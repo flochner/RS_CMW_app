@@ -107,6 +107,7 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="VisaIO.cs" />
     <Compile Include="ConnectionImageForm.cs">
       <SubType>Form</SubType>
     </Compile>

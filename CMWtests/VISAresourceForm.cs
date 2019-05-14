@@ -10,8 +10,6 @@ namespace CMWtests
     {
         public string Resource { get; private set; } = "";
         public int ResourcesCount { get; private set; } = 0;
-        public MainForm.TestStatus Status { get; private set; } = MainForm.TestStatus.InProgress;
-        private IMessageBasedSession session = null;
         private string[] resources;
 
         public VISAresourceForm()
@@ -23,9 +21,12 @@ namespace CMWtests
         public void GetResources()
         {
             int resourceMgr = 0;
-            int retCount = 0;
+            int resCount = 0;
             int vi = 0;
             int i = 0;
+            int findList = 0;
+            string response;
+            ViStatus stat;
 
             if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
@@ -39,7 +40,9 @@ namespace CMWtests
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
 
                 visa32.viOpenDefaultRM(out resourceMgr);
-            }
+                visa32.viSetAttribute(resourceMgr, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_TMO, 0x3E8);
+                visa32.viSetAttribute(resourceMgr, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_MODE, 0x7);
+           }
             else
             {
                 MessageBox.Show("No VISAs Installed!");
@@ -50,30 +53,42 @@ namespace CMWtests
             BtnSelect.Enabled = false;
 
             StringBuilder desc = new StringBuilder(256);
-            visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out vi, out retCount, desc);
+            stat = visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out findList, out resCount, desc);
+            //MessageBox.Show("count: " + resCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
 
-            resources = new string[retCount];
+            int viRetCount = 0;
 
-            if (retCount > 0)
+            if (resCount > 0)
             {
-                for (int j = 0; j < retCount; j++)
+                resources = new string[resCount];
+                for (int j = 0; j < resCount; j++)
                 {
-                    if (!desc.ToString().Contains("::1::"))
+                    if (true)//(!desc.ToString().Contains("::1::"))
                     {
                         resources[i] = desc.ToString();
-                        session = GlobalResourceManager.Open(resources[i]) as IMessageBasedSession;
-                        session.Clear();
-                        session.RawIO.Write("*IDN?\n");
-                        listBoxResources.Items.Add(session.RawIO.ReadString().TrimEnd());
-                        session.Dispose();
+
+                        stat = visa32.viOpen(resourceMgr, resources[i], visa32.VI_NULL, 1000, out vi);
+                        //MessageBox.Show("open " + resources[i], stat.ToString());
+
+                        stat = VisaIO.Write(vi, "*IDN?");
+                        //MessageBox.Show("ret " + viRet + "\n" + "*IDN?", stat.ToString());
+
+                        stat = VisaIO.Read(vi, out response);
+                        //MessageBox.Show("ret " + viRet + "\n" + response + '-', stat.ToString());
+
+                        listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);
+                        visa32.viClose(vi);
                         i++;
                     }
-                    visa32.viFindNext(vi, desc);
+                    desc = new StringBuilder(256);
+                    visa32.viFindNext(findList, desc);
+                    ResourcesCount = 1;
                 }
             }
             else
             {
                 Resource = null;
+                RsVisa.RsViUnloadVisaLibrary();
                 return;
             }
 
