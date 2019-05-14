@@ -6,6 +6,7 @@ using System.Threading;
 //using IviVisaExtended;
 using RsVisaLoader;
 
+
 namespace CMWtests
 {
     public partial class VISAqueryForm : Form
@@ -21,9 +22,6 @@ namespace CMWtests
 
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
-            int resourceMgr = 0;
-            int viRetCount = 0;
-            int vi = 0;
             string[] modelSer;
             string resource = null;
             ViStatus viStat = visa32.VI_NULL;
@@ -55,22 +53,22 @@ namespace CMWtests
                 return;
             }
 
-            viStat = visa32.viOpenDefaultRM(out resourceMgr);
-            viStat = visa32.viOpen(resourceMgr, resource, visa32.VI_NULL, 1000, out vi);
+            viStat = visa32.viOpenDefaultRM(out int defRM);
+            viStat = visa32.viOpen(defRM, resource, visa32.VI_NULL, 1000, out vi);
 
             btnClear_Click(sender, e);
 
-            viStat = VisaIO.Write(vi, "*IDN?");
+            VisaIO.Write(defRM, vi, "*IDN?");
 
             //
             return;
             //
 
-            session.Clear();
-            session.Write("*RST;*CLS");
-            session.Write("*ESE 1", true);
-            session.ErrorChecking();
-            QuerySTB("*IDN?", 2000, out string idn);
+            //session.Clear();
+            //session.Write("*RST;*CLS");
+            //session.Write("*ESE 1", true);
+            //session.ErrorChecking();
+            VisaIO.QuerySTB("*IDN?", 2000, out string idn);
             try
             {
                 modelSer = idn.Split(',');
@@ -93,7 +91,7 @@ namespace CMWtests
         private void btnQueryVISA_Click(object sender, EventArgs e)
         {
             btnQueryVISA.Enabled = false;
-            QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
+            VisaIO.QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
             textBoxResponse.AppendText(response + Environment.NewLine);
             textBoxStringToWrite_TextChanged(sender, e);
         }
@@ -101,13 +99,13 @@ namespace CMWtests
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             btnWriteVISA.Enabled = false;
-            WriteSTB(textBoxStringToWrite.Text, 20000);
+            VisaIO.WriteSTB(textBoxStringToWrite.Text, 20000);
             textBoxStringToWrite_TextChanged(sender, e);
         }
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(textBoxStringToWrite.Text) || session == null)
+            if (String.IsNullOrWhiteSpace(textBoxStringToWrite.Text))// || session == null)
             {
                 btnWriteVISA.Enabled = false;
                 btnQueryVISA.Enabled = false;
@@ -128,14 +126,14 @@ namespace CMWtests
 
         private void btnClose_Click(object sender, EventArgs e)
         {
-            if (session != null)
-            {
-                session.Clear();
-                session.Write("*RST;*CLS");
-                session.Write("*ESE 1");
-                session.ErrorChecking();
-                session.Dispose();
-            }
+            //if (session != null)
+            //{
+            //    session.Clear();
+            //    session.Write("*RST;*CLS");
+            //    session.Write("*ESE 1");
+            //    session.ErrorChecking();
+            //    session.Dispose();
+            //}
         }
 
         private void btnClear_Click(object sender, EventArgs e)

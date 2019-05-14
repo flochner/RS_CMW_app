@@ -2,7 +2,6 @@
 using System.Text;
 using System.Windows.Forms;
 using RsVisaLoader;
-using Ivi.Visa;
 
 namespace CMWtests
 {
@@ -10,6 +9,8 @@ namespace CMWtests
     {
         public string Resource { get; private set; } = "";
         public int ResourcesCount { get; private set; } = 0;
+        private int defRM = 0;
+
         private string[] resources;
 
         public VISAresourceForm()
@@ -20,8 +21,7 @@ namespace CMWtests
 
         public void GetResources()
         {
-            int resourceMgr = 0;
-            int resCount = 0;
+            int resourceCount = 0;
             int vi = 0;
             int i = 0;
             int findList = 0;
@@ -39,9 +39,9 @@ namespace CMWtests
                 else
                     RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
 
-                visa32.viOpenDefaultRM(out resourceMgr);
-                visa32.viSetAttribute(resourceMgr, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_TMO, 0x3E8);
-                visa32.viSetAttribute(resourceMgr, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_MODE, 0x7);
+                visa32.viOpenDefaultRM(out defRM);
+                visa32.viSetAttribute(defRM, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_TMO, 0x3E8);
+                visa32.viSetAttribute(defRM, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_MODE, 0x3);
            }
             else
             {
@@ -53,27 +53,26 @@ namespace CMWtests
             BtnSelect.Enabled = false;
 
             StringBuilder desc = new StringBuilder(256);
-            stat = visa32.viFindRsrc(resourceMgr, "[^ASRL]?*", out findList, out resCount, desc);
-            //MessageBox.Show("count: " + resCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
+            stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out resourceCount, desc);
+            //MessageBox.Show("count: " + resourceCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
 
-            int viRetCount = 0;
-
-            if (resCount > 0)
+            if (resourceCount > 0)
             {
-                resources = new string[resCount];
-                for (int j = 0; j < resCount; j++)
+                resources = new string[resourceCount];
+                for (int j = 0; j < resourceCount; j++)
                 {
-                    if (true)//(!desc.ToString().Contains("::1::"))
+                    string s = desc.ToString();
+                    if (!(s.Contains("::1::") || s.Contains("inst1") || s.Contains("inst2") || s.Contains("inst3")))
                     {
                         resources[i] = desc.ToString();
 
-                        stat = visa32.viOpen(resourceMgr, resources[i], visa32.VI_NULL, 1000, out vi);
+                        stat = visa32.viOpen(defRM, resources[i], visa32.VI_NULL, visa32.VI_TMO_IMMEDIATE, out vi);
                         //MessageBox.Show("open " + resources[i], stat.ToString());
 
-                        stat = VisaIO.Write(vi, "*IDN?");
+                        VisaIO.Write(defRM, vi, "*IDN?");
                         //MessageBox.Show("ret " + viRet + "\n" + "*IDN?", stat.ToString());
 
-                        stat = VisaIO.Read(vi, out response);
+                        VisaIO.Read(defRM, vi, out response);
                         //MessageBox.Show("ret " + viRet + "\n" + response + '-', stat.ToString());
 
                         listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);
@@ -108,7 +107,7 @@ namespace CMWtests
                 listBoxResources.SelectedIndex = -1;
             }
 
-            visa32.viClose(resourceMgr);
+            visa32.viClose(defRM);
             RsVisa.RsViUnloadVisaLibrary();
         }
 
