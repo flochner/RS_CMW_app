@@ -51,10 +51,7 @@ namespace CMWtests
                         stat = visa32.viOpen(defRM, resources[i], visa32.VI_NULL, visa32.VI_TMO_IMMEDIATE, out vi);
                         //MessageBox.Show("open " + resources[i], stat.ToString());
 
-                        visa32.viWrite(vi, "*IDN?"  5, 5);
-                        //MessageBox.Show("ret " + viRet + "\n" + "*IDN?", stat.ToString());
-
-                        visa32.viRead(vi, response, );
+                        response = VisaIO.QueryString(vi, "*IDN?");
                         //MessageBox.Show("ret " + viRet + "\n" + response + '-', stat.ToString());
 
                         listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);

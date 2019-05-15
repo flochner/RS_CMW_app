@@ -58,21 +58,12 @@ namespace CMWtests
             VisaIO.OpenResourceMgr(out int defRM);
             instr = new VisaIO(defRM, resource);
 
-         //   viStat = visa32.viOpenDefaultRM(out int defRM);
-         //   viStat = visa32.viOpen(defRM, resource, visa32.VI_NULL, 1000, out vi);
-
             btnClear_Click(sender, e);
 
-            instr.Write("*IDN?");
-
-            //
-            return;
-            //
-
             //session.Clear();
-            //session.Write("*RST;*CLS");
-            //session.Write("*ESE 1", true);
-            //session.ErrorChecking();
+            instr.Write("*RST;*CLS");
+            instr.Write("*ESE 1", true);
+            instr.ErrorChecking();
             idn = instr.QuerySTB("*IDN?", 2000);
             try
             {

@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System.Text;
 using RsVisaLoader;
+using System.Collections.Generic;
 
 namespace CMWtests
 {
@@ -21,21 +22,50 @@ namespace CMWtests
             StringBuilder viResponse = new StringBuilder(256);
             ViStatus stat = visa32.viRead(vi, viResponse, 256, out int retCnt);
             //response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt - 1 : 0);
-            response = viResponse.ToString().TrimEnd('\n');
+            //response = viResponse.ToString().TrimEnd('\n');
+            response = viResponse.ToString();
+            var rer = response.Split('\n');
+            var ttt = rer[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Read", stat);
             return stat;
         }
 
-        public ViStatus Write(string message)
+        public static ViStatus Read(int vi, out string response, bool readSTB = false)
         {
-            ViStatus stat = visa32.viWrite(vi, message, message.Length, out int viRetCount);
+            StringBuilder viResponse = new StringBuilder(256);
+            ViStatus stat = visa32.viRead(vi, viResponse, 256, out int retCnt);
+            //response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt - 1 : 0);
+            //response = viResponse.ToString().TrimEnd('\n');
+            response = viResponse.ToString();
+            var rer = response.Split('\n');
+            var ttt = rer[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
             return stat;
         }
 
-        private void ShowErrorText(string source, ViStatus status)
+        public ViStatus Write(string message, bool waitForOPC = false)
+        {
+            ViStatus stat = visa32.viWrite(vi, message, message.Length, out int viRetCount);
+            if (waitForOPC == true)
+                WaitForOPC();
+
+            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
+            return stat;
+        }
+
+        public static ViStatus Write(int vi, string message, bool waitForOPC = false)
+        {
+            ViStatus stat = visa32.viWrite(vi, message, message.Length, out int viRetCount);
+            if (waitForOPC == true)
+                WaitForOPC();
+
+            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
+            return stat;
+        }
+
+        private static void ShowErrorText(string source, ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
             ViStatus err = visa32.viStatusDesc(vi, status, text);
@@ -75,7 +105,8 @@ namespace CMWtests
 
         public int QueryInteger(string query)
         {
-            return Int32.Parse(QueryString(query));
+            string response = QueryString(query);
+            return Int32.Parse(response);
         }
 
         public string QueryString(string query)
@@ -86,11 +117,65 @@ namespace CMWtests
             return response;
         }
 
+        public static string QueryString(int vi, string query)
+        {
+            Write(vi, query);
+            Read(vi, out string response);
+            response = response.TrimEnd('\n');
+            return response;
+        }
+
         public string ReadString()
         {
             Read(out string response);
             response = response.TrimEnd('\n');
             return response;
+        }
+
+        public void ClearStatus()
+        {
+            QueryString("*CLS;*OPC?");
+            ReadErrorQueue();
+        }
+
+        public void ErrorChecking()
+        {
+            var errors = ReadErrorQueue();
+            //if (errors.Count > 0)
+            //{
+            //    throw new InstrumentErrorException(errors);
+            //}
+        }
+
+        public List<string> ReadErrorQueue()
+        {
+            var errors = new List<string>();
+
+            if ((QueryInteger("*STB?") & 4) > 0)
+            {
+                while (true)
+                {
+                    var response = QueryString("SYST:ERR?");
+                    if (response.ToLower().Contains("\"no error\""))
+                    {
+                        break;
+                    }
+                    errors.Add(response);
+
+                    // safety stop
+                    if (errors.Count > 50)
+                    {
+                        errors.Add("Cannot clear the error queue");
+                        break;
+                    }
+                }
+            }
+            return errors;
+        }
+
+        private static void WaitForOPC()
+        {
+            QueryString(vi, "*OPC?");
         }
 
         public static void OpenResourceMgr(out int defRM)
