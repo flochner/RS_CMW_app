@@ -28,26 +28,8 @@ namespace CMWtests
             string response;
             ViStatus stat;
 
-            if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
-            {
-                if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_RS))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_RS);
-                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_NI))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_NI);
-                else if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_AG))
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_AG);
-                else
-                    RsVisa.RsViSetDefaultLibrary(RsVisa.RSVISA_MANFID_DEFAULT);
-
-                visa32.viOpenDefaultRM(out defRM);
-                visa32.viSetAttribute(defRM, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_TMO, 0x3E8);
-                visa32.viSetAttribute(defRM, ViAttr.VI_RS_ATTR_TCPIP_FIND_RSRC_MODE, 0x3);
-           }
-            else
-            {
-                MessageBox.Show("No VISAs Installed!");
-                return;
-            }
+            //if novisa return
+            VisaIO.OpenResourceMgr(out defRM);
 
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
@@ -69,10 +51,10 @@ namespace CMWtests
                         stat = visa32.viOpen(defRM, resources[i], visa32.VI_NULL, visa32.VI_TMO_IMMEDIATE, out vi);
                         //MessageBox.Show("open " + resources[i], stat.ToString());
 
-                        VisaIO.Write(defRM, vi, "*IDN?");
+                        visa32.viWrite(vi, "*IDN?"  5, 5);
                         //MessageBox.Show("ret " + viRet + "\n" + "*IDN?", stat.ToString());
 
-                        VisaIO.Read(defRM, vi, out response);
+                        visa32.viRead(vi, response, );
                         //MessageBox.Show("ret " + viRet + "\n" + response + '-', stat.ToString());
 
                         listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);
@@ -133,10 +115,5 @@ namespace CMWtests
 
         private void btnCancel_Click(object sender, EventArgs e)
         { }
-
-        private static bool IsVisaLibraryInstalled(UInt16 iManfId)
-        {
-            return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
-        }
     }
 }

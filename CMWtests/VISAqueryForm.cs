@@ -12,6 +12,7 @@ namespace CMWtests
     public partial class VISAqueryForm : Form
     {
         private int vi = 0;
+        private VisaIO instr = null;
 
         public VISAqueryForm()
         {
@@ -25,6 +26,7 @@ namespace CMWtests
             string[] modelSer;
             string resource = null;
             ViStatus viStat = visa32.VI_NULL;
+            string idn = "";
 
             labelResource.Text = "";
             btnWriteVISA.Enabled = false;
@@ -53,12 +55,15 @@ namespace CMWtests
                 return;
             }
 
-            viStat = visa32.viOpenDefaultRM(out int defRM);
-            viStat = visa32.viOpen(defRM, resource, visa32.VI_NULL, 1000, out vi);
+            VisaIO.OpenResourceMgr(out int defRM);
+            instr = new VisaIO(defRM, resource);
+
+         //   viStat = visa32.viOpenDefaultRM(out int defRM);
+         //   viStat = visa32.viOpen(defRM, resource, visa32.VI_NULL, 1000, out vi);
 
             btnClear_Click(sender, e);
 
-            VisaIO.Write(defRM, vi, "*IDN?");
+            instr.Write("*IDN?");
 
             //
             return;
@@ -68,7 +73,7 @@ namespace CMWtests
             //session.Write("*RST;*CLS");
             //session.Write("*ESE 1", true);
             //session.ErrorChecking();
-            VisaIO.QuerySTB("*IDN?", 2000, out string idn);
+            idn = instr.QuerySTB("*IDN?", 2000);
             try
             {
                 modelSer = idn.Split(',');
@@ -90,8 +95,10 @@ namespace CMWtests
 
         private void btnQueryVISA_Click(object sender, EventArgs e)
         {
+            string response;
+
             btnQueryVISA.Enabled = false;
-            VisaIO.QuerySTB(textBoxStringToWrite.Text, 20000, out string response);
+            response = instr.QuerySTB(textBoxStringToWrite.Text, 20000);
             textBoxResponse.AppendText(response + Environment.NewLine);
             textBoxStringToWrite_TextChanged(sender, e);
         }
@@ -99,7 +106,7 @@ namespace CMWtests
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             btnWriteVISA.Enabled = false;
-            VisaIO.WriteSTB(textBoxStringToWrite.Text, 20000);
+            instr.WriteSTB(textBoxStringToWrite.Text, 20000);
             textBoxStringToWrite_TextChanged(sender, e);
         }
 
