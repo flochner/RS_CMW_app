@@ -19,13 +19,11 @@ namespace CMWtests
 
         public ViStatus Read(out string response, bool readSTB = false)
         {
-            StringBuilder viResponse = new StringBuilder(256);
-            ViStatus stat = visa32.viRead(vi, viResponse, 256, out int retCnt);
-            //response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt - 1 : 0);
+            StringBuilder viResponse = new StringBuilder(1024);
+            ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
+            response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
             //response = viResponse.ToString().TrimEnd('\n');
-            response = viResponse.ToString();
-            var rer = response.Split('\n');
-            var ttt = rer[0];
+            //response = viResponse.ToString().Split('\n')[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Read", stat);
             return stat;
@@ -33,13 +31,11 @@ namespace CMWtests
 
         public static ViStatus Read(int vi, out string response, bool readSTB = false)
         {
-            StringBuilder viResponse = new StringBuilder(256);
-            ViStatus stat = visa32.viRead(vi, viResponse, 256, out int retCnt);
-            //response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt - 1 : 0);
+            StringBuilder viResponse = new StringBuilder(1024);
+            ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
+            response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
             //response = viResponse.ToString().TrimEnd('\n');
-            response = viResponse.ToString();
-            var rer = response.Split('\n');
-            var ttt = rer[0];
+            //response = viResponse.ToString().Split('\n')[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
             return stat;
@@ -106,7 +102,8 @@ namespace CMWtests
         public int QueryInteger(string query)
         {
             string response = QueryString(query);
-            return Int32.Parse(response);
+            int.TryParse(response, out int result);
+            return result;
         }
 
         public string QueryString(string query)

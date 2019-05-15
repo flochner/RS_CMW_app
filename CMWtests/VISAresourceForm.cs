@@ -34,7 +34,7 @@ namespace CMWtests
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
 
-            StringBuilder desc = new StringBuilder(256);
+            StringBuilder desc = new StringBuilder(1024);
             stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out resourceCount, desc);
             //MessageBox.Show("count: " + resourceCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
 
@@ -58,7 +58,7 @@ namespace CMWtests
                         visa32.viClose(vi);
                         i++;
                     }
-                    desc = new StringBuilder(256);
+                    desc = new StringBuilder(1024);
                     visa32.viFindNext(findList, desc);
                     ResourcesCount = 1;
                 }
