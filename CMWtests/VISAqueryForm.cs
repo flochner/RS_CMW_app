@@ -64,7 +64,9 @@ namespace CMWtests
             instr.Write("*RST;*CLS");
             instr.Write("*ESE 1", true);
             instr.ErrorChecking();
-            idn = instr.QuerySTB("*IDN?", 2000);
+            instr.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO", true);
+        idn = instr.QueryString("CALibration:GPRF:MEAS:EPSensor:ZERO?");
+            //idn = instr.QuerySTB("*IDN?", 2000);
             try
             {
                 modelSer = idn.Split(',');
@@ -77,6 +79,7 @@ namespace CMWtests
             }
             catch (Exception exc)
             {
+                textBoxResponse.AppendText(idn + Environment.NewLine);
                 MessageBox.Show(exc.Message, exc.GetType().ToString());
                 return;
             }
