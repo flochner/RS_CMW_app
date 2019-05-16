@@ -2,14 +2,15 @@
 using System.Windows.Forms;
 using System.Text;
 using System.Threading;
-using RsVisaLoader;
 using System.Collections.Generic;
+using RsVisaLoader;
 
 namespace CMWtests
 {
     [Flags]
     public enum StatusByteFlags : short
     {
+        None = 0,
         User0 = 1,
         User1 = 2,
         User2 = 4,
@@ -31,38 +32,14 @@ namespace CMWtests
             visa32.viOpen(defRM, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
         }
 
-/// TODO
-/// read STB
-/// 
         public ViStatus Read(out string response, bool readSTB = false)
         {
             StringBuilder viResponse = new StringBuilder(1024);
             ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
             response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
-            //response = viResponse.ToString().TrimEnd('\n');
-            //response = viResponse.ToString().Split('\n')[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Read", stat);
             return stat;
-        }
-
-        public ViStatus ReadSTB(int vi, out short status)
-        {
-            ViStatus viStat =  visa32.viReadSTB(vi, out status);
-            status = 126;
-            string bits = (status & 1).ToString() ;
-            for (int i = 8; i > 0; i--)
-            {
-                bits += (((status & (1 << i)) == 0) ? 0 : ((status & (1 << i)) / (status & (1 << i)))).ToString();
-                if (bits.Length == 4)
-                    bits += " ";
-            }
-            MessageBox.Show(status + "\n" + bits);
-            if ((status & 5) > 0)
-            {
-                QueryString("syst:err?");
-            }
-            return viStat;
         }
 
         public static ViStatus Read(int vi, out string response, bool readSTB = false)
@@ -70,8 +47,6 @@ namespace CMWtests
             StringBuilder viResponse = new StringBuilder(1024);
             ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
             response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
-            //response = viResponse.ToString().TrimEnd('\n');
-            //response = viResponse.ToString().Split('\n')[0];
 
             if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
             return stat;
@@ -97,45 +72,6 @@ namespace CMWtests
             return stat;
         }
 
-        private static void ShowErrorText(string source, ViStatus status)
-        {
-            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
-            ViStatus err = visa32.viStatusDesc(vi, status, text);
-            MessageBox.Show(status.ToString() + Environment.NewLine + text.ToString(), source);
-        }
-
-        public void WriteSTB(string command, int timeout)
-        {
-            QueryInteger("*ESR?"); //Clear the Event Status Register
-            Write(command + ";*OPC");
-            string exMessage = String.Format("WriteWithSTBpollSync - Timeout occured. Command: \"{0}\", timeout {1} ms", command, timeout);
-            _STBpolling(exMessage, timeout);
-            QueryInteger("*ESR?"); //Clear the Event Status Register
-
-            //    string errResp = session.QueryString("SYST:ERR?").TrimEnd();
-            //    if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
-            //        textBoxResponse.AppendText(errResp + Environment.NewLine);
-        }
-
-        public string QuerySTB(string query, int timeout)
-        {
-            QueryInteger("*ESR?"); //Clear the Event Status Register
-            Write(query + ";*OPC");
-            ReadSTB(vi, out short status);
-            string exMessage = String.Format("QueryWithSTBpollSync - Timeout occured. Query: \"{0}\", timeout {1} ms", query, timeout);
-            _STBpolling(exMessage, timeout);
-            var response = ReadString();
-            response = response.TrimEnd('\n');
-            QueryInteger("*ESR?"); //Clear the Event Status Register
-            return response;
-
-            //Write("SYST:ERR?\n");
-            //string errResp = ReadString().TrimEnd();
-            //if (Convert.ToInt64(errResp.Split(',')[0]) != 0)
-            //    textBoxResponse.AppendText(errResp + Environment.NewLine);
-
-        }
-
         public int QueryInteger(string query)
         {
             string response = QueryString(query);
@@ -154,39 +90,36 @@ namespace CMWtests
         {
             Write(query);
             Read(out string response);
-            response = response.TrimEnd('\n');
-            return response;
+            return response.TrimEnd('\n');
         }
 
         public static string QueryString(int vi, string query)
         {
             Write(vi, query);
             Read(vi, out string response);
-            response = response.TrimEnd('\n');
-            return response;
+            return response.TrimEnd('\n');
         }
 
         public string ReadString()
         {
             Read(out string response);
-            response = response.TrimEnd('\n');
-            return response;
+            return response.TrimEnd('\n');
         }
 
-        public void WriteWithSTBpollSync(string command, int timeout)
+        public void WriteWithSTB(string command, int timeout)
         {
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(command + ";*OPC");
-            string exMessage = String.Format("WriteWithSTBpollSync - Timeout occured. Command: \"{0}\", timeout {1} ms", command, timeout);
+            string exMessage = String.Format("WriteWithSTB - Timeout occured. Command: \"{0}\", timeout {1} ms", command, timeout);
             _STBpolling(exMessage, timeout);
             QueryInteger("*ESR?"); //Clear the Event Status Register
         }
 
-        public string QueryWithSTBpollSync(string query, int timeout)
+        public string QueryWithSTB(string query, int timeout)
         {
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(query + ";*OPC");
-            string exMessage = String.Format("QueryWithSTBpollSync - Timeout occured. Query: \"{0}\", timeout {1} ms", query, timeout);
+            string exMessage = String.Format("QueryWithSTB - Timeout occured. Query: \"{0}\", timeout {1} ms", query, timeout);
             _STBpolling(exMessage, timeout);
             var response = ReadString();
             response = response.TrimEnd('\n');
@@ -214,7 +147,7 @@ namespace CMWtests
         {
             var errors = new List<string>();
 
-            if ((QueryInteger("*STB?") & 4) > 0)
+            if (((QueryInteger("*STB?") >> 4) & 1) > 0)
             {
                 while (true)
                 {
@@ -239,6 +172,13 @@ namespace CMWtests
         private static void WaitForOPC()
         {
             QueryString(vi, "*OPC?");
+        }
+
+        private static void ShowErrorText(string source, ViStatus status)
+        {
+            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
+            ViStatus err = visa32.viStatusDesc(vi, status, text);
+            MessageBox.Show(status.ToString() + Environment.NewLine + text.ToString(), source);
         }
 
         public static void OpenResourceMgr(out int defRM)
@@ -304,11 +244,21 @@ namespace CMWtests
 
         private static StatusByteFlags ReadStatusByte()
         {
-            var stb = QueryInteger(vi, "*STB?");
-            if ((stb & 5) > 0)
+            visa32.viReadSTB(vi, out short stb);
+            if (((stb >> 5) & 1) > 0)
                 return StatusByteFlags.EventStatusRegister;
             else
-                return 0;
+                return StatusByteFlags.None;
+
+            //stb = 15;
+            //string bits = "";
+            //for (int i = 7; i >= 0; i--)
+            //{
+            //    bits += ((stb >> i) & 1);
+            //    if (bits.Length == 4)
+            //        bits += " ";
+            //}
+            //MessageBox.Show(stb + "\n" + bits, "STB Status");
         }
     }
 

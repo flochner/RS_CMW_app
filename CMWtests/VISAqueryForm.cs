@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
-using System.Text;
 using System.Threading;
-//using Ivi.Visa;
-//using IviVisaExtended;
-using RsVisaLoader;
 
 
 namespace CMWtests
 {
     public partial class VISAqueryForm : Form
     {
-        private int vi = 0;
         private VisaIO instr = null;
 
         public VISAqueryForm()
@@ -25,7 +20,6 @@ namespace CMWtests
         {
             string[] modelSer;
             string resource = null;
-            ViStatus viStat = visa32.VI_NULL;
             string idn = "";
 
             labelResource.Text = "";
@@ -49,6 +43,8 @@ namespace CMWtests
             resource = resForm.Resource;
             resForm.Dispose();
 
+            //resource = "TCPIP0::192.168.4.31::inst0::INSTR";
+
             if (string.IsNullOrEmpty(resource))
             {
                 labelResource.Text = "No resource connected";
@@ -60,13 +56,10 @@ namespace CMWtests
 
             btnClear_Click(sender, e);
 
-            //session.Clear();
-            instr.Write("*RST;*CLS");
-            instr.Write("*ESE 1", true);
+            instr.Write("*RST");
+            instr.ClearStatus();
             instr.ErrorChecking();
-            instr.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO", true);
-        idn = instr.QueryString("CALibration:GPRF:MEAS:EPSensor:ZERO?");
-            //idn = instr.QuerySTB("*IDN?", 2000);
+            idn = instr.QueryString("*IDN?");
             try
             {
                 modelSer = idn.Split(',');
@@ -92,7 +85,7 @@ namespace CMWtests
             string response;
 
             btnQueryVISA.Enabled = false;
-            response = instr.QuerySTB(textBoxStringToWrite.Text, 20000);
+            response = instr.QueryWithSTB(textBoxStringToWrite.Text, 20000);
             textBoxResponse.AppendText(response + Environment.NewLine);
             textBoxStringToWrite_TextChanged(sender, e);
         }
@@ -100,7 +93,7 @@ namespace CMWtests
         private void btnWriteVISA_Click(object sender, EventArgs e)
         {
             btnWriteVISA.Enabled = false;
-            instr.WriteSTB(textBoxStringToWrite.Text, 20000);
+            instr.WriteWithSTB(textBoxStringToWrite.Text, 20000);
             textBoxStringToWrite_TextChanged(sender, e);
         }
 

@@ -3,8 +3,6 @@ using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using CMWgraph;
-//using Ivi.Visa; //This .NET assembly is installed with your NI VISA installation
-//using IviVisaExtended; //Custom extention functions for Ivi.Visa
 
 namespace CMWtests
 {
@@ -670,10 +668,9 @@ namespace CMWtests
             {
                 retryZero = false;
 
-                //cmw.Clear();
-                //cmw.write("*RST;*CLS", true);
-                //cmw.write("*ESE 1", true);
-                //cmw.ErrorChecking();
+                cmw.Write("*RST");
+                cmw.ClearStatus();
+                cmw.ErrorChecking();
 
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
@@ -684,15 +681,14 @@ namespace CMWtests
                 if (img.DialogResult == DialogResult.Abort)
                     return TestStatus.Abort;
 
-                    SetHead2Text("Zeroing Sensor...");
+                SetHead2Text("Zeroing Sensor...");
 
 #if !DEBUG
-                    //cmw.write("ABORt:GPRF:MEAS:EPSensor", true);
-                    //cmw.WriteSTB("CALibration:GPRF:MEAS:EPSensor:ZERO", 20000);
-                    //cmw.QuerySTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000, out visaResponse);
+                cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
+                visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 10000);
 #endif
 #if DEBUG
-                    visaResponse = "PASS";
+                visaResponse = "PASS";
 #endif
                     if (!visaResponse.Contains("PASS"))
                     {

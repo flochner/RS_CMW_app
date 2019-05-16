@@ -21,32 +21,20 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_92192E7E5BE8B6440D5044384B9E2E71"
-        "OwnerKey" = "8:_15F057A9444D42799D603311CC0716F0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_C69A93D03AD89AB0473B6E89948EE614"
+        "MsmKey" = "8:_56E4ADF6F0114D71B925D8271BFDA83E"
         "OwnerKey" = "8:_15F057A9444D42799D603311CC0716F0"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_92192E7E5BE8B6440D5044384B9E2E71"
+        "OwnerKey" = "8:_56E4ADF6F0114D71B925D8271BFDA83E"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_15F057A9444D42799D603311CC0716F0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_C69A93D03AD89AB0473B6E89948EE614"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -139,51 +127,20 @@
         }
         "File"
         {
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_92192E7E5BE8B6440D5044384B9E2E71"
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_56E4ADF6F0114D71B925D8271BFDA83E"
             {
             "AssemblyRegister" = "3:1"
             "AssemblyIsInGAC" = "11:FALSE"
             "AssemblyAsmDisplayName" = "8:EPPlus, Version=4.1.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_92192E7E5BE8B6440D5044384B9E2E71"
+                    "_56E4ADF6F0114D71B925D8271BFDA83E"
                     {
                     "Name" = "8:EPPlus.dll"
                     "Attributes" = "3:512"
                     }
                 }
             "SourcePath" = "8:EPPlus.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_11A091AA5CE547E8BAA3FA62A82C2707"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_C69A93D03AD89AB0473B6E89948EE614"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:Ivi.Visa, Version=5.8.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_C69A93D03AD89AB0473B6E89948EE614"
-                    {
-                    "Name" = "8:Ivi.Visa.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:Ivi.Visa.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_11A091AA5CE547E8BAA3FA62A82C2707"
