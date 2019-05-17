@@ -690,7 +690,7 @@ namespace CMWtests
 #if DEBUG
                 visaResponse = "PASS";
 #endif
-                    if (!visaResponse.Contains("PASS"))
+                if (!visaResponse.Contains("PASS"))
                     {
                         var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
                                                      "(Retry) after verifying all outputs are off." + Environment.NewLine +

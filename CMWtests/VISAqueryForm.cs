@@ -2,7 +2,6 @@
 using System.Windows.Forms;
 using System.Threading;
 
-
 namespace CMWtests
 {
     public partial class VISAqueryForm : Form
@@ -59,6 +58,11 @@ namespace CMWtests
             instr.Write("*RST");
             instr.ClearStatus();
             instr.ErrorChecking();
+#if DEBUG
+            //instr.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
+            //idn = instr.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
+            //textBoxResponse.AppendText(idn);
+#endif
             idn = instr.QueryString("*IDN?");
             try
             {

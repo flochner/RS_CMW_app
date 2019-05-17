@@ -11,14 +11,9 @@ namespace CMWtests
     public enum StatusByteFlags : short
     {
         None = 0,
-        User0 = 1,
-        User1 = 2,
-        User2 = 4,
-        User3 = 8,
         MessageAvailable = 16,
-        EventStatusRegister = 32,
-        RequestingService = 64,
-        User7 = 128
+        RequestingService = 32,
+        EventStatusRegister = MessageAvailable | RequestingService
     }
 
     public class VisaIO
@@ -38,17 +33,8 @@ namespace CMWtests
             ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
             response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
 
-            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Read", stat);
-            return stat;
-        }
-
-        public static ViStatus Read(int vi, out string response, bool readSTB = false)
-        {
-            StringBuilder viResponse = new StringBuilder(1024);
-            ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
-            response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
-
-            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
+            if (stat < ViStatus.VI_SUCCESS)
+                ShowErrorText("VisaIO.Read", stat);
             return stat;
         }
 
@@ -58,17 +44,8 @@ namespace CMWtests
             if (waitForOPC == true)
                 WaitForOPC();
 
-            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
-            return stat;
-        }
-
-        public static ViStatus Write(int vi, string message, bool waitForOPC = false)
-        {
-            ViStatus stat = visa32.viWrite(vi, message, message.Length, out int viRetCount);
-            if (waitForOPC == true)
-                WaitForOPC();
-
-            if (stat < ViStatus.VI_SUCCESS) ShowErrorText("VisaIO.Write", stat);
+            if (stat < ViStatus.VI_SUCCESS)
+                ShowErrorText("VisaIO.Write", stat);
             return stat;
         }
 
@@ -79,24 +56,10 @@ namespace CMWtests
             return result;
         }
 
-        public static int QueryInteger(int vi, string query)
-        {
-            string response = QueryString(vi, query);
-            int.TryParse(response, out int result);
-            return result;
-        }
-
         public string QueryString(string query)
         {
             Write(query);
             Read(out string response);
-            return response.TrimEnd('\n');
-        }
-
-        public static string QueryString(int vi, string query)
-        {
-            Write(vi, query);
-            Read(vi, out string response);
             return response.TrimEnd('\n');
         }
 
@@ -169,12 +132,12 @@ namespace CMWtests
             return errors;
         }
 
-        private static void WaitForOPC()
+        private void WaitForOPC()
         {
-            QueryString(vi, "*OPC?");
+            QueryString("*OPC?");
         }
 
-        private static void ShowErrorText(string source, ViStatus status)
+        private void ShowErrorText(string source, ViStatus status)
         {
             StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
             ViStatus err = visa32.viStatusDesc(vi, status, text);
@@ -211,7 +174,7 @@ namespace CMWtests
             return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
         }
 
-        private static void _STBpolling(string exMessage, int timeout)
+        private void _STBpolling(string exMessage, int timeout)
         {
             var start = DateTime.Now;
             var stop = start.AddMilliseconds(timeout);
@@ -242,15 +205,17 @@ namespace CMWtests
             }
         }
 
-        private static StatusByteFlags ReadStatusByte()
+        private StatusByteFlags ReadStatusByte()
         {
             visa32.viReadSTB(vi, out short stb);
-            if (((stb >> 5) & 1) > 0)
+
+            StatusByteFlags statusByte = (StatusByteFlags)stb;
+
+            if (statusByte == StatusByteFlags.MessageAvailable || statusByte == StatusByteFlags.RequestingService)
                 return StatusByteFlags.EventStatusRegister;
             else
-                return StatusByteFlags.None;
+                return statusByte;
 
-            //stb = 15;
             //string bits = "";
             //for (int i = 7; i >= 0; i--)
             //{
@@ -259,6 +224,14 @@ namespace CMWtests
             //        bits += " ";
             //}
             //MessageBox.Show(stb + "\n" + bits, "STB Status");
+
+            //if (((stb >> 4) & 1) > 0)
+            //{
+            //    var response = QueryString("?");
+            //    MessageBox.Show(response, "?");
+            //}
+
+            //if (((stb >> 5) & 1) > 0)
         }
     }
 
@@ -275,10 +248,13 @@ namespace CMWtests
     public class InstrumentErrorException : Exception
     {
         /// <summary>
-        /// Instrument OPC Timeout Exception
+        /// Instrument Error Exception
         /// </summary>
         public InstrumentErrorException(string errors) : base(errors)
         {
         }
     }
 }
+
+
+

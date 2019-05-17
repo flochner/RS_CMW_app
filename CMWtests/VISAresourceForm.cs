@@ -10,6 +10,7 @@ namespace CMWtests
         public string Resource { get; private set; } = "";
         public int ResourcesCount { get; private set; } = 0;
         private int defRM = 0;
+        private VisaIO instr = null;
 
         private string[] resources;
 
@@ -28,11 +29,10 @@ namespace CMWtests
             string response;
             ViStatus stat;
 
-            //if novisa return
-            VisaIO.OpenResourceMgr(out defRM);
-
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
+
+            VisaIO.OpenResourceMgr(out int defRM);
 
             StringBuilder desc = new StringBuilder(1024);
             stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out resourceCount, desc);
@@ -47,13 +47,8 @@ namespace CMWtests
                     if (!(s.Contains("::1::") || s.Contains("inst1") || s.Contains("inst2") || s.Contains("inst3")))
                     {
                         resources[i] = desc.ToString();
-
-                        stat = visa32.viOpen(defRM, resources[i], visa32.VI_NULL, visa32.VI_TMO_IMMEDIATE, out vi);
-                        //MessageBox.Show("open " + resources[i], stat.ToString());
-
-                        response = VisaIO.QueryString(vi, "*IDN?");
-                        //MessageBox.Show("ret " + viRet + "\n" + response + '-', stat.ToString());
-
+                        instr = new VisaIO(defRM, resources[i]);
+                        response = instr.QueryString("*IDN?");
                         listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);
                         visa32.viClose(vi);
                         i++;
