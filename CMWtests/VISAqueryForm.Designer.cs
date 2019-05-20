@@ -123,6 +123,7 @@
             this.textBoxResponse.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxResponse.Size = new System.Drawing.Size(360, 192);
             this.textBoxResponse.TabIndex = 17;
+            this.textBoxResponse.TextChanged += new System.EventHandler(this.textBoxResponse_TextChanged);
             // 
             // btnClear
             // 

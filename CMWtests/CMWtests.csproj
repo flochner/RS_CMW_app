@@ -85,14 +85,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\CMWgraphs\lib\EPPlus.dll</HintPath>
     </Reference>
-    <Reference Include="Ivi.Visa, Version=5.8.0.0, Culture=neutral, PublicKeyToken=a128c98f1d7717c1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Release\Ivi.Visa.dll</HintPath>
-    </Reference>
-    <Reference Include="NationalInstruments.VisaNS, Version=13.0.40.167, Culture=neutral, PublicKeyToken=dc6ad606294fc298, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files (x86)\National Instruments\MeasurementStudioVS2012\DotNET\Assemblies\Current\NationalInstruments.VisaNS.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -120,7 +112,6 @@
     </Compile>
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="graph.cs" />
-    <Compile Include="IviVisaExtended.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>

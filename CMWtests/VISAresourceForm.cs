@@ -7,9 +7,8 @@ namespace CMWtests
 {
     public partial class VISAresourceForm : Form
     {
-        public string Resource { get; private set; } = "";
+        public string Resource { get; private set; } = string.Empty;
         public int ResourcesCount { get; private set; } = 0;
-        private int defRM = 0;
         private VisaIO instr = null;
 
         private string[] resources;
@@ -20,9 +19,13 @@ namespace CMWtests
             GetResources();
         }
 
+        /// <summary>
+        /// Commit 
+        /// </summary>
+        //Fixed resouceForm:separated Count variables.VisaIO: added better Reset(). Implemented Close(). 
+
         public void GetResources()
         {
-            int resourceCount = 0;
             int vi = 0;
             int i = 0;
             int findList = 0;
@@ -35,13 +38,13 @@ namespace CMWtests
             VisaIO.OpenResourceMgr(out int defRM);
 
             StringBuilder desc = new StringBuilder(1024);
-            stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out resourceCount, desc);
-            //MessageBox.Show("count: " + resourceCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
+            stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out int retCount, desc);
+            //MessageBox.Show("count: " + retCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
 
-            if (resourceCount > 0)
+            if (retCount > 0)
             {
-                resources = new string[resourceCount];
-                for (int j = 0; j < resourceCount; j++)
+                resources = new string[retCount];
+                for (int j = 0; j < retCount; j++)
                 {
                     string s = desc.ToString();
                     if (!(s.Contains("::1::") || s.Contains("inst1") || s.Contains("inst2") || s.Contains("inst3")))
@@ -55,12 +58,12 @@ namespace CMWtests
                     }
                     desc = new StringBuilder(1024);
                     visa32.viFindNext(findList, desc);
-                    ResourcesCount = 1;
                 }
+                ResourcesCount = i;
             }
             else
             {
-                Resource = null;
+                Resource = string.Empty;
                 RsVisa.RsViUnloadVisaLibrary();
                 return;
             }
@@ -69,10 +72,9 @@ namespace CMWtests
             this.Height = this.Height + 15 * (listBoxResources.Items.Count - 1);
             this.MinimumSize = new System.Drawing.Size(this.Width, this.Height);
 
-            if (listBoxResources.Items.Count == 1)
+            if (ResourcesCount == 1)
             {
-                ResourcesCount = 1;
-                Resource = desc.ToString();
+                Resource = resources[0];
                 listBoxResources.SelectedIndex = 0;
                 BtnSelect.Enabled = true;
             }

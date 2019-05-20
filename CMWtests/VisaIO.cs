@@ -27,6 +27,13 @@ namespace CMWtests
             visa32.viOpen(defRM, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
         }
 
+        public ViStatus Close()
+        {
+            ViStatus status = visa32.viClose(defRM);
+            RsVisa.RsViUnloadVisaLibrary();
+            return status;
+        }
+
         public ViStatus Read(out string response, bool readSTB = false)
         {
             StringBuilder viResponse = new StringBuilder(1024);
@@ -90,10 +97,17 @@ namespace CMWtests
             return response;
         }
 
+        public void Reset()
+        {
+            Write("*RST", true);
+            ClearStatus();
+            Write("*ESE 1", true);
+        }
+
         public void ClearStatus()
         {
             QueryString("*CLS;*OPC?");
-            ReadErrorQueue();
+            ErrorChecking();
         }
 
         public void ErrorChecking()

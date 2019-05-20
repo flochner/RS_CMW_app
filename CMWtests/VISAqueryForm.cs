@@ -18,16 +18,24 @@ namespace CMWtests
         private void btnConnectNew_Click(object sender, EventArgs e)
         {
             string[] modelSer;
-            string resource = null;
-            string idn = "";
+            string resource = string.Empty;
+            string idn = string.Empty;
 
             labelResource.Text = "";
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
+            textBoxResponse.ResetText();
+
+            if (instr != null)
+            {
+                instr.Reset();
+                instr.Close();
+                instr = null;
+            }
 
             var resForm = new VISAresourceForm();
 
-            if (resForm.Resource == null)
+            if (resForm.ResourcesCount == 0)
             {
                 labelResource.Text = "";
                 Thread.Sleep(250);
@@ -55,13 +63,11 @@ namespace CMWtests
 
             btnClear_Click(sender, e);
 
-            instr.Write("*RST");
-            instr.ClearStatus();
-            instr.ErrorChecking();
+            instr.Reset();
 #if DEBUG
-            //instr.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
-            //idn = instr.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
-            //textBoxResponse.AppendText(idn);
+            instr.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
+            idn = instr.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
+            textBoxResponse.AppendText(idn);
 #endif
             idn = instr.QueryString("*IDN?");
             try
@@ -103,7 +109,7 @@ namespace CMWtests
 
         private void textBoxStringToWrite_TextChanged(object sender, EventArgs e)
         {
-            if (String.IsNullOrWhiteSpace(textBoxStringToWrite.Text))// || session == null)
+            if (String.IsNullOrWhiteSpace(textBoxStringToWrite.Text))
             {
                 btnWriteVISA.Enabled = false;
                 btnQueryVISA.Enabled = false;
@@ -122,16 +128,19 @@ namespace CMWtests
             }
         }
 
+        private void textBoxResponse_TextChanged(object sender, EventArgs e)
+        {
+            textBoxResponse.Refresh();
+        }
+
         private void btnClose_Click(object sender, EventArgs e)
         {
-            //if (session != null)
-            //{
-            //    session.Clear();
-            //    session.Write("*RST;*CLS");
-            //    session.Write("*ESE 1");
-            //    session.ErrorChecking();
-            //    session.Dispose();
-            //}
+            if (instr != null)
+            {
+                instr.Reset();
+                instr.Close();
+                instr = null;
+            }
         }
 
         private void btnClear_Click(object sender, EventArgs e)
