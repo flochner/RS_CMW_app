@@ -48,7 +48,7 @@ namespace CMWtests
             pictureBox1.Visible = true;
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void button1_MouseClick(object sender, EventArgs e)
         {
             _result = MessageBox.Show("Abort all testing?",
                                       "Warning!",
@@ -59,7 +59,7 @@ namespace CMWtests
                 this.DialogResult = DialogResult.Abort;
         }
 
-        private void button2_Click(object sender, EventArgs e)
+        private void button2_MouseClick(object sender, EventArgs e)
         {
             if (_buttons == MessageBoxButtons.OKCancel)
                 this.DialogResult = DialogResult.OK;
@@ -67,7 +67,7 @@ namespace CMWtests
                 this.DialogResult = DialogResult.Retry;
         }
 
-        private void button3_Click(object sender, EventArgs e)
+        private void button3_MouseClick(object sender, EventArgs e)
         {
             if (_buttons == MessageBoxButtons.AbortRetryIgnore)
             {
@@ -90,6 +90,13 @@ namespace CMWtests
                 if (_result == DialogResult.Yes)
                     this.DialogResult = DialogResult.Abort;
             }
+        }
+
+        private void button_KeyDown(object sender, KeyEventArgs e)
+        {
+            //MessageBox.Show("Use a mouse to control this window.", "", 
+            //                 MessageBoxButtons.OK,
+            //                 MessageBoxIcon.Information);
         }
 
         private void toolTipAbort_Popup(object sender, PopupEventArgs e)
