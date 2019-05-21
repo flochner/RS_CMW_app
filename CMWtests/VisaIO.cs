@@ -19,17 +19,15 @@ namespace CMWtests
     public class VisaIO
     {
         private static int vi = 0;
-        private static int defRM = 0;
 
-        public VisaIO(int resMgr, string viDesc)
+        public VisaIO(string viDesc)
         {
-            defRM = resMgr;
-            visa32.viOpen(defRM, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
+            visa32.viOpen(MainForm.DefResMgr, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
         }
 
         public ViStatus Close()
         {
-            ViStatus status = visa32.viClose(defRM);
+            ViStatus status = visa32.viClose(MainForm.DefResMgr);
             RsVisa.RsViUnloadVisaLibrary();
             return status;
         }

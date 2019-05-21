@@ -17,10 +17,14 @@ namespace CMWtests
         private bool isExitRequested = false;
         private bool isExitOK = true;
         private bool pauseTesting = false;
+        private static int _defResMgr;
+
+        public static int DefResMgr { get => _defResMgr; private set => _defResMgr = value; }
 
         public MainForm()
         {
             InitializeComponent();
+            VisaIO.OpenResourceMgr(out _defResMgr);
         }
 
         private void btnBeginTests_Click(object sender, EventArgs e)
