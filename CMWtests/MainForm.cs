@@ -1,6 +1,4 @@
 ﻿using System;
-using System.IO;
-using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -9,10 +7,6 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
-        //delegate void StringDelegate(string text);
-        //delegate void BoolDelegate(bool v);
-        //delegate void IntDelegate(int n);
-        //delegate void VoidDelegate();
         private CancellationTokenSource cts = null;
         private bool isExitRequested = false;
         private bool isExitOK = true;
@@ -29,31 +23,24 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
+            textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
-            textBoxResults.Clear();
+            communicateWithInstrumentToolStripMenuItem.Enabled = false;
             pauseTesting = false;
 
             cts = null ?? new CancellationTokenSource();
 
             Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
+
+            // dotNet >= 4.5
+            //
             //Task.Factory.StartNewOnDefaultScheduler(() => Begin());
             //Task.Run(() => Begin());
         }
 
         public void SetBtnBeginEnabled(bool v)
         {
-            //if (this.btnBeginTests.InvokeRequired)
-            //{
-            //    BoolDelegate d = new BoolDelegate(SetBtnBeginEnabled);
-            //    this.BeginInvoke(d, new object[] { v });
-            //}
-            //else
-            //{
-            //    this.btnBeginTests.Enabled = v;
-            //    this.Refresh();
-            //}
-
             Invoke((MethodInvoker)(() =>
             {
                 btnBeginTests.Enabled = v;
@@ -68,17 +55,6 @@ namespace CMWtests
 
         public void SetBtnCancelEnabled(bool v)
         {
-            //if (this.btnCancelTests.InvokeRequired)
-            //{
-            //    BoolDelegate d = new BoolDelegate(SetBtnCancelEnabled);
-            //    this.BeginInvoke(d, new object[] { v });
-            //}
-            //else
-            //{
-            //    this.btnCancelTests.Enabled = v;
-            //    this.Refresh();
-            //}
-
             Invoke((MethodInvoker)(() =>
             {
                 btnCancelTests.Enabled = v;
@@ -92,7 +68,11 @@ namespace CMWtests
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            using (var query = new VISAqueryForm()) { query.ShowDialog(); }
+            using (var query = new VISAqueryForm())
+            {
+                query.ShowDialog();
+                communicateWithInstrumentToolStripMenuItem.Enabled = true;
+            }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -248,15 +228,6 @@ namespace CMWtests
         private void textBoxResults_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
         private void labelHead1_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
         private void labelHead2_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
-
-        #region Code for future use
-        //string[] args = new string[]
-        //{
-        //        "ll",
-        //        "ww",
-        //};
-        //CMWgraph.Graph graph = new CMWgraph.Graph(args);    }
-        #endregion
     }
 
     public static class ExtensionMethods
@@ -283,12 +254,11 @@ namespace CMWtests
                 pb.Value = value;           // Move to correct value
             }
 
-            pb.CreateGraphics().DrawString(((int)((double)pb.Value / (double)pb.Maximum * 100)).ToString() + "%",
-                new Font("Arial", (float)8.25, FontStyle.Regular),
-                Brushes.Black,
-                new PointF(pb.Width / 2 - 10, pb.Height / 2 - 7));
-            pb.Refresh();
-
+            //pb.CreateGraphics().DrawString(((int)((double)pb.Value / (double)pb.Maximum * 100)).ToString() + "%",
+            //    new Font("Arial", (float)8.25, FontStyle.Regular),
+            //    Brushes.Black,
+            //    new PointF(pb.Width / 2 - 10, pb.Height / 2 - 7));
+            //pb.Refresh();
         }
     }
 }
