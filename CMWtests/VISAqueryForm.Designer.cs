@@ -70,10 +70,8 @@
             // 
             // textBoxStringToWrite
             // 
-            this.textBoxStringToWrite.AllowDrop = true;
             this.textBoxStringToWrite.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBoxStringToWrite.CharacterCasing = System.Windows.Forms.CharacterCasing.Upper;
             this.textBoxStringToWrite.Location = new System.Drawing.Point(12, 64);
             this.textBoxStringToWrite.Name = "textBoxStringToWrite";
             this.textBoxStringToWrite.Size = new System.Drawing.Size(360, 20);
@@ -124,6 +122,7 @@
             this.textBoxResponse.Size = new System.Drawing.Size(360, 192);
             this.textBoxResponse.TabIndex = 17;
             this.textBoxResponse.TextChanged += new System.EventHandler(this.textBoxResponse_TextChanged);
+            this.textBoxResponse.KeyDown += new System.Windows.Forms.KeyEventHandler(this.textBoxResponse_KeyDown);
             // 
             // btnClear
             // 

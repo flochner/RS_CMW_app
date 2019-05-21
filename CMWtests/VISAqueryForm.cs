@@ -58,8 +58,7 @@ namespace CMWtests
                 return;
             }
 
-            VisaIO.OpenResourceMgr(out int defRM);
-            instr = new VisaIO(defRM, resource);
+            instr = new VisaIO(resource);
 
             btnClear_Click(sender, e);
 
@@ -146,6 +145,11 @@ namespace CMWtests
         private void btnClear_Click(object sender, EventArgs e)
         {
             textBoxResponse.Text = string.Empty;
+        }
+
+        private void textBoxResponse_KeyDown(object sender, KeyEventArgs e)
+        {
+            e.SuppressKeyPress = true;
         }
     }
 }
