@@ -177,13 +177,11 @@ namespace CMWtests
                 }
             }
 
-        ///
-        /// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        /// 
-#if DEBUG
-        //fml
+        //
+        // :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // 
+
         gentests:
-#endif
 
             SetHead1Text("GPRF CW Generator Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Generator Tests");
@@ -389,6 +387,7 @@ namespace CMWtests
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
             int pmStatus = 0;
+            int statsCount = 1;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
             double maxError = 0.0;
@@ -418,8 +417,9 @@ namespace CMWtests
 
             #region Config RX / TX
             /// setup sensor to read
-            cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; " +
-                      "TOUT 15; RESolution PD2; ATTenuation:STATe OFF");
+            cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
+                      "RESolution PD2; SCOunt " + statsCount + "; ATTenuation:STATe OFF");
+            //cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -437,10 +437,10 @@ namespace CMWtests
             {
                 _csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
 
-                int statsCount = (testAmpl == -44) ? 2 : 1;
-                //int statsCount = 1; //// fml
-                AddToResults("" + testAmpl + ", " + statsCount);
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
+               // int statsCount = (testAmpl == -44) ? 2 : 1;
+               // int statsCount = 1; //// fml
+               // AddToResults("" + testAmpl + ", " + statsCount);
+               // cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
                 cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
                 minFreq = 70;
             }
@@ -514,7 +514,7 @@ namespace CMWtests
                                 return TestStatus.Abort;
                         }
                         ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
-                                     MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                         var btnCancelEnabled = GetBtnCancelEnabled();
                         SetBtnCancelEnabled(false);
@@ -551,7 +551,7 @@ namespace CMWtests
                     cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
 
                     ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
-                                     MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
+                                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                     var btnCancelEnabled = GetBtnCancelEnabled();
                     SetBtnCancelEnabled(false);
@@ -661,7 +661,7 @@ namespace CMWtests
             string[] pmResponse = { };
 
             SetBtnCancelEnabled(false);
-            ProgressBar2_Reset();
+            ProgressBar1_Reset();
 
             do //while retryZero
             {
@@ -738,8 +738,7 @@ namespace CMWtests
 
             if (!string.IsNullOrWhiteSpace(resource))
             {
-                VisaIO.OpenResourceMgr(out int defRM);
-                cmw = new VisaIO(defRM, resource);
+                cmw = new VisaIO(resource);
 
                 //try
                 //{
@@ -916,8 +915,8 @@ namespace CMWtests
 
         private void InitMeasureSettings()
         {
-            //cmw.Write("CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6");
-            //cmw.Write("TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
+            cmw.Write("CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6");
+            cmw.Write("TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
         }
 
         private TestStatus GracefulExit(TestStatus exitStatus)
