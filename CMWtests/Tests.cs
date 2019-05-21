@@ -928,7 +928,7 @@ namespace CMWtests
             try
             {
                 cmw.Reset();
-                cmw.Close();
+                cmw.CloseInstrument();
                 cmw = null;
             }
             catch (NullReferenceException) { }

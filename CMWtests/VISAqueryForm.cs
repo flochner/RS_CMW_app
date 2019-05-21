@@ -29,7 +29,7 @@ namespace CMWtests
             if (instr != null)
             {
                 instr.Reset();
-                instr.Close();
+                instr.CloseInstrument();
                 instr = null;
             }
 
@@ -137,7 +137,7 @@ namespace CMWtests
             if (instr != null)
             {
                 instr.Reset();
-                instr.Close();
+                instr.CloseInstrument();
                 instr = null;
             }
         }

@@ -25,10 +25,16 @@ namespace CMWtests
             visa32.viOpen(MainForm.DefResMgr, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
         }
 
-        public ViStatus Close()
+        public static ViStatus CloseDefMgr()
         {
             ViStatus status = visa32.viClose(MainForm.DefResMgr);
             RsVisa.RsViUnloadVisaLibrary();
+            return status;
+        }
+
+        public ViStatus CloseInstrument()
+        {
+            ViStatus status = visa32.viClose(vi);
             return status;
         }
 

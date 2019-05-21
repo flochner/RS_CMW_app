@@ -112,6 +112,7 @@ namespace CMWtests
         {
             while (!isExitOK)
                 Thread.Sleep(100);
+            VisaIO.CloseDefMgr();
             Application.Exit();
         }
 

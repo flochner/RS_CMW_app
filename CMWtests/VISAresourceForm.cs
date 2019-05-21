@@ -35,10 +35,8 @@ namespace CMWtests
             listBoxResources.Visible = true;
             BtnSelect.Enabled = false;
 
-            VisaIO.OpenResourceMgr(out int defRM);
-
             StringBuilder desc = new StringBuilder(1024);
-            stat = visa32.viFindRsrc(defRM, "[^ASRL]?*", out findList, out int retCount, desc);
+            stat = visa32.viFindRsrc(MainForm.DefResMgr, "[^ASRL]?*", out findList, out int retCount, desc);
             //MessageBox.Show("count: " + retCount.ToString() + "\n" + desc.ToString(), "RS - " + stat.ToString());
 
             if (retCount > 0)
@@ -50,7 +48,7 @@ namespace CMWtests
                     if (!(s.Contains("::1::") || s.Contains("inst1") || s.Contains("inst2") || s.Contains("inst3")))
                     {
                         resources[i] = desc.ToString();
-                        instr = new VisaIO(defRM, resources[i]);
+                        instr = new VisaIO(resources[i]);
                         response = instr.QueryString("*IDN?");
                         listBoxResources.Items.Add(i + " - " + resources[i] + "  -  " + response);
                         visa32.viClose(vi);
@@ -82,9 +80,6 @@ namespace CMWtests
             {
                 listBoxResources.SelectedIndex = -1;
             }
-
-            visa32.viClose(defRM);
-            RsVisa.RsViUnloadVisaLibrary();
         }
 
         private void listBoxResources_DoubleClick(object sender, MouseEventArgs e)
