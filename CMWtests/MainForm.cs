@@ -7,18 +7,25 @@ namespace CMWtests
 {
     public partial class MainForm : Form
     {
+        public static int DefResMgr { get; private set; } = -1;
+
         private CancellationTokenSource cts = null;
         private bool isExitRequested = false;
         private bool isExitOK = true;
+        private bool paused = true;
         private bool pauseTesting = false;
-        private static int _defResMgr;
-
-        public static int DefResMgr { get => _defResMgr; private set => _defResMgr = value; }
 
         public MainForm()
         {
             InitializeComponent();
-            VisaIO.OpenResourceMgr(out _defResMgr);
+            DefResMgr = VisaIO.OpenResourceMgr();
+            if (DefResMgr == 0)
+            {
+                btnBeginTests.Enabled = false;
+                newToolStripMenuItem.Enabled = false;
+                optionsToolStripMenuItem.Enabled = false;
+                communicateWithInstrumentToolStripMenuItem.Enabled = false;
+            }
         }
 
         private void btnBeginTests_Click(object sender, EventArgs e)
@@ -28,6 +35,7 @@ namespace CMWtests
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
             pauseTesting = false;
+            paused = false;
 
             cts = null ?? new CancellationTokenSource();
 
@@ -102,6 +110,9 @@ namespace CMWtests
                 AppExit();
 
             pauseTesting = true;
+            while (!paused)
+                Thread.Sleep(100);
+
             var abort = MessageBox.Show("Really abort testing?",
                                         "Warning",
                                          MessageBoxButtons.YesNo,
@@ -220,6 +231,23 @@ namespace CMWtests
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
             }));
+        }
+
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pauseTesting = true;
+            while (!paused)
+                Thread.Sleep(100);
+
+            var options = new OptionsForm(statsCount);
+            options.ShowDialog(this);
+            statsCount = options.StatsCount;
+            options.Dispose();
+
+            if (cmw != null)
+                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
+
+            pauseTesting = false;
         }
 
         private void MainForm_Load(object sender, EventArgs e) { }
