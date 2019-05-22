@@ -162,9 +162,9 @@ namespace CMWtests
             MessageBox.Show(status.ToString() + Environment.NewLine + text.ToString(), source);
         }
 
-        public static void OpenResourceMgr(out int defRM)
+        public static int OpenResourceMgr()
         {
-            defRM = 0;
+            int defRM = 0;
 
             if (IsVisaLibraryInstalled(RsVisa.RSVISA_MANFID_DEFAULT))
             {
@@ -183,8 +183,9 @@ namespace CMWtests
             }
             else
             {
-                MessageBox.Show("No VISAs Installed!");
+                MessageBox.Show("VISA library not installed!");
             }
+            return defRM;
         }
 
         private static bool IsVisaLibraryInstalled(UInt16 iManfId)
