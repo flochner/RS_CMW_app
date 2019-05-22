@@ -9,11 +9,13 @@ namespace CMWtests
     public partial class MainForm
     {
         public enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
+
         private StreamWriter _csvStream = null;
         private TestStatus status = TestStatus.Complete;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int pointsCount = 0;
+        private int statsCount = 2;
         private int testCount = 0;
         private long minFreq = 0;
         private bool hasKB036 = false;
@@ -387,7 +389,6 @@ namespace CMWtests
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
             int pmStatus = 0;
-            int statsCount = 1;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
             double maxError = 0.0;
@@ -416,10 +417,10 @@ namespace CMWtests
                 return TestStatus.Abort;
 
             #region Config RX / TX
+
             /// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
                       "RESolution PD2; SCOunt " + statsCount + "; ATTenuation:STATe OFF");
-            //cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -450,17 +451,20 @@ namespace CMWtests
 
             currentFreq = minFreq * (long)1e6;
             endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-#endregion
+            #endregion
 
             do  ///// Main Loop
             {
                 while (pauseTesting == true && cts.IsCancellationRequested == false)
+                    paused = true;
                     Thread.Sleep(500);
+                paused = false;
 
                 if (cts.IsCancellationRequested)
                     return TestStatus.Abort;
 
-#region Set up this loop - set freqs - get GPRF Measure Power
+                #region Set up this loop - set freqs - get GPRF Measure Power
+
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
@@ -479,9 +483,10 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-#endregion
+                #endregion
 
-#region Take sensor reading
+                #region  Take sensor reading
+
                 do  //while (retry)
                 {
                     retry = false;
@@ -509,10 +514,13 @@ namespace CMWtests
 
                         while (pauseTesting)
                         {
+                            paused = true;
                             Thread.Sleep(100);
                             if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
+                        paused = false;
+
                         ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
@@ -522,10 +530,12 @@ namespace CMWtests
                         img.SetImage(testName + "_" + numOfFrontEnds);
                         while (pauseTesting)
                         {
+                            paused = true;
                             Thread.Sleep(100);
                             if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
+                        paused = false;
                         img.ShowDialog();
                         SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -541,9 +551,9 @@ namespace CMWtests
                     amplError = cmwMeasPower - pmPower;
                 else
                     amplError = pmPower - testAmpl;
-#endregion
+                #endregion
 
-#region Handle excessive error
+                #region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 200e6) && (Math.Abs(pmPower - testAmpl) > 3) && !ignoreAmplError)
                 {
@@ -586,9 +596,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-#endregion
+                #endregion
 
-#region Record results - setup next loop
+                #region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -615,7 +625,7 @@ namespace CMWtests
                     currentFreq += (long)100e6;
 
                 ProgressBar1_Update();
-#endregion
+                #endregion
 
             } while (currentFreq <= endFreq);
 
@@ -651,7 +661,7 @@ namespace CMWtests
             return TestStatus.Success;
 
 
-#endregion
+            #endregion
         }
 
         private TestStatus ConnectionMessage(string connection)
@@ -986,6 +996,5 @@ namespace CMWtests
             }));
             return result;
         }
-
     }
 }
