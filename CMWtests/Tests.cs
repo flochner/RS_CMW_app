@@ -456,8 +456,10 @@ namespace CMWtests
             do  ///// Main Loop
             {
                 while (pauseTesting == true && cts.IsCancellationRequested == false)
+                {
                     paused = true;
                     Thread.Sleep(500);
+                }
                 paused = false;
 
                 if (cts.IsCancellationRequested)

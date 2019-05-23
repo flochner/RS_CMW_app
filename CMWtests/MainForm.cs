@@ -119,15 +119,17 @@ namespace CMWtests
                                          MessageBoxIcon.Warning,
                                          MessageBoxDefaultButton.Button2);
             if (abort == DialogResult.Yes)
-                try
-                {
-                    cts.Cancel();
-                }
+            {
+                try {  cts.Cancel();  }
                 catch (NullReferenceException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+
+                VisaIO.CloseDefMgr();
+            }
             else
                 pauseTesting = false;
+
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -237,8 +239,10 @@ namespace CMWtests
         {
             pauseTesting = true;
             while (!paused)
+            {
+                SetHead1Text("Locked st options menu item click");
                 Thread.Sleep(100);
-
+            }
             var options = new OptionsForm(statsCount);
             options.ShowDialog(this);
             statsCount = options.StatsCount;
