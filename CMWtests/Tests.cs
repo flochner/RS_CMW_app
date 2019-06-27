@@ -8,10 +8,10 @@ namespace CMWtests
 {
     public partial class MainForm
     {
-        public enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
+        public enum TestStatus : int { Abort = -1, Success, InProgress, Paused, Complete };
 
         private StreamWriter _csvStream = null;
-        private TestStatus status = TestStatus.Complete;
+        private TestStatus status;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int pointsCount = 0;
@@ -27,15 +27,43 @@ namespace CMWtests
         private string csvFileName = "";
         private VisaIO cmw = null;
 
+        private TestStatus Status
+        {
+            get
+            {
+                return status;
+            }
+            set
+            {
+                if (value != status)
+                {
+                    status = value;
+                    SetStatusLabel(status.ToString());
+                }
+            }
+        }
+
+        public string DebugText
+        {
+            set
+            {
+                SetDebugText(value);
+                Thread.Sleep(500);
+                SetDebugText("");
+            }
+        }
+
         public void Begin()
         {
+            ResetOptions();
             isExitOK = false;
-            status = TestStatus.InProgress;
-            status = Sequencer();
+            Status = TestStatus.InProgress;
 
-            if (status == TestStatus.Abort)
+            Status = Sequencer();
+
+            if (Status == TestStatus.Abort)
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-            else if (status == TestStatus.Complete)
+            else if (Status == TestStatus.Complete)
                 AddToResults(Environment.NewLine + "Tests Complete.");
 
             isExitOK = true;
@@ -59,8 +87,7 @@ namespace CMWtests
             ProgressBar2_Settings(12 * numOfTRX);
 
 #if DEBUG
-            /// fml
-          //  goto gentests;
+            goto gentests;
 #endif         
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
@@ -353,7 +380,7 @@ namespace CMWtests
                     ProgressBar2_Update(++testCount);
                 }
 
-            /// -------------------------------------------------------------
+                /// -------------------------------------------------------------
                 chartLimits3 = (",-0.8,-0.6,0,0.6,0.8");
                 chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
                 amplList = new int[] { -8, -44 };
@@ -455,15 +482,18 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                while (pauseTesting == true && cts.IsCancellationRequested == false)
+                while (pauseTesting == true)
                 {
-                    paused = true;
+                    Status = TestStatus.Paused;
                     Thread.Sleep(500);
+#if DEBUG
+                    DebugText = "Locked at main loop - while pausetesting";
+#endif
+                    if (cts.IsCancellationRequested)
+                        return TestStatus.Abort;
                 }
-                paused = false;
-
-                if (cts.IsCancellationRequested)
-                    return TestStatus.Abort;
+                Status = TestStatus.InProgress;
+                //SetStatusLabel(Status.ToString());
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
 
@@ -514,14 +544,17 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        while (pauseTesting)
+                        while (pauseTesting == true)
                         {
-                            paused = true;
+                            Status = TestStatus.Paused;
                             Thread.Sleep(100);
+#if DEBUG
+                            DebugText = "Locked at main loop - pmStatus pausetesting - 1";
+#endif
                             if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
-                        paused = false;
+                        Status = TestStatus.InProgress;
 
                         ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -530,14 +563,19 @@ namespace CMWtests
                         SetBtnCancelEnabled(false);
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
-                        while (pauseTesting)
+
+                        while (pauseTesting == true)
                         {
-                            paused = true;
+                            Status = TestStatus.Paused;
                             Thread.Sleep(100);
+#if DEBUG
+                            DebugText = "Locked at main loop - pmStatus pausetesting - 2";
+#endif
                             if (cts.IsCancellationRequested)
                                 return TestStatus.Abort;
                         }
-                        paused = false;
+                        Status = TestStatus.InProgress;
+
                         img.ShowDialog();
                         SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -697,8 +735,7 @@ namespace CMWtests
 #if !DEBUG
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
                 visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 10000);
-#endif
-#if DEBUG
+#else
                 visaResponse = "PASS";
 #endif
                 if (!visaResponse.Contains("PASS"))
@@ -840,11 +877,10 @@ namespace CMWtests
             SetHead2Text("Please wait...");
             do
             {
-#if DEBUG
-                visaResponse = "0,0";
-#endif
 #if !DEBUG
                 visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 15000);
+#else
+                visaResponse = "0,0";
 #endif
                 try
                 {
@@ -936,6 +972,7 @@ namespace CMWtests
             SetBtnCancelEnabled(false);
             SetHead1Text("");
             SetHead2Text("");
+            Status = exitStatus;
 
             try
             {
@@ -980,7 +1017,8 @@ namespace CMWtests
                 ProgressBar1_Reset();
                 ProgressBar2_Reset();
             }
-                return exitStatus;
+
+            return exitStatus;
         }
 
         private DialogResult ModalMessageBox(string message, string title = "",

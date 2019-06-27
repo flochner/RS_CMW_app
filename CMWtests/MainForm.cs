@@ -12,12 +12,14 @@ namespace CMWtests
         private CancellationTokenSource cts = null;
         private bool isExitRequested = false;
         private bool isExitOK = true;
-        private bool paused = true;
+        //private bool paused = true;
         private bool pauseTesting = false;
 
         public MainForm()
         {
             InitializeComponent();
+            this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
+
             DefResMgr = VisaIO.OpenResourceMgr();
             if (DefResMgr == 0)
             {
@@ -35,7 +37,9 @@ namespace CMWtests
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
             pauseTesting = false;
-            paused = false;
+            Status = TestStatus.InProgress;
+
+            //return;
 
             cts = null ?? new CancellationTokenSource();
 
@@ -90,16 +94,21 @@ namespace CMWtests
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             isExitRequested = true;
-            if (status == TestStatus.Complete || status == TestStatus.Abort)
+            if (Status == TestStatus.Complete || Status == TestStatus.Abort)
                 AppExit();
             else
                 btnCancelTests_Click(sender, e);
         }
 
-        public void AppExit()
+        private void AppExit()
         {
             while (!isExitOK)
+            {
                 Thread.Sleep(100);
+#if DEBUG
+                DebugText = "Locked at AppExit";
+#endif
+            }
             VisaIO.CloseDefMgr();
             Application.Exit();
         }
@@ -110,8 +119,13 @@ namespace CMWtests
                 AppExit();
 
             pauseTesting = true;
-            while (!paused)
+            while (Status == TestStatus.InProgress)
+            {
                 Thread.Sleep(100);
+#if DEBUG
+                DebugText = "Locked at abort button click";
+#endif
+            }
 
             var abort = MessageBox.Show("Really abort testing?",
                                         "Warning",
@@ -120,16 +134,17 @@ namespace CMWtests
                                          MessageBoxDefaultButton.Button2);
             if (abort == DialogResult.Yes)
             {
-                try {  cts.Cancel();  }
+                try { cts.Cancel(); }
                 catch (NullReferenceException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
-
-                VisaIO.CloseDefMgr();
             }
             else
+            {
                 pauseTesting = false;
-
+                Status = TestStatus.InProgress;
+               // SetStatusLabel(Status.ToString());
+            }
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -218,12 +233,28 @@ namespace CMWtests
             }));
         }
 
+        private void SetDebugText(string text)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                labelDebug.Text = text;
+            }));
+        }
+
         private void SetHead2Text(string text)
         {
             Invoke((MethodInvoker)(() =>
             {
                 labelHead2.Text = text;
                 Refresh();
+            }));
+        }
+
+        private void SetStatusLabel(string text)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                labelStatus.Text = text;
             }));
         }
 
@@ -238,10 +269,12 @@ namespace CMWtests
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             pauseTesting = true;
-            while (!paused)
+            while (Status == TestStatus.InProgress)
             {
-                SetHead1Text("Locked st options menu item click");
                 Thread.Sleep(100);
+#if DEBUG
+                DebugText = "Locked at options menu item click";
+#endif
             }
             var options = new OptionsForm(statsCount);
             options.ShowDialog(this);
@@ -252,6 +285,35 @@ namespace CMWtests
                 cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
 
             pauseTesting = false;
+        }
+
+        private void ResetOptions()
+        {
+            statsCount = 2;
+        }
+
+        void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            switch (e.CloseReason)
+            {
+                case CloseReason.ApplicationExitCall:
+                    break;
+                case CloseReason.FormOwnerClosing:
+                    break;
+                case CloseReason.MdiFormClosing:
+                    break;
+                case CloseReason.None:
+                    break;
+                case CloseReason.TaskManagerClosing:
+                    break;
+                case CloseReason.UserClosing:
+                    exitToolStripMenuItem_Click(sender, e);
+                    break;
+                case CloseReason.WindowsShutDown:
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void MainForm_Load(object sender, EventArgs e) { }

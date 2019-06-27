@@ -74,6 +74,7 @@ namespace CMWtests
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.labelDebug = new System.Windows.Forms.Label();
+            this.labelStatus = new System.Windows.Forms.Label();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -437,17 +438,28 @@ namespace CMWtests
             // 
             this.labelDebug.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.labelDebug.AutoEllipsis = true;
-            this.labelDebug.Location = new System.Drawing.Point(12, 416);
+            this.labelDebug.Location = new System.Drawing.Point(196, 416);
             this.labelDebug.Name = "labelDebug";
-            this.labelDebug.Size = new System.Drawing.Size(560, 13);
+            this.labelDebug.Size = new System.Drawing.Size(376, 13);
             this.labelDebug.TabIndex = 14;
             this.labelDebug.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // labelStatus
+            // 
+            this.labelStatus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.labelStatus.AutoEllipsis = true;
+            this.labelStatus.Location = new System.Drawing.Point(12, 416);
+            this.labelStatus.Name = "labelStatus";
+            this.labelStatus.Size = new System.Drawing.Size(178, 13);
+            this.labelStatus.TabIndex = 15;
+            this.labelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(584, 431);
+            this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.labelDebug);
             this.Controls.Add(this.progressBar2);
             this.Controls.Add(this.progressBar1);
@@ -515,6 +527,7 @@ namespace CMWtests
         public System.Windows.Forms.ProgressBar progressBar1;
         public System.Windows.Forms.ProgressBar progressBar2;
         private System.Windows.Forms.Label labelDebug;
+        private System.Windows.Forms.Label labelStatus;
     }
 }
 
