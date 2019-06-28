@@ -11,7 +11,24 @@ namespace CMWtests
         public enum TestStatus : int { Abort = -1, Success, InProgress, Paused, Complete };
 
         private StreamWriter _csvStream = null;
-        private TestStatus status;
+        private TestStatus _status = TestStatus.Complete;
+        private TestStatus Status
+        {
+            get
+            {
+                return _status;
+            }
+            set
+            {
+                if (value != _status)
+                {
+                    _status = value;
+#if DEBUG
+                    SetStatusLabel(_status.ToString());
+#endif
+                }
+            }
+        }
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int pointsCount = 0;
@@ -25,24 +42,6 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
-        private VisaIO cmw = null;
-
-        private TestStatus Status
-        {
-            get
-            {
-                return status;
-            }
-            set
-            {
-                if (value != status)
-                {
-                    status = value;
-                    SetStatusLabel(status.ToString());
-                }
-            }
-        }
-
         public string DebugText
         {
             set
@@ -52,6 +51,8 @@ namespace CMWtests
                 SetDebugText("");
             }
         }
+
+        private VisaIO cmw = null;
 
         public void Begin()
         {
@@ -87,7 +88,7 @@ namespace CMWtests
             ProgressBar2_Settings(12 * numOfTRX);
 
 #if DEBUG
-            goto gentests;
+            //goto gentests;
 #endif         
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
@@ -482,7 +483,7 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                while (pauseTesting == true)
+                while (PauseTesting)
                 {
                     Status = TestStatus.Paused;
                     Thread.Sleep(500);
@@ -544,7 +545,7 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        while (pauseTesting == true)
+                        while (PauseTesting == true)
                         {
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
@@ -564,7 +565,7 @@ namespace CMWtests
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
 
-                        while (pauseTesting == true)
+                        while (PauseTesting == true)
                         {
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
@@ -1018,6 +1019,7 @@ namespace CMWtests
                 ProgressBar2_Reset();
             }
 
+            communicateWithInstrumentToolStripMenuItem.Enabled = true;
             return exitStatus;
         }
 
