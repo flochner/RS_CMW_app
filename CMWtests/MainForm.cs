@@ -10,10 +10,26 @@ namespace CMWtests
         public static int DefResMgr { get; private set; } = -1;
 
         private CancellationTokenSource cts = null;
+        private bool abortTesting = false;
         private bool isExitRequested = false;
         private bool isExitOK = true;
         //private bool paused = true;
-        private bool pauseTesting = false;
+        private bool _pauseTesting = false;
+        private bool PauseTesting
+        {
+            get
+            {
+                return _pauseTesting;
+            }
+            set
+            {
+                if (value != _pauseTesting)
+                {
+                    _pauseTesting = value;
+                }
+
+            }
+        }
 
         public MainForm()
         {
@@ -36,7 +52,7 @@ namespace CMWtests
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
-            pauseTesting = false;
+            PauseTesting = false;
             Status = TestStatus.InProgress;
 
             //return;
@@ -118,7 +134,7 @@ namespace CMWtests
             if (cts.IsCancellationRequested && isExitRequested)
                 AppExit();
 
-            pauseTesting = true;
+            PauseTesting = true;
             while (Status == TestStatus.InProgress)
             {
                 Thread.Sleep(100);
@@ -138,12 +154,14 @@ namespace CMWtests
                 catch (NullReferenceException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
                 catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
+
+                MessageBox.Show(Status.ToString());
+                abortTesting = true;
             }
             else
             {
-                pauseTesting = false;
+                PauseTesting = false;
                 Status = TestStatus.InProgress;
-               // SetStatusLabel(Status.ToString());
             }
         }
 
@@ -268,7 +286,7 @@ namespace CMWtests
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            pauseTesting = true;
+            PauseTesting = true;
             while (Status == TestStatus.InProgress)
             {
                 Thread.Sleep(100);
@@ -284,12 +302,12 @@ namespace CMWtests
             if (cmw != null)
                 cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
 
-            pauseTesting = false;
+            PauseTesting = false;
         }
 
         private void ResetOptions()
         {
-            statsCount = 2;
+            statsCount = 1;
         }
 
         void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -307,7 +325,16 @@ namespace CMWtests
                 case CloseReason.TaskManagerClosing:
                     break;
                 case CloseReason.UserClosing:
+                    PauseTesting = true;
+                    while (Status == TestStatus.InProgress)
+                    {
+                        Thread.Sleep(100);
+#if DEBUG
+                        DebugText = "Locked at Form closing";
+#endif
+                    }
                     exitToolStripMenuItem_Click(sender, e);
+                    e.Cancel = !abortTesting;
                     break;
                 case CloseReason.WindowsShutDown:
                     break;
@@ -333,6 +360,11 @@ namespace CMWtests
         /// </summary>
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
+//            if (value != pb.Maximum)
+                pb.Value = value;
+            pb.Refresh();
+            return;
+
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.
             if (value == pb.Maximum)
