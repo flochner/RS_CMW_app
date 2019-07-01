@@ -32,7 +32,7 @@ namespace CMWtests
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int pointsCount = 0;
-        private int statsCount = 2;
+        private int statsCount = OptionsForm.StatsCount;
         private int testCount = 0;
         private long minFreq = 0;
         private bool hasKB036 = false;
@@ -42,7 +42,7 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
-        public string DebugText
+        private string DebugText
         {
             set
             {
@@ -54,25 +54,17 @@ namespace CMWtests
 
         private VisaIO cmw = null;
 
-        public void Begin()
+        public TestStatus Begin()
         {
-            ResetOptions();
-            isExitOK = false;
             Status = TestStatus.InProgress;
 
+            if (ConnectIdentifyDUT() == TestStatus.Abort)
+                return GracefulExit(TestStatus.Abort);
+
             Status = Sequencer();
-
-            if (Status == TestStatus.Abort)
-                AddToResults(Environment.NewLine + "Tests Aborted.");
-            else if (Status == TestStatus.Complete)
-                AddToResults(Environment.NewLine + "Tests Complete.");
-
-            isExitOK = true;
-
-            if (isExitRequested)
-                AppExit();
-            else
-                SetBtnBeginEnabled(true);
+            
+            SetBtnBeginEnabled(true);
+            return Status;
         }
 
         private TestStatus Sequencer()
@@ -80,9 +72,6 @@ namespace CMWtests
             int[] amplList = { };
             string testName = "";
             testCount = 0;
-
-            if (ConnectIdentifyDUT() == TestStatus.Abort)
-                return GracefulExit(TestStatus.Abort);
 
             SetBtnCancelEnabled(true);
             ProgressBar2_Settings(12 * numOfTRX);
@@ -483,18 +472,17 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                while (PauseTesting)
+                while (PauseTesting || CancelTesting)
                 {
                     Status = TestStatus.Paused;
                     Thread.Sleep(500);
 #if DEBUG
                     DebugText = "Locked at main loop - while pausetesting";
 #endif
-                    if (cts.IsCancellationRequested)
+                    if (CancelTesting)
                         return TestStatus.Abort;
                 }
                 Status = TestStatus.InProgress;
-                //SetStatusLabel(Status.ToString());
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
 
@@ -545,14 +533,14 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        while (PauseTesting == true)
+                        while (PauseTesting || CancelTesting)
                         {
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
 #if DEBUG
                             DebugText = "Locked at main loop - pmStatus pausetesting - 1";
 #endif
-                            if (cts.IsCancellationRequested)
+                            if (CancelTesting)
                                 return TestStatus.Abort;
                         }
                         Status = TestStatus.InProgress;
@@ -565,14 +553,14 @@ namespace CMWtests
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
 
-                        while (PauseTesting == true)
+                        while (PauseTesting || CancelTesting)
                         {
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
 #if DEBUG
                             DebugText = "Locked at main loop - pmStatus pausetesting - 2";
 #endif
-                            if (cts.IsCancellationRequested)
+                            if (CancelTesting)
                                 return TestStatus.Abort;
                         }
                         Status = TestStatus.InProgress;
@@ -1003,23 +991,23 @@ namespace CMWtests
                     ModalMessageBox("Temp file delete Exception");
                 }
 
-            try
-            {
-                cts.Dispose();
-                SetBtnBeginEnabled(true);
-            }
-            catch (Exception exc)
-            {
-                ModalMessageBox(exc.Message, exc.GetType().ToString());
-            }
+            SetBtnBeginEnabled(true);
 
-            if (exitStatus != TestStatus.Complete)
+            if (Status == TestStatus.Abort)
             {
+                AddToResults(Environment.NewLine + "Tests Aborted.");
                 ProgressBar1_Reset();
                 ProgressBar2_Reset();
             }
+            else if (Status == TestStatus.Complete)
+            {
+                AddToResults(Environment.NewLine + "Tests Complete.");
+            }
 
-            communicateWithInstrumentToolStripMenuItem.Enabled = true;
+            Status = TestStatus.Complete;
+
+
+
             return exitStatus;
         }
 

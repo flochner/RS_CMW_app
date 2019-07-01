@@ -116,7 +116,7 @@ namespace CMWtests
             this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -380,7 +380,7 @@ namespace CMWtests
             this.btnBeginTests.Name = "btnBeginTests";
             this.btnBeginTests.Size = new System.Drawing.Size(75, 23);
             this.btnBeginTests.TabIndex = 1;
-            this.btnBeginTests.Text = "Begin Tests";
+            this.btnBeginTests.Text = "Start";
             this.btnBeginTests.UseVisualStyleBackColor = true;
             this.btnBeginTests.Click += new System.EventHandler(this.btnBeginTests_Click);
             // 
@@ -411,7 +411,7 @@ namespace CMWtests
             this.btnCancelTests.Name = "btnCancelTests";
             this.btnCancelTests.Size = new System.Drawing.Size(75, 23);
             this.btnCancelTests.TabIndex = 13;
-            this.btnCancelTests.Text = "Abort Tests";
+            this.btnCancelTests.Text = "Cancel";
             this.btnCancelTests.UseVisualStyleBackColor = true;
             this.btnCancelTests.Click += new System.EventHandler(this.btnCancelTests_Click);
             // 
