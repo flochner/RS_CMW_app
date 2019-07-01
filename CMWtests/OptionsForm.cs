@@ -5,7 +5,7 @@ namespace CMWtests
 {
     public partial class OptionsForm : Form
     {
-        public int StatsCount { get; private set; }
+        public static int StatsCount { get; private set; } = 2;
 
         public OptionsForm(int count)
         {
@@ -21,6 +21,11 @@ namespace CMWtests
 
         private void buttonCancel_Click(object sender, EventArgs e)
         {
+        }
+
+        private void btnReset_Click(object sender, EventArgs e)
+        {
+            StatsCount = 2;
         }
     }
 }
