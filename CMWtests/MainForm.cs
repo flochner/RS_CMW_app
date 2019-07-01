@@ -9,11 +9,22 @@ namespace CMWtests
     {
         public static int DefResMgr { get; private set; } = -1;
 
-        private CancellationTokenSource cts = null;
-        private bool abortTesting = false;
-        private bool isExitRequested = false;
-        private bool isExitOK = true;
-        //private bool paused = true;
+        private bool _cancelTesting = false;
+        private bool CancelTesting
+        {
+            get
+            {
+                return _cancelTesting;
+            }
+            set
+            {
+                if (value != _cancelTesting)
+                {
+                    _cancelTesting = value;
+                }
+
+            }
+        }
         private bool _pauseTesting = false;
         private bool PauseTesting
         {
@@ -55,10 +66,6 @@ namespace CMWtests
             PauseTesting = false;
             Status = TestStatus.InProgress;
 
-            //return;
-
-            cts = null ?? new CancellationTokenSource();
-
             Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
 
             // dotNet >= 4.5
@@ -73,6 +80,7 @@ namespace CMWtests
             {
                 btnBeginTests.Enabled = v;
                 newToolStripMenuItem.Enabled = v;
+                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
             }));
         }
 
@@ -99,7 +107,6 @@ namespace CMWtests
             using (var query = new VISAqueryForm())
             {
                 query.ShowDialog();
-                communicateWithInstrumentToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -109,31 +116,23 @@ namespace CMWtests
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            isExitRequested = true;
-            if (Status == TestStatus.Complete || Status == TestStatus.Abort)
-                AppExit();
-            else
-                btnCancelTests_Click(sender, e);
+            Exit();
         }
 
-        private void AppExit()
+        private void Exit()
         {
-            while (!isExitOK)
-            {
-                Thread.Sleep(100);
-#if DEBUG
-                DebugText = "Locked at AppExit";
-#endif
-            }
+            CancelTests();
             VisaIO.CloseDefMgr();
             Application.Exit();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
         {
-            if (cts.IsCancellationRequested && isExitRequested)
-                AppExit();
+            CancelTests();
+        }
 
+        private void CancelTests()
+        {
             PauseTesting = true;
             while (Status == TestStatus.InProgress)
             {
@@ -143,25 +142,18 @@ namespace CMWtests
 #endif
             }
 
-            var abort = MessageBox.Show("Really abort testing?",
-                                        "Warning",
-                                         MessageBoxButtons.YesNo,
-                                         MessageBoxIcon.Warning,
-                                         MessageBoxDefaultButton.Button2);
-            if (abort == DialogResult.Yes)
-            {
-                try { cts.Cancel(); }
-                catch (NullReferenceException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
-                catch (ObjectDisposedException exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
-                catch (Exception exc) { MessageBox.Show("btnCancelTests_Click\n" + exc.Message, exc.GetType().ToString()); }
 
-                MessageBox.Show(Status.ToString());
-                abortTesting = true;
-            }
-            else
+            if (Status != TestStatus.Complete)
             {
-                PauseTesting = false;
-                Status = TestStatus.InProgress;
+                var abort = MessageBox.Show("Really abort testing?",
+                                            "Warning",
+                                             MessageBoxButtons.YesNo,
+                                             MessageBoxIcon.Warning,
+                                             MessageBoxDefaultButton.Button2);
+                if (abort == DialogResult.Yes)
+                    CancelTesting = true;
+                else
+                    PauseTesting = false;
             }
         }
 
@@ -296,7 +288,7 @@ namespace CMWtests
             }
             var options = new OptionsForm(statsCount);
             options.ShowDialog(this);
-            statsCount = options.StatsCount;
+            statsCount = OptionsForm.StatsCount;
             options.Dispose();
 
             if (cmw != null)
@@ -307,38 +299,17 @@ namespace CMWtests
 
         private void ResetOptions()
         {
-            statsCount = 1;
+            //statsCount = 1;
         }
 
-        void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        void MainForm_FormClosing(object sender, FormClosingEventArgs f)
         {
-            switch (e.CloseReason)
+            switch (f.CloseReason)
             {
                 case CloseReason.ApplicationExitCall:
                     break;
-                case CloseReason.FormOwnerClosing:
-                    break;
-                case CloseReason.MdiFormClosing:
-                    break;
-                case CloseReason.None:
-                    break;
-                case CloseReason.TaskManagerClosing:
-                    break;
-                case CloseReason.UserClosing:
-                    PauseTesting = true;
-                    while (Status == TestStatus.InProgress)
-                    {
-                        Thread.Sleep(100);
-#if DEBUG
-                        DebugText = "Locked at Form closing";
-#endif
-                    }
-                    exitToolStripMenuItem_Click(sender, e);
-                    e.Cancel = !abortTesting;
-                    break;
-                case CloseReason.WindowsShutDown:
-                    break;
                 default:
+                    Exit();
                     break;
             }
         }
