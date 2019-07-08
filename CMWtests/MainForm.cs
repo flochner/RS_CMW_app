@@ -142,7 +142,6 @@ namespace CMWtests
 #endif
             }
 
-
             if (Status != TestStatus.Complete)
             {
                 var abort = MessageBox.Show("Really abort testing?",
@@ -302,7 +301,7 @@ namespace CMWtests
             //statsCount = 1;
         }
 
-        void MainForm_FormClosing(object sender, FormClosingEventArgs f)
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
         {
             switch (f.CloseReason)
             {
@@ -314,12 +313,10 @@ namespace CMWtests
             }
         }
 
-        private void MainForm_Load(object sender, EventArgs e) { }
         private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
-        private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e) { }
-        private void textBoxResults_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
-        private void labelHead1_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
-        private void labelHead2_TextChanged(object sender, EventArgs e) { }//this.Refresh(); }
+        private void textBoxResults_TextChanged(object sender, EventArgs e) { }
+        private void labelHead1_TextChanged(object sender, EventArgs e) { }
+        private void labelHead2_TextChanged(object sender, EventArgs e) { }
     }
 
     public static class ExtensionMethods
@@ -331,10 +328,8 @@ namespace CMWtests
         /// </summary>
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
-//            if (value != pb.Maximum)
+            if (value != pb.Maximum)
                 pb.Value = value;
-            pb.Refresh();
-            return;
 
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.
@@ -350,12 +345,6 @@ namespace CMWtests
                 pb.Value = value + 1;       // Move past
                 pb.Value = value;           // Move to correct value
             }
-
-            //pb.CreateGraphics().DrawString(((int)((double)pb.Value / (double)pb.Maximum * 100)).ToString() + "%",
-            //    new Font("Arial", (float)8.25, FontStyle.Regular),
-            //    Brushes.Black,
-            //    new PointF(pb.Width / 2 - 10, pb.Height / 2 - 7));
-            //pb.Refresh();
         }
     }
 }

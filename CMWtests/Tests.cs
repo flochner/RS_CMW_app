@@ -29,6 +29,7 @@ namespace CMWtests
                 }
             }
         }
+        private VisaIO cmw = null;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int pointsCount = 0;
@@ -51,8 +52,6 @@ namespace CMWtests
                 SetDebugText("");
             }
         }
-
-        private VisaIO cmw = null;
 
         public TestStatus Begin()
         {
@@ -777,16 +776,7 @@ namespace CMWtests
             if (!string.IsNullOrWhiteSpace(resource))
             {
                 cmw = new VisaIO(resource);
-
-                //try
-                //{
-                    cmw.Reset();
-                //}
-                //catch (Exception e)
-                //{
-                //    ModalMessageBox(String.Format("Error initializing the session:\n{0}", e.Message), e.GetType().ToString());
-                //    return TestStatus.Abort;
-                //}
+                cmw.Reset();
             }
             else
             {
@@ -1005,8 +995,6 @@ namespace CMWtests
             }
 
             Status = TestStatus.Complete;
-
-
 
             return exitStatus;
         }
