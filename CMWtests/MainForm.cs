@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -59,6 +60,8 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
+            if (ControlAero(false) == false) MessageBox.Show("ControlAero failed");
+           // menuStrip1.Enabled = false;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
@@ -74,7 +77,15 @@ namespace CMWtests
             //Task.Run(() => Begin());
         }
 
-        public void SetBtnBeginEnabled(bool v)
+        private void SetMenuStripEnabled(bool v)
+        {
+            Invoke((MethodInvoker)(() =>
+            {
+                menuStrip1.Enabled = v;
+            }));
+        }
+
+        private void SetBtnBeginEnabled(bool v)
         {
             Invoke((MethodInvoker)(() =>
             {
@@ -84,12 +95,12 @@ namespace CMWtests
             }));
         }
 
-        public bool GetBtnBeginEnabled()
+        private bool GetBtnBeginEnabled()
         {
             return btnBeginTests.Enabled;
         }
 
-        public void SetBtnCancelEnabled(bool v)
+        private void SetBtnCancelEnabled(bool v)
         {
             Invoke((MethodInvoker)(() =>
             {
@@ -97,7 +108,7 @@ namespace CMWtests
             }));
         }
 
-        public bool GetBtnCancelEnabled()
+        private bool GetBtnCancelEnabled()
         {
             return btnCancelTests.Enabled;
         }
@@ -317,6 +328,23 @@ namespace CMWtests
         private void textBoxResults_TextChanged(object sender, EventArgs e) { }
         private void labelHead1_TextChanged(object sender, EventArgs e) { }
         private void labelHead2_TextChanged(object sender, EventArgs e) { }
+
+        public readonly uint DWM_EC_DISABLECOMPOSITION = 0;
+        public readonly uint DWM_EC_ENABLECOMPOSITION = 1;
+        [DllImport("dwmapi.dll", EntryPoint = "DwmEnableComposition")]
+        protected extern static uint Win32DwmEnableComposition(uint uCompositionAction);
+        public bool ControlAero(bool enable)
+        {
+            try
+            {
+                if (enable)
+                    Win32DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
+                if (!enable)
+                    Win32DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
+                return true;
+            }
+            catch { return false; }
+        }
     }
 
     public static class ExtensionMethods
@@ -328,8 +356,9 @@ namespace CMWtests
         /// </summary>
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
-            if (value != pb.Maximum)
+            //if (value != pb.Maximum)
                 pb.Value = value;
+            return;
 
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.
