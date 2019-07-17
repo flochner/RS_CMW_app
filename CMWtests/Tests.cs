@@ -10,6 +10,7 @@ namespace CMWtests
     {
         public enum TestStatus : int { Abort = -1, Success, InProgress, Paused, Complete };
 
+        private ManualResetEvent pauseEvent;
         private StreamWriter _csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
@@ -22,18 +23,20 @@ namespace CMWtests
             {
                 if (value != _status)
                 {
+                    if (_status == TestStatus.Paused)
+                        pauseEvent.Reset();
+                    if (value == TestStatus.Paused)
+                        pauseEvent.Set();
+//#if DEBUG
+                    SetStatusLabel(value.ToString());
+//#endif
                     _status = value;
-#if DEBUG
-                    SetStatusLabel(_status.ToString());
-#endif
                 }
             }
         }
         private VisaIO cmw = null;
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
-        private int pointsCount = 0;
-        private int statsCount = OptionsForm.StatsCount;
         private int testCount = 0;
         private long minFreq = 0;
         private bool hasKB036 = false;
@@ -43,19 +46,13 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
-        private string DebugText
-        {
-            set
-            {
-                SetDebugText(value);
-                Thread.Sleep(500);
-                SetDebugText("");
-            }
-        }
 
         public TestStatus Begin()
         {
+            pauseEvent = new ManualResetEvent(false);
             Status = TestStatus.InProgress;
+            CancelTesting = false;
+            PauseTesting = false;
 
             if (ConnectIdentifyDUT() == TestStatus.Abort)
                 return GracefulExit(TestStatus.Abort);
@@ -77,7 +74,7 @@ namespace CMWtests
 
 #if DEBUG
             //goto gentests;
-#endif         
+#endif
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
 
@@ -404,7 +401,8 @@ namespace CMWtests
 
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
-            int pmStatus = 0;
+            int pmStatus = -1;
+            int pointsCount = 0;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
             double maxError = 0.0;
@@ -432,11 +430,11 @@ namespace CMWtests
             if (_csvStream == null)
                 return TestStatus.Abort;
 
-            #region Config RX / TX
+#region Config RX / TX
 
             /// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
-                      "RESolution PD2; SCOunt " + statsCount + "; ATTenuation:STATe OFF");
+                      "RESolution PD2; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -453,11 +451,6 @@ namespace CMWtests
             else if (testName.Contains("TX"))
             {
                 _csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
-
-               // int statsCount = (testAmpl == -44) ? 2 : 1;
-               // int statsCount = 1; //// fml
-               // AddToResults("" + testAmpl + ", " + statsCount);
-               // cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
                 cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
                 minFreq = 70;
             }
@@ -467,7 +460,7 @@ namespace CMWtests
 
             currentFreq = minFreq * (long)1e6;
             endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-            #endregion
+#endregion
 
             do  ///// Main Loop
             {
@@ -476,14 +469,14 @@ namespace CMWtests
                     Status = TestStatus.Paused;
                     Thread.Sleep(500);
 #if DEBUG
-                    DebugText = "Locked at main loop - while pausetesting";
+                    SetDebugText("Locked at main loop - while pausetesting");
 #endif
                     if (CancelTesting)
                         return TestStatus.Abort;
                 }
                 Status = TestStatus.InProgress;
 
-                #region Set up this loop - set freqs - get GPRF Measure Power
+#region Set up this loop - set freqs - get GPRF Measure Power
 
                 pointsCount += 1;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
@@ -503,9 +496,9 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-                #endregion
+#endregion
 
-                #region  Take sensor reading
+#region  Take sensor reading
 
                 do  //while (retry)
                 {
@@ -537,7 +530,7 @@ namespace CMWtests
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
 #if DEBUG
-                            DebugText = "Locked at main loop - pmStatus pausetesting - 1";
+                            SetDebugText("Locked at main loop - pmStatus pausetesting - 1");
 #endif
                             if (CancelTesting)
                                 return TestStatus.Abort;
@@ -557,7 +550,7 @@ namespace CMWtests
                             Status = TestStatus.Paused;
                             Thread.Sleep(100);
 #if DEBUG
-                            DebugText = "Locked at main loop - pmStatus pausetesting - 2";
+                            SetDebugText("Locked at main loop - pmStatus pausetesting - 2");
 #endif
                             if (CancelTesting)
                                 return TestStatus.Abort;
@@ -579,9 +572,9 @@ namespace CMWtests
                     amplError = cmwMeasPower - pmPower;
                 else
                     amplError = pmPower - testAmpl;
-                #endregion
+#endregion
 
-                #region Handle excessive error
+#region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 200e6) && (Math.Abs(pmPower - testAmpl) > 3) && !ignoreAmplError)
                 {
@@ -624,9 +617,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-                #endregion
+#endregion
 
-                #region Record results - setup next loop
+#region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -652,8 +645,8 @@ namespace CMWtests
                 else
                     currentFreq += (long)100e6;
 
-                ProgressBar1_Update();
-                #endregion
+                ProgressBar1_Update(pointsCount);
+#endregion
 
             } while (currentFreq <= endFreq);
 
@@ -661,7 +654,7 @@ namespace CMWtests
             if (hasKB036)
                 AddToResults(string.Format("Max error 3.3 GHz to 6 GHz: {0} dB", maxError6.ToString("F2")));
 
-            #region Cleanup - close files - create graph
+#region Cleanup - close files - create graph
             /// Set instruments to standby.
             cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
             cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -689,7 +682,7 @@ namespace CMWtests
             return TestStatus.Success;
 
 
-            #endregion
+#endregion
         }
 
         private TestStatus ConnectionMessage(string connection)
@@ -763,7 +756,7 @@ namespace CMWtests
 
         private TestStatus ConnectIdentifyDUT()
         {
-            int pmStatus = -1;
+            int pmStatus = 0;
             bool retrySensor = false;
             string cmwModel = "";
             string cmwSerNum = "";
@@ -848,7 +841,9 @@ namespace CMWtests
 
             // CMW Options
             visaResponse = cmw.QueryString("SYSTem:BASE:OPTion:LIST? HWOPtion");
+#if DEBUG
             AddToResults(visaResponse);
+#endif
             hwOptions = visaResponse.Split(',');
 
             for (int i = 0; i < hwOptions.Length; i++)
@@ -859,10 +854,11 @@ namespace CMWtests
                 if (hwOptions[i].Contains("H590"))
                     numOfFrontEnds++;
             }
+#if DEBUG
             AddToResults("hasKB036: " + hasKB036.ToString());
             AddToResults("numOfTRX: " + numOfTRX.ToString());
             AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
-
+#endif
             // Check Sensor connection
             SetHead2Text("Please wait...");
             do
@@ -878,6 +874,7 @@ namespace CMWtests
                 }
                 catch (Exception e)
                 {
+                    pmStatus = -1;
                     ModalMessageBox(e.Message, e.GetType().ToString());
                 }
 
@@ -962,7 +959,6 @@ namespace CMWtests
             SetBtnCancelEnabled(false);
             SetHead1Text("");
             SetHead2Text("");
-            Status = exitStatus;
 
             try
             {
@@ -994,30 +990,27 @@ namespace CMWtests
 
             SetBtnBeginEnabled(true);
 
-            if (Status == TestStatus.Abort)
+            if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
                 ProgressBar1_Reset();
                 ProgressBar2_Reset();
             }
-            else if (Status == TestStatus.Complete)
+            else if (exitStatus == TestStatus.Complete)
             {
                 AddToResults(Environment.NewLine + "Tests Complete.");
             }
 
-            Status = TestStatus.Complete;
-
-            //return exitStatus;
-            return Status;
+            return Status = TestStatus.Complete;
         }
 
         private DialogResult ModalMessageBox(string message, string title = "",
-                                     MessageBoxButtons buttons = MessageBoxButtons.OK,
-                                     MessageBoxIcon icon = MessageBoxIcon.None,
-                                     MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
+                                             MessageBoxButtons buttons = MessageBoxButtons.OK,
+                                             MessageBoxIcon icon = MessageBoxIcon.None,
+                                             MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
         {
             DialogResult result = DialogResult.OK;
-            Invoke((MethodInvoker)(() =>
+            Invoke(new MethodInvoker(() =>
             {
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
