@@ -7,10 +7,11 @@ namespace CMWtests
     {
         public static int StatsCount { get; private set; } = 2;
 
-        public OptionsForm()
+        public OptionsForm(int count)
         {
             InitializeComponent();
-            numericUpDown_EPS.Value = StatsCount;
+            numericUpDown_EPS.Value = count;
+            StatsCount = count;
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
@@ -24,7 +25,7 @@ namespace CMWtests
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            numericUpDown_EPS.Value = StatsCount = 2;
+            StatsCount = 2;
         }
     }
 }

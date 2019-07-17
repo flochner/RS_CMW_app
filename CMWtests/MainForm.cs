@@ -9,8 +9,39 @@ namespace CMWtests
     public partial class MainForm : Form
     {
         public static int DefResMgr { get; private set; } = -1;
-        private bool CancelTesting { get; set; }
-        private bool PauseTesting { get; set; }
+
+        private bool _cancelTesting = false;
+        private bool CancelTesting
+        {
+            get
+            {
+                return _cancelTesting;
+            }
+            set
+            {
+                if (value != _cancelTesting)
+                {
+                    _cancelTesting = value;
+                }
+
+            }
+        }
+        private bool _pauseTesting = false;
+        private bool PauseTesting
+        {
+            get
+            {
+                return _pauseTesting;
+            }
+            set
+            {
+                if (value != _pauseTesting)
+                {
+                    _pauseTesting = value;
+                }
+
+            }
+        }
 
         public MainForm()
         {
@@ -29,25 +60,16 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            ControlAero(true);
-            // menuStrip1.Enabled = false;
+            if (ControlAero(false) == false) MessageBox.Show("ControlAero failed");
+           // menuStrip1.Enabled = false;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
+            PauseTesting = false;
+            Status = TestStatus.InProgress;
 
-            //Task res = 
             Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
-            // Task text = Task.Factory.StartNew(() => ThreadStatusText(res), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
-
-            //while (!res.IsCompleted)// .Status == TaskStatus.Running)
-            //{
-            //    labelDebug.Text = res.Status.ToString();
-            //    Thread.Sleep(500);
-            //    labelDebug.Text = "";
-            //    Thread.Sleep(500);
-            //}
-            //SetDebugText(res.Status.ToString();
 
             // dotNet >= 4.5
             //
@@ -55,24 +77,21 @@ namespace CMWtests
             //Task.Run(() => Begin());
         }
 
-        private void ThreadStatusText(Task task)
+        private void SetMenuStripEnabled(bool v)
         {
-            while (CancelTesting == false)
-                Thread.Sleep(500);
-            labelDebug.Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                labelDebug.Text = ".." + task.Status.ToString() + "..";
-                Thread.Sleep(500);
-                labelDebug.Text = "empty";
-                Thread.Sleep(100);
+                menuStrip1.Enabled = v;
             }));
         }
 
-        private void SetMenuStripEnabled(bool v)
+        private void SetBtnBeginEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                menuStrip1.Enabled = v;
+                btnBeginTests.Enabled = v;
+                newToolStripMenuItem.Enabled = v;
+                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
             }));
         }
 
@@ -81,27 +100,17 @@ namespace CMWtests
             return btnBeginTests.Enabled;
         }
 
-        private void SetBtnBeginEnabled(bool v)
+        private void SetBtnCancelEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                btnBeginTests.Enabled = v;
-                newToolStripMenuItem.Enabled = v;
-                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
+                btnCancelTests.Enabled = v;
             }));
         }
 
         private bool GetBtnCancelEnabled()
         {
             return btnCancelTests.Enabled;
-        }
-
-        private void SetBtnCancelEnabled(bool v)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                btnCancelTests.Enabled = v;
-            }));
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
@@ -123,11 +132,9 @@ namespace CMWtests
 
         private void Exit()
         {
-            if (CancelTests() == true)
-            {
-                VisaIO.CloseDefMgr();
-                Application.Exit();
-            }
+            CancelTests();
+            VisaIO.CloseDefMgr();
+            Application.Exit();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
@@ -135,63 +142,29 @@ namespace CMWtests
             CancelTests();
         }
 
-        private bool CancelTests()
+        private void CancelTests()
         {
             PauseTesting = true;
-            pauseEvent.WaitOne();
-
-
-//            while (Status == TestStatus.InProgress)
-//            {
-//                //                MessageBox.Show("[canceltests 2] " + Status.ToString());
-//                Thread.Sleep(500);
-//#if DEBUG
-//                SetDebugText("Locked at abort button click");
-//#endif
-//            }
-
-            if (Status == TestStatus.Complete ||
-                MessageBox.Show("Really abort testing?",
-                                "Warning",
-                                    MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Warning,
-                                    MessageBoxDefaultButton.Button2)
-                == DialogResult.Yes)
+            while (Status == TestStatus.InProgress)
             {
-                CancelTesting = true;
-                return true;
-            }
-            else
-            {
-                PauseTesting = false;
-                return false;
+                Thread.Sleep(100);
+#if DEBUG
+                DebugText = "Locked at abort button click";
+#endif
             }
 
-
-
-
-            //if (Status != TestStatus.Complete)
-            //{
-            //    if (MessageBox.Show("Really abort testing?",
-            //                        "Warning",
-            //                         MessageBoxButtons.YesNo,
-            //                         MessageBoxIcon.Warning,
-            //                         MessageBoxDefaultButton.Button2)
-            //        == DialogResult.Yes)
-            //    {
-            //        CancelTesting = true;
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        PauseTesting = false;
-            //        return false;
-            //    }
-            //}
-            //else
-            //{
-            //    return true;
-            //}
+            if (Status != TestStatus.Complete)
+            {
+                var abort = MessageBox.Show("Really abort testing?",
+                                            "Warning",
+                                             MessageBoxButtons.YesNo,
+                                             MessageBoxIcon.Warning,
+                                             MessageBoxDefaultButton.Button2);
+                if (abort == DialogResult.Yes)
+                    CancelTesting = true;
+                else
+                    PauseTesting = false;
+            }
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -221,38 +194,35 @@ namespace CMWtests
             about.ShowDialog();
         }
 
-        private void ProgressBar1_Update(int value)
+        private void ProgressBar1_Update()
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
-                progressBar1.SetProgressNoAnimation(value);
-                //progressBar1.Value = value;
-                //progressBar1.Refresh();
+                progressBar1.SetProgressNoAnimation(pointsCount);
             }));
         }
 
         private void ProgressBar2_Update(int value)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 progressBar2.SetProgressNoAnimation(value);
-                //progressBar2.Value = value;
-                //progressBar2.Refresh();
             }));
         }
 
         private void ProgressBar1_Settings(int maxValue)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
+                Refresh();
             }));
         }
 
         private void ProgressBar2_Settings(int maxValue)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 progressBar2.Maximum = maxValue;
                 progressBar2.Value = 0;
@@ -261,7 +231,7 @@ namespace CMWtests
 
         private void ProgressBar1_Reset()
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 progressBar1.Value = 0;
             }));
@@ -269,7 +239,7 @@ namespace CMWtests
 
         private void ProgressBar2_Reset()
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 progressBar2.Value = 0;
             }));
@@ -277,7 +247,7 @@ namespace CMWtests
 
         private void SetHead1Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 labelHead1.Text = text;
             }));
@@ -285,17 +255,15 @@ namespace CMWtests
 
         private void SetDebugText(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 labelDebug.Text = text;
-                Thread.Sleep(500);
-                labelDebug.Text = string.Empty;
             }));
         }
 
         private void SetHead2Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 labelHead2.Text = text;
                 Refresh();
@@ -304,7 +272,7 @@ namespace CMWtests
 
         private void SetStatusLabel(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 labelStatus.Text = text;
             }));
@@ -312,7 +280,7 @@ namespace CMWtests
 
         private void AddToResults(string item)
         {
-            Invoke(new MethodInvoker(() =>
+            Invoke((MethodInvoker)(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
             }));
@@ -320,25 +288,28 @@ namespace CMWtests
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(Status.ToString());
             PauseTesting = true;
-            pauseEvent.WaitOne();
-//            while (Status == TestStatus.InProgress)
-//            {
-//                MessageBox.Show(Status.ToString());
-//                Thread.Sleep(100);
-//#if DEBUG
-//                SetDebugText("Locked at options menu item click");
-//#endif
-//            }
-            var options = new OptionsForm();
+            while (Status == TestStatus.InProgress)
+            {
+                Thread.Sleep(100);
+#if DEBUG
+                DebugText = "Locked at options menu item click";
+#endif
+            }
+            var options = new OptionsForm(statsCount);
             options.ShowDialog(this);
+            statsCount = OptionsForm.StatsCount;
             options.Dispose();
 
             if (cmw != null)
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
+                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + statsCount);
 
             PauseTesting = false;
+        }
+
+        private void ResetOptions()
+        {
+            //statsCount = 1;
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
@@ -360,25 +331,19 @@ namespace CMWtests
 
         public readonly uint DWM_EC_DISABLECOMPOSITION = 0;
         public readonly uint DWM_EC_ENABLECOMPOSITION = 1;
-
         [DllImport("dwmapi.dll", EntryPoint = "DwmEnableComposition")]
         protected extern static uint Win32DwmEnableComposition(uint uCompositionAction);
         public bool ControlAero(bool enable)
         {
-            //return true;
             try
             {
                 if (enable)
                     Win32DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-                else
+                if (!enable)
                     Win32DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
                 return true;
             }
-            catch
-            {
-                MessageBox.Show("ControlAero failed");
-                return false;
-            }
+            catch { return false; }
         }
     }
 
@@ -392,8 +357,8 @@ namespace CMWtests
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
             //if (value != pb.Maximum)
-            //pb.Value = value;
-            //return;
+                pb.Value = value;
+            return;
 
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.

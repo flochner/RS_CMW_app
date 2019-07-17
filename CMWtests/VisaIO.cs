@@ -84,7 +84,7 @@ namespace CMWtests
         {
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(command + ";*OPC");
-            string exMessage = String.Format("WriteWithSTB - Timeout occurred. Command: \"{0}\", timeout {1} ms", command, timeout);
+            string exMessage = String.Format("WriteWithSTB - Timeout occured. Command: \"{0}\", timeout {1} ms", command, timeout);
             _STBpolling(exMessage, timeout);
             QueryInteger("*ESR?"); //Clear the Event Status Register
         }
@@ -93,7 +93,7 @@ namespace CMWtests
         {
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(query + ";*OPC");
-            string exMessage = String.Format("QueryWithSTB - Timeout occurred. Query: \"{0}\", timeout {1} ms", query, timeout);
+            string exMessage = String.Format("QueryWithSTB - Timeout occured. Query: \"{0}\", timeout {1} ms", query, timeout);
             _STBpolling(exMessage, timeout);
             var response = ReadString();
             response = response.TrimEnd('\n');
