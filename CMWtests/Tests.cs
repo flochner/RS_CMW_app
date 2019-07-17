@@ -10,7 +10,7 @@ namespace CMWtests
     {
         public enum TestStatus : int { Abort = -1, Success, InProgress, Paused, Complete };
 
-        private ManualResetEvent pauseEvent;
+        private AutoResetEvent pauseEvent;
         private StreamWriter _csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
@@ -23,14 +23,12 @@ namespace CMWtests
             {
                 if (value != _status)
                 {
-                    if (_status == TestStatus.Paused)
-                        pauseEvent.Reset();
                     if (value == TestStatus.Paused)
                         pauseEvent.Set();
-//#if DEBUG
-                    SetStatusLabel(value.ToString());
-//#endif
                     _status = value;
+#if DEBUG
+                    SetStatusLabel(_status.ToString());
+#endif
                 }
             }
         }
@@ -49,7 +47,7 @@ namespace CMWtests
 
         public TestStatus Begin()
         {
-            pauseEvent = new ManualResetEvent(false);
+            pauseEvent = new AutoResetEvent(true);
             Status = TestStatus.InProgress;
             CancelTesting = false;
             PauseTesting = false;

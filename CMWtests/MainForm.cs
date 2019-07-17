@@ -30,42 +30,17 @@ namespace CMWtests
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
             ControlAero(true);
-            // menuStrip1.Enabled = false;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
 
-            //Task res = 
             Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
-            // Task text = Task.Factory.StartNew(() => ThreadStatusText(res), CancellationToken.None, TaskCreationOptions.None, TaskScheduler.Default);
-
-            //while (!res.IsCompleted)// .Status == TaskStatus.Running)
-            //{
-            //    labelDebug.Text = res.Status.ToString();
-            //    Thread.Sleep(500);
-            //    labelDebug.Text = "";
-            //    Thread.Sleep(500);
-            //}
-            //SetDebugText(res.Status.ToString();
 
             // dotNet >= 4.5
             //
             //Task.Factory.StartNewOnDefaultScheduler(() => Begin());
             //Task.Run(() => Begin());
-        }
-
-        private void ThreadStatusText(Task task)
-        {
-            while (CancelTesting == false)
-                Thread.Sleep(500);
-            labelDebug.Invoke(new MethodInvoker(() =>
-            {
-                labelDebug.Text = ".." + task.Status.ToString() + "..";
-                Thread.Sleep(500);
-                labelDebug.Text = "empty";
-                Thread.Sleep(100);
-            }));
         }
 
         private void SetMenuStripEnabled(bool v)
@@ -138,17 +113,8 @@ namespace CMWtests
         private bool CancelTests()
         {
             PauseTesting = true;
-            pauseEvent.WaitOne();
-
-
-//            while (Status == TestStatus.InProgress)
-//            {
-//                //                MessageBox.Show("[canceltests 2] " + Status.ToString());
-//                Thread.Sleep(500);
-//#if DEBUG
-//                SetDebugText("Locked at abort button click");
-//#endif
-//            }
+            if (Status != TestStatus.Complete)
+                pauseEvent.WaitOne();
 
             if (Status == TestStatus.Complete ||
                 MessageBox.Show("Really abort testing?",
@@ -166,32 +132,6 @@ namespace CMWtests
                 PauseTesting = false;
                 return false;
             }
-
-
-
-
-            //if (Status != TestStatus.Complete)
-            //{
-            //    if (MessageBox.Show("Really abort testing?",
-            //                        "Warning",
-            //                         MessageBoxButtons.YesNo,
-            //                         MessageBoxIcon.Warning,
-            //                         MessageBoxDefaultButton.Button2)
-            //        == DialogResult.Yes)
-            //    {
-            //        CancelTesting = true;
-            //        return true;
-            //    }
-            //    else
-            //    {
-            //        PauseTesting = false;
-            //        return false;
-            //    }
-            //}
-            //else
-            //{
-            //    return true;
-            //}
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -201,12 +141,6 @@ namespace CMWtests
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //if (tests == null)
-            //{
-            //    MessageBox.Show("no excel sheet");
-            //    return;
-            //}
-
             //try
             //{
             //    string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests?.cmwID + ".xlsx";
@@ -288,8 +222,10 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelDebug.Text = text;
+                labelDebug.Refresh();
                 Thread.Sleep(500);
                 labelDebug.Text = string.Empty;
+                labelDebug.Refresh();
             }));
         }
 
@@ -320,17 +256,10 @@ namespace CMWtests
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(Status.ToString());
             PauseTesting = true;
-            pauseEvent.WaitOne();
-//            while (Status == TestStatus.InProgress)
-//            {
-//                MessageBox.Show(Status.ToString());
-//                Thread.Sleep(100);
-//#if DEBUG
-//                SetDebugText("Locked at options menu item click");
-//#endif
-//            }
+            if (Status != TestStatus.Complete)
+                pauseEvent.WaitOne();
+
             var options = new OptionsForm();
             options.ShowDialog(this);
             options.Dispose();
