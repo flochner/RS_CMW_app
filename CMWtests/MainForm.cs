@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -10,12 +9,16 @@ namespace CMWtests
     {
         public static int DefResMgr { get; private set; } = -1;
         private bool CancelTesting { get; set; }
-        private bool PauseTesting { get; set; }
+        private ManualResetEvent mreMeasure;
+        private ManualResetEvent mreExit;
 
         public MainForm()
         {
             InitializeComponent();
             this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
+            mreMeasure = new ManualResetEvent(true);
+            mreExit = new ManualResetEvent(false);
+
 
             DefResMgr = VisaIO.OpenResourceMgr();
             if (DefResMgr == 0)
@@ -29,18 +32,12 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            ControlAero(true);
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
 
-            Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.AttachedToParent, TaskScheduler.Default);
-
-            // dotNet >= 4.5
-            //
-            //Task.Factory.StartNewOnDefaultScheduler(() => Begin());
-            //Task.Run(() => Begin());
+            Task.Factory.StartNew(Begin, TaskCreationOptions.LongRunning);
         }
 
         private void SetMenuStripEnabled(bool v)
@@ -99,10 +96,14 @@ namespace CMWtests
         private void Exit()
         {
             if (CancelTests() == true)
-            {
-                VisaIO.CloseDefMgr();
-                Application.Exit();
-            }
+                Task.Factory.StartNew(() =>
+                {
+                    if (Status != TestStatus.Complete)
+                        mreExit.WaitOne();
+                    VisaIO.CloseDefMgr();
+                    Application.Exit();
+                });
+            mreExit.Reset();
         }
 
         private void btnCancelTests_Click(object sender, EventArgs e)
@@ -112,9 +113,10 @@ namespace CMWtests
 
         private bool CancelTests()
         {
-            PauseTesting = true;
-            if (Status != TestStatus.Complete)
-                pauseEvent.WaitOne();
+            mreMeasure.Reset();
+            while (Status != TestStatus.Complete &&
+                   mreMeasure.WaitOne(0) == true)
+                Thread.Sleep(100);
 
             if (Status == TestStatus.Complete ||
                 MessageBox.Show("Really abort testing?",
@@ -125,11 +127,12 @@ namespace CMWtests
                 == DialogResult.Yes)
             {
                 CancelTesting = true;
+                mreMeasure.Set();
                 return true;
             }
             else
             {
-                PauseTesting = false;
+                mreMeasure.Set();
                 return false;
             }
         }
@@ -160,8 +163,6 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 progressBar1.SetProgressNoAnimation(value);
-                //progressBar1.Value = value;
-                //progressBar1.Refresh();
             }));
         }
 
@@ -170,8 +171,6 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 progressBar2.SetProgressNoAnimation(value);
-                //progressBar2.Value = value;
-                //progressBar2.Refresh();
             }));
         }
 
@@ -181,6 +180,7 @@ namespace CMWtests
             {
                 progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
+                progressBar1.Refresh();
             }));
         }
 
@@ -190,6 +190,7 @@ namespace CMWtests
             {
                 progressBar2.Maximum = maxValue;
                 progressBar2.Value = 0;
+                progressBar2.Refresh();
             }));
         }
 
@@ -198,6 +199,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 progressBar1.Value = 0;
+                progressBar1.Refresh();
             }));
         }
 
@@ -206,6 +208,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 progressBar2.Value = 0;
+                progressBar2.Refresh();
             }));
         }
 
@@ -214,6 +217,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
+                labelHead1.Refresh();
             }));
         }
 
@@ -234,7 +238,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
-                Refresh();
+                labelHead2.Refresh();
             }));
         }
 
@@ -243,6 +247,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
+                labelStatus.Refresh();
             }));
         }
 
@@ -251,14 +256,16 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
+                textBoxResults.Refresh();
             }));
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            PauseTesting = true;
-            if (Status != TestStatus.Complete)
-                pauseEvent.WaitOne();
+            mreMeasure.Reset();
+            while (Status != TestStatus.Complete &&
+                   mreMeasure.WaitOne(0) == true)
+                Thread.Sleep(100);
 
             var options = new OptionsForm();
             options.ShowDialog(this);
@@ -267,7 +274,7 @@ namespace CMWtests
             if (cmw != null)
                 cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
 
-            PauseTesting = false;
+            mreMeasure.Set();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
@@ -277,6 +284,7 @@ namespace CMWtests
                 case CloseReason.ApplicationExitCall:
                     break;
                 default:
+                    f.Cancel = true;
                     Exit();
                     break;
             }
@@ -286,31 +294,7 @@ namespace CMWtests
         private void textBoxResults_TextChanged(object sender, EventArgs e) { }
         private void labelHead1_TextChanged(object sender, EventArgs e) { }
         private void labelHead2_TextChanged(object sender, EventArgs e) { }
-
-        public readonly uint DWM_EC_DISABLECOMPOSITION = 0;
-        public readonly uint DWM_EC_ENABLECOMPOSITION = 1;
-
-        [DllImport("dwmapi.dll", EntryPoint = "DwmEnableComposition")]
-        protected extern static uint Win32DwmEnableComposition(uint uCompositionAction);
-        public bool ControlAero(bool enable)
-        {
-            //return true;
-            try
-            {
-                if (enable)
-                    Win32DwmEnableComposition(DWM_EC_ENABLECOMPOSITION);
-                else
-                    Win32DwmEnableComposition(DWM_EC_DISABLECOMPOSITION);
-                return true;
-            }
-            catch
-            {
-                MessageBox.Show("ControlAero failed");
-                return false;
-            }
-        }
     }
-
     public static class ExtensionMethods
     {
         /// <summary>
@@ -320,10 +304,6 @@ namespace CMWtests
         /// </summary>
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
-            //if (value != pb.Maximum)
-            //pb.Value = value;
-            //return;
-
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.
             if (value == pb.Maximum)
@@ -338,6 +318,7 @@ namespace CMWtests
                 pb.Value = value + 1;       // Move past
                 pb.Value = value;           // Move to correct value
             }
+            pb.Refresh();
         }
     }
 }
