@@ -162,7 +162,34 @@ namespace CMWtests
         {
             Invoke(new MethodInvoker(() =>
             {
-                progressBar1.SetProgressNoAnimation(value);
+                for (int i = 0; i < 10; i++)
+                {
+                    progressBar1.Maximum++;
+                    progressBar1.Value++;
+                    progressBar1.Maximum--;
+                    progressBar1.Refresh();
+
+                    progressBar2.Maximum++;
+                    progressBar2.Value++;
+                    progressBar2.Maximum--;
+                    progressBar2.Refresh();
+
+                    
+                    
+                    //progressBar1.Maximum++;
+                    //progressBar1.Value++;
+                    //progressBar1.Maximum--;
+                    //progressBar1.Refresh();
+
+                    //progressBar2.Maximum++;
+                    //progressBar2.Value++;
+                    //progressBar2.Maximum--;
+                    //progressBar2.Refresh();
+                }
+#if DEBUG
+                labelDebug.Text = progressBar1.Value.ToString();
+                //     Thread.Sleep(500);
+#endif
             }));
         }
 
@@ -171,6 +198,10 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 progressBar2.SetProgressNoAnimation(value);
+#if DEBUG
+                labelDebug.Text = progressBar2.Value.ToString();
+             //   Thread.Sleep(500);
+#endif
             }));
         }
 
@@ -178,7 +209,8 @@ namespace CMWtests
         {
             Invoke(new MethodInvoker(() =>
             {
-                progressBar1.Maximum = maxValue;
+                if (maxValue > 0)
+                    progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
                 progressBar1.Refresh();
             }));
@@ -188,25 +220,8 @@ namespace CMWtests
         {
             Invoke(new MethodInvoker(() =>
             {
-                progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-                progressBar2.Refresh();
-            }));
-        }
-
-        private void ProgressBar1_Reset()
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                progressBar1.Value = 0;
-                progressBar1.Refresh();
-            }));
-        }
-
-        private void ProgressBar2_Reset()
-        {
-            Invoke(new MethodInvoker(() =>
-            {
+                if (maxValue > 0)
+                    progressBar2.Maximum = maxValue;
                 progressBar2.Value = 0;
                 progressBar2.Refresh();
             }));
@@ -304,19 +319,57 @@ namespace CMWtests
         /// </summary>
         public static void SetProgressNoAnimation(this ProgressBar pb, int value)
         {
+            pb.Maximum++;
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Value++; pb.Refresh();
+            pb.Maximum--;
+            return;
+
+
+            if (pb.Value != 0)
+                pb.Value--;
+            pb.Refresh();
+            //for (int i = 0; i < 11; i++)
+            //{
+                if (pb.Value != pb.Maximum)
+                    pb.Value++;
+                Thread.Sleep(50);
+                pb.Refresh();
+            //}
+            
+
+            return;
+
+            int curValue = pb.Value;
+            for (int i = -1; i < 10; i++)
+            {
+                if (curValue == 0)
+                    i++;
+                if (pb.Value != pb.Maximum)
+                    pb.Value += i;
+            }
+            return;
+
             // To get around the progressive animation, we need to move the 
             // progress bar backwards.
-            if (value == pb.Maximum)
+            if (pb.Value == pb.Minimum)
             {
                 // Special case as value can't be set greater than Maximum.
-                pb.Maximum = value + 1;     // Temporarily Increase Maximum
-                pb.Value = value + 1;       // Move past
-                pb.Maximum = value;         // Reset maximum
+                //pb.Value = pb.Value + 2;       // Move past
+                pb.Value = pb.Value + 1;           // Move to correct value
             }
             else
             {
-                pb.Value = value + 1;       // Move past
-                pb.Value = value;           // Move to correct value
+                //pb.Value = pb.Value - 1;       // Move past
+                pb.Value = pb.Value + 1;           // Move to correct value
             }
             pb.Refresh();
         }

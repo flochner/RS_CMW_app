@@ -12,11 +12,9 @@ namespace CMWtests
 
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
-        private int testCount = 0;
         private long minFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
-        private bool isFirstTest = true;
         private string chartLimits3 = "";
         private string chartLimits6 = "";
         private string cmwID = "";
@@ -59,11 +57,11 @@ namespace CMWtests
         private TestStatus Sequencer()
         {
             int[] amplList = { };
+            int testCount = 0;
             string testName = "";
-            testCount = 0;
 
             SetBtnCancelEnabled(true);
-            ProgressBar2_Settings(12 * numOfTRX);
+            ProgressBar2_Settings(120 * numOfTRX * (hasKB036 ? 60 : 33));
 
 #if DEBUG
             //goto gentests;
@@ -91,7 +89,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update(++testCount);
+               // ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -104,7 +102,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                //    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -121,7 +119,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update(++testCount);
+             //   ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -134,7 +132,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+              //      ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -153,7 +151,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+               //     ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX4", true);
@@ -161,7 +159,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                //    ProgressBar2_Update(++testCount);
                 }
 
                 /// -------------------------------------------------------------
@@ -177,7 +175,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+               //     ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX4", true);
@@ -185,7 +183,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -216,7 +214,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update(++testCount);
+                //ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -229,7 +227,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                    //ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -253,7 +251,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update(++testCount);
+             //   ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -266,7 +264,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -289,7 +287,7 @@ namespace CMWtests
             {
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
-                ProgressBar2_Update(++testCount);
+            //    ProgressBar2_Update(++testCount);
             }
 
             if (numOfTRX > 1)
@@ -302,7 +300,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -327,7 +325,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX4", true);
@@ -335,7 +333,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                //    ProgressBar2_Update(++testCount);
                 }
 
                 /// -------------------------------------------------------------
@@ -357,7 +355,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX4", true);
@@ -365,7 +363,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                 //   ProgressBar2_Update(++testCount);
                 }
 
                 /// -------------------------------------------------------------
@@ -387,7 +385,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+               //     ProgressBar2_Update(++testCount);
                 }
 
                 cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX4", true);
@@ -395,7 +393,7 @@ namespace CMWtests
                 {
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
-                    ProgressBar2_Update(++testCount);
+                //    ProgressBar2_Update(++testCount);
                 }
             }
 
@@ -412,6 +410,7 @@ namespace CMWtests
             double pmPower = 0.0;
             long currentFreq = 0;
             long endFreq = 0;
+            bool isFirstTest = true;
             bool retry = false;
             string chartLimits = "";
             string testHeader = "";
@@ -425,7 +424,7 @@ namespace CMWtests
             testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            ProgressBar1_Settings(hasKB036 ? 60 : 33);
+            ProgressBar1_Settings(hasKB036 ? 600 : 330);
 
         start:
 
@@ -478,7 +477,9 @@ namespace CMWtests
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
 
-                pointsCount += 1;
+                ProgressBar1_Update(pointsCount);
+                //ProgressBar2_Update(2);
+                pointsCount++;
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
                 cmw.Write("SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq);
@@ -621,8 +622,6 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-
-                ProgressBar1_Update(pointsCount);
 #endregion
 
             } while (currentFreq <= endFreq);
@@ -673,7 +672,7 @@ namespace CMWtests
 
             SetBtnCancelEnabled(false);
             SetMenuStripEnabled(false);
-            ProgressBar1_Reset();
+            ProgressBar1_Settings(0);
 
             do //while retryZero
             {
@@ -972,8 +971,8 @@ namespace CMWtests
             if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-                ProgressBar1_Reset();
-                ProgressBar2_Reset();
+                ProgressBar1_Settings(0);
+                ProgressBar2_Settings(0);
             }
             else if (exitStatus == TestStatus.Complete)
             {
