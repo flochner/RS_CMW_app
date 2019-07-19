@@ -56,7 +56,7 @@ namespace CMWtests
                 WaitForOPC();
 
             if (stat < ViStatus.VI_SUCCESS)
-                ShowErrorText("VisaIO.Write", stat);
+                ShowErrorText("VisaIO.Write", message, stat);
             return stat;
         }
 
@@ -153,6 +153,13 @@ namespace CMWtests
         private void WaitForOPC()
         {
             QueryString("*OPC?");
+        }
+
+        private void ShowErrorText(string source, string message, ViStatus status)
+        {
+            StringBuilder text = new StringBuilder(visa32.VI_FIND_BUFLEN);
+            ViStatus err = visa32.viStatusDesc(vi, status, text);
+            MessageBox.Show(message + Environment.NewLine + status.ToString() + Environment.NewLine + text.ToString(), source);
         }
 
         private void ShowErrorText(string source, ViStatus status)
