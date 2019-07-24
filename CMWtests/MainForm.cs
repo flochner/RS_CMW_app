@@ -19,7 +19,6 @@ namespace CMWtests
             mreMeasure = new ManualResetEvent(true);
             mreExit = new ManualResetEvent(false);
 
-
             DefResMgr = VisaIO.OpenResourceMgr();
             if (DefResMgr == 0)
             {
@@ -158,54 +157,36 @@ namespace CMWtests
             about.ShowDialog();
         }
 
-        private void ProgressBar1_Update(int value)
+        private void ProgressBars_Update(int ampl)
         {
-            Invoke(new MethodInvoker(() =>
+            if (mreMeasure.WaitOne(0) == false)
+                return;
+
+            int mSec = (ampl == -44 ? 262 : 15);
+            DateTime wait;
+
+            BeginInvoke(new MethodInvoker(() =>
             {
                 for (int i = 0; i < 10; i++)
                 {
-                    progressBar1.Maximum++;
-                    progressBar1.Value++;
-                    progressBar1.Maximum--;
-                    progressBar1.Refresh();
+                    if (CancelTesting == true)
+                        return;
 
-                    progressBar2.Maximum++;
-                    progressBar2.Value++;
-                    progressBar2.Maximum--;
-                    progressBar2.Refresh();
+                    progressBar1.PerformStep();
+                    progressBar2.PerformStep();
 
-                    
-                    
-                    //progressBar1.Maximum++;
-                    //progressBar1.Value++;
-                    //progressBar1.Maximum--;
-                    //progressBar1.Refresh();
-
-                    //progressBar2.Maximum++;
-                    //progressBar2.Value++;
-                    //progressBar2.Maximum--;
-                    //progressBar2.Refresh();
-                }
+                    wait = DateTime.Now.AddMilliseconds(mSec);
+                    while (DateTime.Now < wait)
+                        Application.DoEvents();
 #if DEBUG
                 labelDebug.Text = progressBar1.Value.ToString();
-                //     Thread.Sleep(500);
+                labelDebug.Refresh();
 #endif
+                }
             }));
         }
 
-        private void ProgressBar2_Update(int value)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                progressBar2.SetProgressNoAnimation(value);
-#if DEBUG
-                labelDebug.Text = progressBar2.Value.ToString();
-             //   Thread.Sleep(500);
-#endif
-            }));
-        }
-
-        private void ProgressBar1_Settings(int maxValue)
+        private void ProgressBar1_Init(int maxValue = 0)
         {
             Invoke(new MethodInvoker(() =>
             {
@@ -216,7 +197,7 @@ namespace CMWtests
             }));
         }
 
-        private void ProgressBar2_Settings(int maxValue)
+        private void ProgressBar2_Init(int maxValue = 0)
         {
             Invoke(new MethodInvoker(() =>
             {
@@ -309,69 +290,5 @@ namespace CMWtests
         private void textBoxResults_TextChanged(object sender, EventArgs e) { }
         private void labelHead1_TextChanged(object sender, EventArgs e) { }
         private void labelHead2_TextChanged(object sender, EventArgs e) { }
-    }
-    public static class ExtensionMethods
-    {
-        /// <summary>
-        /// Sets the progress bar value, without using 'Windows Aero' animation.
-        /// This is to work around a known WinForms issue where the progress bar 
-        /// is slow to update. 
-        /// </summary>
-        public static void SetProgressNoAnimation(this ProgressBar pb, int value)
-        {
-            pb.Maximum++;
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Value++; pb.Refresh();
-            pb.Maximum--;
-            return;
-
-
-            if (pb.Value != 0)
-                pb.Value--;
-            pb.Refresh();
-            //for (int i = 0; i < 11; i++)
-            //{
-                if (pb.Value != pb.Maximum)
-                    pb.Value++;
-                Thread.Sleep(50);
-                pb.Refresh();
-            //}
-            
-
-            return;
-
-            int curValue = pb.Value;
-            for (int i = -1; i < 10; i++)
-            {
-                if (curValue == 0)
-                    i++;
-                if (pb.Value != pb.Maximum)
-                    pb.Value += i;
-            }
-            return;
-
-            // To get around the progressive animation, we need to move the 
-            // progress bar backwards.
-            if (pb.Value == pb.Minimum)
-            {
-                // Special case as value can't be set greater than Maximum.
-                //pb.Value = pb.Value + 2;       // Move past
-                pb.Value = pb.Value + 1;           // Move to correct value
-            }
-            else
-            {
-                //pb.Value = pb.Value - 1;       // Move past
-                pb.Value = pb.Value + 1;           // Move to correct value
-            }
-            pb.Refresh();
-        }
     }
 }

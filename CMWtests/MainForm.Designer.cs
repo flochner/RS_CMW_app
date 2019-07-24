@@ -421,6 +421,7 @@ namespace CMWtests
             this.progressBar1.Location = new System.Drawing.Point(12, 385);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(560, 12);
+            this.progressBar1.Step = 1;
             this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar1.TabIndex = 0;
             // 
@@ -431,6 +432,8 @@ namespace CMWtests
             this.progressBar2.Location = new System.Drawing.Point(12, 403);
             this.progressBar2.Name = "progressBar2";
             this.progressBar2.Size = new System.Drawing.Size(560, 12);
+            this.progressBar2.Step = 1;
+            this.progressBar2.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBar2.TabIndex = 0;
             // 
             // labelDebug
