@@ -261,6 +261,7 @@ namespace CMWtests
         }
     }
 
+    [Serializable]
     public class InstrumentOPCtimeoutException : Exception
     {
         /// <summary>
@@ -271,6 +272,7 @@ namespace CMWtests
         }
     }
 
+    [Serializable]
     public class InstrumentErrorException : Exception
     {
         /// <summary>

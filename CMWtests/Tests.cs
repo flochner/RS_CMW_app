@@ -163,8 +163,9 @@ namespace CMWtests
         // :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         // 
 
+#if DEBUG
         gentests:
-
+#endif
             SetHead1Text("GPRF CW Generator Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Generator Tests");
 
@@ -201,8 +202,8 @@ namespace CMWtests
             chartLimits6 = (",-1.8,-1.6,0,1.6,1.8");
             amplList = new int[] { 0, -36 };
 #if DEBUG
-            //return GracefulExit(TestStatus.Complete);
             amplList = new int[] { -36 };
+            //return GracefulExit(TestStatus.Complete);
 #endif
 
             testName = "RF1OUT_TX";
@@ -402,7 +403,7 @@ namespace CMWtests
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
-                #region Set up this loop - set freqs - get GPRF Measure Power
+#region Set up this loop - set freqs - get GPRF Measure Power
                 ProgressBars_Update(testAmpl);
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");

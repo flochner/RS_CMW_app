@@ -19,6 +19,8 @@ namespace CMWtests
             if (disposing && (components != null))
             {
                 components.Dispose();
+                mreExit.Dispose();
+                mreMeasure.Dispose();
             }
             base.Dispose(disposing);
         }
