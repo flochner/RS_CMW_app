@@ -39,75 +39,87 @@ namespace CMWtests
             Task.Factory.StartNew(Begin, TaskCreationOptions.LongRunning);
         }
 
-        private void SetMenuStripEnabled(bool v)
+        private void SetHead1Text(string text)
         {
             Invoke(new MethodInvoker(() =>
             {
-                menuStrip1.Enabled = v;
+                labelHead1.Text = text;
+                labelHead1.Refresh();
             }));
         }
 
-        private bool GetBtnBeginEnabled()
-        {
-            return btnBeginTests.Enabled;
-        }
-
-        private void SetBtnBeginEnabled(bool v)
+        private void SetHead2Text(string text)
         {
             Invoke(new MethodInvoker(() =>
             {
-                btnBeginTests.Enabled = v;
-                newToolStripMenuItem.Enabled = v;
-                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
+                labelHead2.Text = text;
+                labelHead2.Refresh();
             }));
         }
 
-        private bool GetBtnCancelEnabled()
-        {
-            return btnCancelTests.Enabled;
-        }
-
-        private void SetBtnCancelEnabled(bool v)
+        private void SetStatusLabel(string text)
         {
             Invoke(new MethodInvoker(() =>
             {
-                btnCancelTests.Enabled = v;
+                labelStatus.Text = text;
+                labelStatus.Refresh();
             }));
         }
 
-        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
+        private void SetDebugText(string text)
         {
-            using (var query = new VISAqueryForm())
+            Invoke(new MethodInvoker(() =>
             {
-                query.ShowDialog();
-            }
+                labelDebug.Text = text;
+                labelDebug.Refresh();
+                Thread.Sleep(500);
+                labelDebug.Text = string.Empty;
+                labelDebug.Refresh();
+            }));
         }
 
-        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        private void AddToResults(string item)
         {
+            Invoke(new MethodInvoker(() =>
+            {
+                textBoxResults.AppendText(item + Environment.NewLine);
+                textBoxResults.Refresh();
+            }));
         }
 
-        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        private void ProgressBar1_Init(int maxValue = 0)
         {
-            Exit();
+            Invoke(new MethodInvoker(() =>
+            {
+                if (maxValue > 0)
+                    progressBar1.Maximum = maxValue;
+                progressBar1.Value = 0;
+                progressBar1.Refresh();
+            }));
         }
 
-        private void Exit()
+        private void ProgressBar2_Init(int maxValue = 0)
         {
-            if (CancelTests() == true)
-                Task.Factory.StartNew(() =>
-                {
-                    if (Status != TestStatus.Complete)
-                        mreExit.WaitOne();
-                    VisaIO.CloseDefMgr();
-                    Application.Exit();
-                });
-            mreExit.Reset();
+            Invoke(new MethodInvoker(() =>
+            {
+                if (maxValue > 0)
+                    progressBar2.Maximum = maxValue;
+                progressBar2.Value = 0;
+                progressBar2.Refresh();
+            }));
         }
 
-        private void btnCancelTests_Click(object sender, EventArgs e)
+        private void ProgressBars_Update(int ampl)
         {
-            CancelTests();
+            BeginInvoke(new MethodInvoker(() =>
+            {
+                    progressBar1.PerformStep();
+                    progressBar2.PerformStep();
+#if DEBUG
+                labelDebug.Text = progressBar1.Value.ToString();
+                labelDebug.Refresh();
+#endif
+            }));
         }
 
         private bool CancelTests()
@@ -136,6 +148,68 @@ namespace CMWtests
             }
         }
 
+        private void Exit()
+        {
+            if (CancelTests() == true)
+                Task.Factory.StartNew(() =>
+                {
+                    if (Status != TestStatus.Complete)
+                        mreExit.WaitOne();
+                    VisaIO.CloseDefMgr();
+                    Application.Exit();
+                });
+            mreExit.Reset();
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
+        {
+            switch (f.CloseReason)
+            {
+                case CloseReason.ApplicationExitCall:
+                    break;
+                default:
+                    f.Cancel = true;
+                    Exit();
+                    break;
+            }
+        }
+
+        private void SetMenuStripEnabled(bool v)
+        {
+            Invoke(new MethodInvoker(() =>
+            {
+                menuStrip1.Enabled = v;
+            }));
+        }
+
+        private void SetBtnBeginEnabled(bool v)
+        {
+            Invoke(new MethodInvoker(() =>
+            {
+                btnBeginTests.Enabled = v;
+                newToolStripMenuItem.Enabled = v;
+                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
+            }));
+        }
+
+        private bool GetBtnCancelEnabled()
+        {
+            return btnCancelTests.Enabled;
+        }
+
+        private void SetBtnCancelEnabled(bool v)
+        {
+            Invoke(new MethodInvoker(() =>
+            {
+                btnCancelTests.Enabled = v;
+            }));
+        }
+
+        private void btnCancelTests_Click(object sender, EventArgs e)
+        {
+            CancelTests();
+        }
+
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             btnBeginTests_Click(sender, e);
@@ -157,87 +231,21 @@ namespace CMWtests
             about.ShowDialog();
         }
 
-        private void ProgressBars_Update(int ampl)
+        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            BeginInvoke(new MethodInvoker(() =>
+            using (var query = new VISAqueryForm())
             {
-                    progressBar1.PerformStep();
-                    progressBar2.PerformStep();
-#if DEBUG
-                labelDebug.Text = progressBar1.Value.ToString();
-                labelDebug.Refresh();
-#endif
-            }));
+                query.ShowDialog();
+            }
         }
 
-        private void ProgressBar1_Init(int maxValue = 0)
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Invoke(new MethodInvoker(() =>
-            {
-                if (maxValue > 0)
-                    progressBar1.Maximum = maxValue;
-                progressBar1.Value = 0;
-                progressBar1.Refresh();
-            }));
         }
 
-        private void ProgressBar2_Init(int maxValue = 0)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Invoke(new MethodInvoker(() =>
-            {
-                if (maxValue > 0)
-                    progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-                progressBar2.Refresh();
-            }));
-        }
-
-        private void SetHead1Text(string text)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                labelHead1.Text = text;
-                labelHead1.Refresh();
-            }));
-        }
-
-        private void SetDebugText(string text)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                labelDebug.Text = text;
-                labelDebug.Refresh();
-                Thread.Sleep(500);
-                labelDebug.Text = string.Empty;
-                labelDebug.Refresh();
-            }));
-        }
-
-        private void SetHead2Text(string text)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                labelHead2.Text = text;
-                labelHead2.Refresh();
-            }));
-        }
-
-        private void SetStatusLabel(string text)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                labelStatus.Text = text;
-                labelStatus.Refresh();
-            }));
-        }
-
-        private void AddToResults(string item)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                textBoxResults.AppendText(item + Environment.NewLine);
-                textBoxResults.Refresh();
-            }));
+            Exit();
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -255,19 +263,6 @@ namespace CMWtests
                 cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
 
             mreMeasure.Set();
-        }
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
-        {
-            switch (f.CloseReason)
-            {
-                case CloseReason.ApplicationExitCall:
-                    break;
-                default:
-                    f.Cancel = true;
-                    Exit();
-                    break;
-            }
         }
 
         private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
