@@ -159,30 +159,14 @@ namespace CMWtests
 
         private void ProgressBars_Update(int ampl)
         {
-            if (mreMeasure.WaitOne(0) == false)
-                return;
-
-            int mSec = (ampl == -44 ? 262 : 15);
-            DateTime wait;
-
             BeginInvoke(new MethodInvoker(() =>
             {
-                for (int i = 0; i < 10; i++)
-                {
-                    if (CancelTesting == true)
-                        return;
-
                     progressBar1.PerformStep();
                     progressBar2.PerformStep();
-
-                    wait = DateTime.Now.AddMilliseconds(mSec);
-                    while (DateTime.Now < wait)
-                        Application.DoEvents();
 #if DEBUG
                 labelDebug.Text = progressBar1.Value.ToString();
                 labelDebug.Refresh();
 #endif
-                }
             }));
         }
 
