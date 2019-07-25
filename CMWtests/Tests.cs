@@ -67,7 +67,7 @@ namespace CMWtests
             goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
-            AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
+            AddToResults(Environment.NewLine + "GPRF CW Measurement Tests");
 
             /// -------------------------------------------------------------
             chartLimits3 = ",-0.7,-0.5,0,0.5,0.7";
@@ -167,7 +167,7 @@ namespace CMWtests
         gentests:
 #endif
             SetHead1Text("GPRF CW Generator Tests");
-            AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Generator Tests");
+            AddToResults(Environment.NewLine + "GPRF CW Generator Tests");
 
             chartLimits3 = (",-0.8,-0.6,0,0.6,0.8");
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
