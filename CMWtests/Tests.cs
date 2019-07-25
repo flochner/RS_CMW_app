@@ -20,7 +20,7 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
-        private StreamWriter _csvStream = null;
+        private StreamWriter csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
         {
@@ -61,10 +61,10 @@ namespace CMWtests
             string testName = "";
 
             SetBtnCancelEnabled(true);
-            ProgressBar2_Init(120 * numOfTRX * (hasKB036 ? 60 : 33));
+            ProgressBar2_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 /// !
 #if DEBUG
-            //goto gentests;
+            goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + Environment.NewLine + "GPRF CW Measurement Tests");
@@ -172,7 +172,7 @@ namespace CMWtests
             chartLimits3 = (",-0.8,-0.6,0,0.6,0.8");
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
-#if !DEBUG
+#if DEBUG
             amplList = new int[] { -44 };
 #endif
 
@@ -336,35 +336,35 @@ namespace CMWtests
             int pmStatus = -1;
             double amplError = 0.0;
             double cmwMeasPower = 0.0;
-            double maxError = 0.0;
             double pmPower = 0.0;
-            long currentFreq = 0;
-            long endFreq = 0;
             bool retry = false;
             string chartLimits = "";
-            string testHeader = "";
             string visaResponse = "";
             string[] pmResponse = { };
 
+#if DEBUG
+            SetDebugText("Waiting at Measure Start");
+#endif
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
+     //       mreMeasure.Set();
 
-            testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
+            var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            ProgressBar1_Init(hasKB036 ? 600 : 330);
+            ProgressBar1_Init(hasKB036 ? 60 : 33);
 
         start:
 
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
-            _csvStream = OpenTempFile();
-            if (_csvStream == null)
+            csvStream = OpenTempFile();
+            if (csvStream == null)
                 return TestStatus.Abort;
 
-#region Config RX / TX
+            #region Config RX / TX
 
             /// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
@@ -373,7 +373,7 @@ namespace CMWtests
             ///// setup measurement tests
             if (testName.Contains("RX"))
             {
-                _csvStream.WriteLine("    GPRF CW Measurement Tests - " + cmwID);
+                csvStream.WriteLine("    GPRF CW Measurement Tests - " + cmwID);
                 cmw.Write("INIT:GPRF:MEAS:POWer");
                 cmw.Write("CONFigure:GPRF:MEAS:RFSettings:ENPower " + testAmpl);
                 if (testName.Contains("1COM") || testName.Contains("2COM"))
@@ -384,26 +384,29 @@ namespace CMWtests
             }
             else if (testName.Contains("TX"))
             {
-                _csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
+                csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
                 cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
                 minFreq = 70;
             }
 
-            _csvStream.WriteLine("0," + chartLimits3);
+            csvStream.WriteLine("0," + chartLimits3);
             cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
 
-            currentFreq = minFreq * (long)1e6;
-            endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-#endregion
+            var currentFreq = minFreq * (long)1e6;
+            var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
+            #endregion
 
             do  ///// Main Loop
             {
+#if DEBUG
+                SetDebugText("Waiting at Measure main loop start");
+#endif
                 mreMeasure.WaitOne();
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
-#region Set up this loop - set freqs - get GPRF Measure Power
+                #region Set up this loop - set freqs - get GPRF Measure Power
                 ProgressBars_Update(testAmpl);
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
@@ -423,10 +426,9 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-#endregion
+                #endregion
 
-#region  Take sensor reading
-
+                #region  Take sensor reading
                 do  //while (retry)
                 {
                     retry = false;
@@ -476,9 +478,9 @@ namespace CMWtests
                     amplError = cmwMeasPower - pmPower;
                 else
                     amplError = pmPower - testAmpl;
-#endregion
+                #endregion
 
-#region Handle excessive error
+                #region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 400e6) && (Math.Abs(amplError) > 3) && !ignoreAmplError)
                 {
@@ -512,8 +514,8 @@ namespace CMWtests
                     {
                         if (File.Exists(csvFileName))
                             try
-                            { _csvStream.Dispose();
-                              File.Delete(csvFileName); }
+                            { csvStream.Dispose();
+                                File.Delete(csvFileName); }
                             catch { ModalMessageBox("Temp file delete Exception"); }
                         goto start;
                     }
@@ -521,9 +523,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-#endregion
+                #endregion
 
-#region Record results - setup next loop
+                #region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -540,7 +542,7 @@ namespace CMWtests
                 }
 
                 // Push frequency, point-error and limit-line values.
-                _csvStream.WriteLine(currentFreq / 1e6 + "," + amplError + chartLimits);
+                csvStream.WriteLine(currentFreq / 1e6 + "," + amplError + chartLimits);
 
                 // If current frequency is the minimum measurement frequency of CMW,
                 // then the next freq is 200 MHz, otherwise it is increased by 100 MHz
@@ -548,7 +550,7 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-#endregion
+                #endregion
 
             } while (currentFreq <= endFreq);
 
@@ -562,15 +564,15 @@ namespace CMWtests
             cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
 
             // Push one frequency point beyond test to make whitespace in graph (3400 or 6100 MHz).
-            _csvStream.WriteLine(currentFreq / 1e6 + "," + chartLimits);
-            _csvStream.WriteLine(testHeader);
-            _csvStream.Dispose();
+            csvStream.WriteLine(currentFreq / 1e6 + "," + chartLimits);
+            csvStream.WriteLine(testHeader);
+            csvStream.Dispose();
 
             SetHead2Text("");
 
             // maxErr tells graph to decide whether to use fixed Y-axis (2 dB),
             //   or dynamic axis if error exceeds 2 dB.
-            maxError = Math.Max(Math.Abs(maxError3), Math.Abs(maxError6));
+            var maxError = Math.Max(Math.Abs(maxError3), Math.Abs(maxError6));
 
             // Create graph
             Graph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
@@ -588,7 +590,6 @@ namespace CMWtests
         private TestStatus ConnectionMessage(string connection)
         {
             bool retryZero = false;
-            string visaResponse = "";
             string[] pmResponse = { };
 
             if (CancelTesting == true)
@@ -602,6 +603,9 @@ namespace CMWtests
             {
                 retryZero = false;
 
+#if DEBUG
+                SetDebugText("Waiting at ConnectionMessage start");
+#endif
                 mreMeasure.WaitOne();
                 if (CancelTesting == true)
                     return TestStatus.Abort;
@@ -626,7 +630,7 @@ namespace CMWtests
 /// !
 #if !DEBUG
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
-                visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
+                var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
                 visaResponse = "PASS";
 #endif
@@ -664,9 +668,6 @@ namespace CMWtests
             bool retrySensor = false;
             string cmwModel = "";
             string cmwSerNum = "";
-            string resource = "";
-            string visaResponse = "";
-            string[] hwOptions = { };
             string[] identFields = { };
 
             numOfFrontEnds = 0;
@@ -678,7 +679,7 @@ namespace CMWtests
             if (resourceForm.ResourcesCount != 1)
                 resourceForm.ShowDialog();
             SetBtnCancelEnabled(btnCancelEnabled);
-            resource = resourceForm.Resource;
+            var resource = resourceForm.Resource;
             resourceForm.Dispose();
 
             if (!string.IsNullOrWhiteSpace(resource))
@@ -693,7 +694,7 @@ namespace CMWtests
             }
 
             // CMW Identification
-            visaResponse = cmw.QueryString("*IDN?");
+            var visaResponse = cmw.QueryString("*IDN?");
             try
             {
                 identFields = visaResponse.Split(',');
@@ -743,12 +744,15 @@ namespace CMWtests
             cmwID = cmwModel + " " + cmwSerNum;
             AddToResults(cmwID);
 
+            var cmwFW = identFields[3];
+            AddToResults("FW " + cmwFW);
+
             // CMW Options
             visaResponse = cmw.QueryString("SYSTem:BASE:OPTion:LIST? HWOPtion");
 #if DEBUG
             AddToResults(visaResponse);
 #endif
-            hwOptions = visaResponse.Split(',');
+            var hwOptions = visaResponse.Split(',');
 
             for (int i = 0; i < hwOptions.Length; i++)
             {
@@ -873,10 +877,10 @@ namespace CMWtests
             }
             catch (NullReferenceException) { }
 
-            if (_csvStream != null)
+            if (csvStream != null)
                 try
                 {
-                    _csvStream.Dispose();
+                    csvStream.Dispose();
                 }
                 catch
                 {
