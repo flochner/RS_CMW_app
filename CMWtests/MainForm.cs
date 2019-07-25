@@ -87,16 +87,16 @@ namespace CMWtests
             }));
         }
 
-        private void ProgressBar1_Init(int maxValue = 0)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                if (maxValue > 0)
-                    progressBar1.Maximum = maxValue;
-                progressBar1.Value = 0;
-                progressBar1.Refresh();
-            }));
-        }
+        //private void ProgressBar1_Init(int maxValue = 0)
+        //{
+        //    Invoke(new MethodInvoker(() =>
+        //    {
+        //        if (maxValue > 0)
+        //            progressBar1.Maximum = maxValue;
+        //        progressBar1.Value = 0;
+        //        progressBar1.Refresh();
+        //    }));
+        //}
 
         private void ProgressBar2_Init(int maxValue = 0)
         {
@@ -113,11 +113,11 @@ namespace CMWtests
         {
             BeginInvoke(new MethodInvoker(() =>
             {
-                    progressBar1.PerformStep();
+                    //progressBar1.PerformStep();
                     progressBar2.PerformStep();
 #if DEBUG
-                labelDebug.Text = progressBar1.Value.ToString();
-                labelDebug.Refresh();
+                //labelDebug.Text = progressBar1.Value.ToString();
+                //labelDebug.Refresh();
 #endif
             }));
         }

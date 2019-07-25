@@ -73,11 +73,12 @@ namespace CMWtests
             this.labelHead1 = new System.Windows.Forms.Label();
             this.labelHead2 = new System.Windows.Forms.Label();
             this.btnCancelTests = new System.Windows.Forms.Button();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.progressBar2 = new System.Windows.Forms.ProgressBar();
             this.labelDebug = new System.Windows.Forms.Label();
             this.labelStatus = new System.Windows.Forms.Label();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -365,13 +366,13 @@ namespace CMWtests
             this.textBoxResults.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxResults.Cursor = System.Windows.Forms.Cursors.Default;
             this.textBoxResults.HideSelection = false;
-            this.textBoxResults.Location = new System.Drawing.Point(12, 72);
+            this.textBoxResults.Location = new System.Drawing.Point(12, 300);
             this.textBoxResults.MaxLength = 2147483646;
             this.textBoxResults.Multiline = true;
             this.textBoxResults.Name = "textBoxResults";
             this.textBoxResults.ReadOnly = true;
             this.textBoxResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxResults.Size = new System.Drawing.Size(576, 307);
+            this.textBoxResults.Size = new System.Drawing.Size(576, 97);
             this.textBoxResults.TabIndex = 0;
             this.textBoxResults.TextChanged += new System.EventHandler(this.textBoxResults_TextChanged);
             // 
@@ -416,17 +417,6 @@ namespace CMWtests
             this.btnCancelTests.UseVisualStyleBackColor = true;
             this.btnCancelTests.Click += new System.EventHandler(this.btnCancelTests_Click);
             // 
-            // progressBar1
-            // 
-            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(12, 385);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(576, 12);
-            this.progressBar1.Step = 1;
-            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar1.TabIndex = 0;
-            // 
             // progressBar2
             // 
             this.progressBar2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -458,15 +448,23 @@ namespace CMWtests
             this.labelStatus.TabIndex = 15;
             this.labelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Location = new System.Drawing.Point(12, 73);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(576, 221);
+            this.pictureBox1.TabIndex = 16;
+            this.pictureBox1.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(600, 431);
+            this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.labelDebug);
             this.Controls.Add(this.progressBar2);
-            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnCancelTests);
             this.Controls.Add(this.labelHead2);
             this.Controls.Add(this.labelHead1);
@@ -482,6 +480,7 @@ namespace CMWtests
             this.Text = "CMW RF Level Accuracy";
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -527,10 +526,10 @@ namespace CMWtests
         public System.Windows.Forms.Label labelHead1;
         public System.Windows.Forms.Label labelHead2;
         private System.Windows.Forms.Button btnCancelTests;
-        public System.Windows.Forms.ProgressBar progressBar1;
         public System.Windows.Forms.ProgressBar progressBar2;
         private System.Windows.Forms.Label labelDebug;
         private System.Windows.Forms.Label labelStatus;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 

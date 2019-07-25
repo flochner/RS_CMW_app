@@ -353,7 +353,7 @@ namespace CMWtests
             var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            ProgressBar1_Init(hasKB036 ? 60 : 33);
+            //ProgressBar1_Init(hasKB036 ? 60 : 33);
 
         start:
 
@@ -597,7 +597,7 @@ namespace CMWtests
 
             SetBtnCancelEnabled(false);
             SetMenuStripEnabled(false);
-            ProgressBar1_Init();
+            //ProgressBar1_Init();
 
             do //while retryZero
             {
@@ -632,7 +632,7 @@ namespace CMWtests
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
                 var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
-                visaResponse = "PASS";
+                var visaResponse = "PASS";
 #endif
                 if (!visaResponse.Contains("PASS"))
                 {
@@ -902,7 +902,7 @@ namespace CMWtests
             if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-                ProgressBar1_Init();
+                //ProgressBar1_Init();
                 ProgressBar2_Init();
             }
             else if (exitStatus == TestStatus.Complete)
