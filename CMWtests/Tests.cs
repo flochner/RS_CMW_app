@@ -15,7 +15,8 @@ namespace CMWtests
         private long minFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
-        private bool isFirstTest = true;
+/// !
+        private bool isFirstTest = false;
         private string chartLimits3 = "";
         private string chartLimits6 = "";
         private string cmwID = "";
@@ -575,7 +576,7 @@ namespace CMWtests
             var maxError = Math.Max(Math.Abs(maxError3), Math.Abs(maxError6));
 
             // Create graph
-            Graph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
+            ExcelGraph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
             File.Delete(csvFileName);
 
             isFirstTest = false;
@@ -628,7 +629,7 @@ namespace CMWtests
 
                 SetHead2Text("Zeroing Sensor...");
 /// !
-#if !DEBUG
+#if DEBUG
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
                 var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
@@ -757,6 +758,8 @@ namespace CMWtests
             for (int i = 0; i < hwOptions.Length; i++)
             {
                 hasKB036 = hwOptions[i].Contains("KB036");
+/// !
+                hasKB036 = true;
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
                 if (hwOptions[i].Contains("H590"))
@@ -772,7 +775,7 @@ namespace CMWtests
             do
             {
 /// !
-#if !DEBUG
+#if DEBUG
                 visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 15000);
 #else
                 visaResponse = "0,0";

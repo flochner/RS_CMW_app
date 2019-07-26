@@ -78,7 +78,7 @@ namespace CMWtests
             }));
         }
 
-        private void AddToResults(string item)
+        public void AddToResults(string item)
         {
             Invoke(new MethodInvoker(() =>
             {
