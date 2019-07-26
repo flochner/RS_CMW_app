@@ -372,7 +372,7 @@ namespace CMWtests
             this.textBoxResults.Name = "textBoxResults";
             this.textBoxResults.ReadOnly = true;
             this.textBoxResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBoxResults.Size = new System.Drawing.Size(710, 120);
+            this.textBoxResults.Size = new System.Drawing.Size(710, 118);
             this.textBoxResults.TabIndex = 0;
             this.textBoxResults.TextChanged += new System.EventHandler(this.textBoxResults_TextChanged);
             // 
@@ -473,8 +473,6 @@ namespace CMWtests
             this.Controls.Add(this.menuStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximumSize = new System.Drawing.Size(750, 550);
-            this.MinimumSize = new System.Drawing.Size(750, 550);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "CMW RF Level Accuracy";
