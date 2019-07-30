@@ -64,7 +64,7 @@ namespace CMWtests
             SetBtnCancelEnabled(true);
             ProgressBar2_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 /// !
-#if DEBUG
+#if !DEBUG
             goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
@@ -677,8 +677,15 @@ namespace CMWtests
             var btnCancelEnabled = GetBtnCancelEnabled();
             SetBtnCancelEnabled(false);
             var resourceForm = new VISAresourceForm();
-            if (resourceForm.ResourcesCount != 1)
+
+            if (resourceForm.ResourcesCount == 0)
+            {
+                AddToResults("No resources available.");
+                return TestStatus.Abort;
+            }
+            if (resourceForm.ResourcesCount > 1)
                 resourceForm.ShowDialog();
+
             SetBtnCancelEnabled(btnCancelEnabled);
             var resource = resourceForm.Resource;
             resourceForm.Dispose();
@@ -759,7 +766,9 @@ namespace CMWtests
             {
                 hasKB036 = hwOptions[i].Contains("KB036");
 /// !
+#if DEBUG
                 hasKB036 = true;
+#endif
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
                 if (hwOptions[i].Contains("H590"))
