@@ -85,7 +85,7 @@ namespace CMWtests
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(command + ";*OPC");
             string exMessage = String.Format("WriteWithSTB - Timeout occurred. Command: \"{0}\", timeout {1} ms", command, timeout);
-            _STBpolling(exMessage, timeout);
+            STBpolling(exMessage, timeout);
             QueryInteger("*ESR?"); //Clear the Event Status Register
         }
 
@@ -94,7 +94,7 @@ namespace CMWtests
             QueryInteger("*ESR?"); //Clear the Event Status Register
             Write(query + ";*OPC");
             string exMessage = String.Format("QueryWithSTB - Timeout occurred. Query: \"{0}\", timeout {1} ms", query, timeout);
-            _STBpolling(exMessage, timeout);
+            STBpolling(exMessage, timeout);
             var response = ReadString();
             response = response.TrimEnd('\n');
             QueryInteger("*ESR?"); //Clear the Event Status Register
@@ -200,7 +200,7 @@ namespace CMWtests
             return RsVisa.RsViIsVisaLibraryInstalled(iManfId) != 0;
         }
 
-        private void _STBpolling(string exMessage, int timeout)
+        private void STBpolling(string exMessage, int timeout)
         {
             var start = DateTime.Now;
             var stop = start.AddMilliseconds(timeout);
