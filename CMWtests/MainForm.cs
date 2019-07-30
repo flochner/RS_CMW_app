@@ -188,7 +188,7 @@ namespace CMWtests
             {
                 btnBeginTests.Enabled = v;
                 newToolStripMenuItem.Enabled = v;
-                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
+                communicateWithInstrumentToolStripMenuItem.Enabled = v;
             }));
         }
 
