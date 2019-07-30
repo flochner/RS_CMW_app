@@ -343,9 +343,7 @@ namespace CMWtests
             string visaResponse = "";
             string[] pmResponse = { };
 
-#if DEBUG
             SetDebugText("Waiting at Measure Start");
-#endif
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
@@ -399,9 +397,7 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-#if DEBUG
                 SetDebugText("Waiting at Measure main loop start");
-#endif
                 mreMeasure.WaitOne();
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
@@ -604,9 +600,7 @@ namespace CMWtests
             {
                 retryZero = false;
 
-#if DEBUG
                 SetDebugText("Waiting at ConnectionMessage start");
-#endif
                 mreMeasure.WaitOne();
                 if (CancelTesting == true)
                     return TestStatus.Abort;
@@ -827,10 +821,6 @@ namespace CMWtests
                 }
             } while (retrySensor == true);
 
-#if DEBUG
-            hasKB036 = false;
-            numOfFrontEnds = 1;
-#endif
             SetHead2Text("");
             return TestStatus.Success;
         }
