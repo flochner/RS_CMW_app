@@ -103,6 +103,8 @@ namespace CMWtests
         }
 
         private void btnCancel_Click(object sender, EventArgs e)
-        { }
+        {
+            Resource = null;
+        }
     }
 }
