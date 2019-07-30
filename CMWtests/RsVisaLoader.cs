@@ -334,6 +334,7 @@ namespace RsVisaLoader
   };
   #endregion //Completion and Error Codes
   #endregion //Constants
+
   internal sealed class visa32
   {
     public const int VI_SPEC_VERSION = 0x400000;
