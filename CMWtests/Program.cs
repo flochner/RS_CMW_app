@@ -14,7 +14,7 @@ namespace CMWtests
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
+            //Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             MainForm _obj = new MainForm();
             Application.Run(_obj);
