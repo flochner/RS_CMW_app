@@ -73,7 +73,7 @@ namespace CMWtests
             this.labelHead1 = new System.Windows.Forms.Label();
             this.labelHead2 = new System.Windows.Forms.Label();
             this.btnCancelTests = new System.Windows.Forms.Button();
-            this.progressBar2 = new System.Windows.Forms.ProgressBar();
+            this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.labelDebug = new System.Windows.Forms.Label();
             this.labelStatus = new System.Windows.Forms.Label();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
@@ -417,16 +417,16 @@ namespace CMWtests
             this.btnCancelTests.UseVisualStyleBackColor = true;
             this.btnCancelTests.Click += new System.EventHandler(this.btnCancelTests_Click);
             // 
-            // progressBar2
+            // progressBar1
             // 
-            this.progressBar2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar2.Location = new System.Drawing.Point(12, 483);
-            this.progressBar2.Name = "progressBar2";
-            this.progressBar2.Size = new System.Drawing.Size(710, 12);
-            this.progressBar2.Step = 1;
-            this.progressBar2.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.progressBar2.TabIndex = 0;
+            this.progressBar1.Location = new System.Drawing.Point(12, 483);
+            this.progressBar1.Name = "progressBar1";
+            this.progressBar1.Size = new System.Drawing.Size(710, 12);
+            this.progressBar1.Step = 1;
+            this.progressBar1.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.progressBar1.TabIndex = 0;
             // 
             // labelDebug
             // 
@@ -464,7 +464,7 @@ namespace CMWtests
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.labelDebug);
-            this.Controls.Add(this.progressBar2);
+            this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.btnCancelTests);
             this.Controls.Add(this.labelHead2);
             this.Controls.Add(this.labelHead1);
@@ -524,7 +524,7 @@ namespace CMWtests
         public System.Windows.Forms.Label labelHead1;
         public System.Windows.Forms.Label labelHead2;
         private System.Windows.Forms.Button btnCancelTests;
-        public System.Windows.Forms.ProgressBar progressBar2;
+        public System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label labelDebug;
         private System.Windows.Forms.Label labelStatus;
         public System.Windows.Forms.PictureBox pictureBox1;
