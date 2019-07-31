@@ -44,7 +44,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
-                labelHead1.Refresh();
+                labelHead1.Invalidate();
             }));
         }
 
@@ -53,7 +53,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
-                labelHead2.Refresh();
+                labelHead2.Invalidate();
             }));
         }
 
@@ -62,7 +62,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
-                labelStatus.Refresh();
+                labelStatus.Invalidate();
             }));
         }
 
@@ -72,10 +72,10 @@ namespace CMWtests
             //Invoke(new MethodInvoker(() =>
             //{
             //    labelDebug.Text = text;
-            //    labelDebug.Refresh();
+            //    labelDebug.Invalidate();
             //    Thread.Sleep(500);
             //    labelDebug.Text = string.Empty;
-            //    labelDebug.Refresh();
+            //    labelDebug.Invalidate();
             //}));
 #endif
         }
@@ -85,29 +85,29 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
-                textBoxResults.Refresh();
+                textBoxResults.Invalidate();
             }));
         }
 
-        private void ProgressBar2_Init(int maxValue = 0)
+        private void ProgressBar1_Init(int maxValue = 0)
         {
             Invoke(new MethodInvoker(() =>
             {
                 if (maxValue > 0)
-                    progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-                progressBar2.Refresh();
+                    progressBar1.Maximum = maxValue;
+                progressBar1.Value = 0;
+                progressBar1.Invalidate();
             }));
         }
 
-        private void ProgressBars_Update(int ampl)
+        private void ProgressBar1_Update(int ampl)
         {
             BeginInvoke(new MethodInvoker(() =>
             {
-                    progressBar2.PerformStep();
+                    progressBar1.PerformStep();
 #if DEBUG
                 //labelDebug.Text = progressBar1.Value.ToString();
-                //labelDebug.Refresh();
+                //labelDebug.Invalidate();
 #endif
             }));
         }
