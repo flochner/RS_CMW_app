@@ -46,11 +46,12 @@ namespace CMWgraph
                 chart.Series.Add(csvText.Offset(1, col, maxFreq + 2, 1), csvText.Offset(1, 0, maxFreq + 2, 1));
 
             chart.Title.Text = sheet.Cells[maxFreq + 4, 1].Value.ToString();
+            chart.Title.Overlay = false;
             chart.SetPosition(44, 6);
             chart.SetSize(710, 280);
             chart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
-            chart.Legend.Add();
-            chart.Legend.Position = eLegendPosition.TopRight;
+            chart.Legend.Remove();
+            //chart.Legend.Position = eLegendPosition.Right;
 
             RemoveGridlines(chart);
 
