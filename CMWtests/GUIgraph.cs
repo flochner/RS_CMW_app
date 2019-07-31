@@ -7,17 +7,22 @@ using System.Drawing;
 
 namespace CMWtests
 {
-    class GUIgraph : MainForm
+    public partial class MainForm
     {
-        public GUIgraph()
+        private double lastAmplError;
+
+        private void CreateGraph(string resource)
         {
-            Pix();
+            pictureBox1.Image = (Image)Properties.Resources.ResourceManager.GetObject(resource);
+            Invoke(new MethodInvoker(() =>
+            {
+                pictureBox1.Show();
+                pictureBox1.Invalidate();
+            }));
         }
 
-        public void Pix()
-        {
-            pictureBox1.CreateGraphics();
-        }
-
+        private void PlotPoint(long currentFreq, double amplError)
+        { }
+        
     }
 }
