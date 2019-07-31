@@ -209,47 +209,19 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\RF1COM_RX_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF1COM_RX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF1COM_TX_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF1COM_TX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF1OUT_TX_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF1OUT_TX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF2COM_RX_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF2COM_RX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF2COM_TX_1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF2COM_TX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF3COM_RX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF3COM_TX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF3OUT_TX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF4COM_RX_2.png" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Resources\RF4COM_TX_2.png" />
   </ItemGroup>
   <ItemGroup>
