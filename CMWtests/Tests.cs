@@ -16,7 +16,11 @@ namespace CMWtests
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
 /// !
+#if !DEBUG
+        private bool isFirstTest = true;
+#else
         private bool isFirstTest = false;
+#endif
         private string chartLimits3 = "";
         private string chartLimits6 = "";
         private string cmwID = "";
@@ -352,8 +356,6 @@ namespace CMWtests
             var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            //ProgressBar1_Init(hasKB036 ? 60 : 33);
-
         start:
 
             double maxError3 = 0.0;
@@ -363,7 +365,7 @@ namespace CMWtests
             if (csvStream == null)
                 return TestStatus.Abort;
 
-            #region Config RX / TX
+#region Config RX / TX
 
             /// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
@@ -393,7 +395,7 @@ namespace CMWtests
 
             var currentFreq = minFreq * (long)1e6;
             var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-            #endregion
+#endregion
 
             do  ///// Main Loop
             {
@@ -403,7 +405,7 @@ namespace CMWtests
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
-                #region Set up this loop - set freqs - get GPRF Measure Power
+#region Set up this loop - set freqs - get GPRF Measure Power
                 ProgressBars_Update(testAmpl);
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
@@ -423,9 +425,9 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-                #endregion
+#endregion
 
-                #region  Take sensor reading
+#region  Take sensor reading
                 do  //while (retry)
                 {
                     retry = false;
@@ -475,9 +477,9 @@ namespace CMWtests
                     amplError = cmwMeasPower - pmPower;
                 else
                     amplError = pmPower - testAmpl;
-                #endregion
+#endregion
 
-                #region Handle excessive error
+#region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 400e6) && (Math.Abs(amplError) > 3) && !ignoreAmplError)
                 {
@@ -520,9 +522,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-                #endregion
+#endregion
 
-                #region Record results - setup next loop
+#region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -547,7 +549,7 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-                #endregion
+#endregion
 
             } while (currentFreq <= endFreq);
 
@@ -594,7 +596,6 @@ namespace CMWtests
 
             SetBtnCancelEnabled(false);
             SetMenuStripEnabled(false);
-            //ProgressBar1_Init();
 
             do //while retryZero
             {
@@ -623,7 +624,7 @@ namespace CMWtests
 
                 SetHead2Text("Zeroing Sensor...");
 /// !
-#if DEBUG
+#if !DEBUG
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
                 var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
@@ -759,9 +760,8 @@ namespace CMWtests
             for (int i = 0; i < hwOptions.Length; i++)
             {
                 hasKB036 = hwOptions[i].Contains("KB036");
-/// !
 #if DEBUG
-                hasKB036 = true;
+                hasKB036 = false;
 #endif
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
@@ -778,7 +778,7 @@ namespace CMWtests
             do
             {
 /// !
-#if DEBUG
+#if !DEBUG
                 visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 15000);
 #else
                 visaResponse = "0,0";
@@ -904,7 +904,6 @@ namespace CMWtests
             if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-                //ProgressBar1_Init();
                 ProgressBar2_Init();
             }
             else if (exitStatus == TestStatus.Complete)
