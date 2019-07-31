@@ -66,7 +66,7 @@ namespace CMWtests
             string testName = "";
 
             SetBtnCancelEnabled(true);
-            ProgressBar2_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
+            ProgressBar1_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 /// !
 #if !DEBUG
             goto gentests;
@@ -351,12 +351,13 @@ namespace CMWtests
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
-     //       mreMeasure.Set();
 
             var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
         start:
+
+            CreateGraph("Graph_" + testName);
 
             double maxError3 = 0.0;
             double maxError6 = 0.0;
@@ -365,7 +366,7 @@ namespace CMWtests
             if (csvStream == null)
                 return TestStatus.Abort;
 
-#region Config RX / TX
+            #region Config RX / TX
 
             /// setup sensor to read
             cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
@@ -395,7 +396,7 @@ namespace CMWtests
 
             var currentFreq = minFreq * (long)1e6;
             var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
-#endregion
+            #endregion
 
             do  ///// Main Loop
             {
@@ -405,8 +406,8 @@ namespace CMWtests
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
-#region Set up this loop - set freqs - get GPRF Measure Power
-                ProgressBars_Update(testAmpl);
+                #region Set up this loop - set freqs - get GPRF Measure Power
+                ProgressBar1_Update(testAmpl);
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
@@ -425,9 +426,9 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
                 }
-#endregion
+                #endregion
 
-#region  Take sensor reading
+                #region  Take sensor reading
                 do  //while (retry)
                 {
                     retry = false;
@@ -477,9 +478,9 @@ namespace CMWtests
                     amplError = cmwMeasPower - pmPower;
                 else
                     amplError = pmPower - testAmpl;
-#endregion
+                #endregion
 
-#region Handle excessive error
+                #region Handle excessive error
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 400e6) && (Math.Abs(amplError) > 3) && !ignoreAmplError)
                 {
@@ -522,9 +523,9 @@ namespace CMWtests
                     if (ignoreAmplError)
                         cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
                 }
-#endregion
+                #endregion
 
-#region Record results - setup next loop
+                #region Record results - setup next loop
                 // Determine active band to record error for,
                 //   and store only if it is greater than the current maximum error.
                 if (currentFreq <= 3300e6)
@@ -542,6 +543,7 @@ namespace CMWtests
 
                 // Push frequency, point-error and limit-line values.
                 csvStream.WriteLine(currentFreq / 1e6 + "," + amplError + chartLimits);
+                PlotPoint(currentFreq, amplError);
 
                 // If current frequency is the minimum measurement frequency of CMW,
                 // then the next freq is 200 MHz, otherwise it is increased by 100 MHz
@@ -549,7 +551,7 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-#endregion
+            #endregion
 
             } while (currentFreq <= endFreq);
 
@@ -557,7 +559,7 @@ namespace CMWtests
             if (hasKB036)
                 AddToResults(string.Format("Max error 3.3 GHz to 6 GHz: {0} dB", maxError6.ToString("F2")));
 
-#region Cleanup - close files - create graph
+            #region Cleanup - close files - create graph
             /// Set instruments to standby.
             cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
             cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -573,7 +575,7 @@ namespace CMWtests
             //   or dynamic axis if error exceeds 2 dB.
             var maxError = Math.Max(Math.Abs(maxError3), Math.Abs(maxError6));
 
-            // Create graph
+            // Create Excel graph
             ExcelGraph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
             File.Delete(csvFileName);
 
@@ -583,7 +585,7 @@ namespace CMWtests
             ignoreAmplError = true;
 
             return TestStatus.Success;
-#endregion
+            #endregion
         }
 
         private TestStatus ConnectionMessage(string connection)
@@ -904,7 +906,7 @@ namespace CMWtests
             if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
-                ProgressBar2_Init();
+                ProgressBar1_Init();
             }
             else if (exitStatus == TestStatus.Complete)
             {
