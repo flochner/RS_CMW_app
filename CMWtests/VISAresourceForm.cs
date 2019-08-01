@@ -19,11 +19,6 @@ namespace CMWtests
             GetResources();
         }
 
-        /// <summary>
-        /// Commit 
-        /// </summary>
-        //Fixed resouceForm:separated Count variables.VisaIO: added better Reset(). Implemented Close(). 
-
         public void GetResources()
         {
             int vi = 0;
