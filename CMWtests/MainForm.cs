@@ -104,7 +104,8 @@ namespace CMWtests
         {
             BeginInvoke(new MethodInvoker(() =>
             {
-                    progressBar1.PerformStep();
+                progressBar1.PerformStep();
+                progressBar1.Invalidate();
 #if DEBUG
                 //labelDebug.Text = progressBar1.Value.ToString();
                 //labelDebug.Invalidate();
@@ -217,16 +218,14 @@ namespace CMWtests
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutBox about = new AboutBox();
-            about.ShowDialog();
+            using (var about = new AboutBox())
+                about.ShowDialog();
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var query = new VISAqueryForm())
-            {
                 query.ShowDialog();
-            }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
