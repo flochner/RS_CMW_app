@@ -450,13 +450,14 @@ namespace CMWtests
             // 
             // pictureBox1
             // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.Window;
+            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.pictureBox1.Location = new System.Drawing.Point(12, 73);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(710, 280);
             this.pictureBox1.TabIndex = 16;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Visible = false;
-            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(pictureBox1_Paint);
+            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             // 
             // MainForm
             // 
@@ -521,15 +522,15 @@ namespace CMWtests
         private System.Windows.Forms.ToolStripMenuItem customizeToolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem communicateWithInstrumentToolStripMenuItem;
-        public System.Windows.Forms.TextBox textBoxResults;
+        private System.Windows.Forms.TextBox textBoxResults;
         private System.Windows.Forms.Button btnBeginTests;
-        public System.Windows.Forms.Label labelHead1;
-        public System.Windows.Forms.Label labelHead2;
+        private System.Windows.Forms.Label labelHead1;
+        private System.Windows.Forms.Label labelHead2;
         private System.Windows.Forms.Button btnCancelTests;
-        public System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label labelDebug;
         private System.Windows.Forms.Label labelStatus;
-        public System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBox1;
     }
 }
 
