@@ -21,7 +21,7 @@ namespace CMWtests
             string resource = string.Empty;
             string idn = string.Empty;
 
-            labelResource.Text = "";
+            labelResource.Text = string.Empty;
             btnWriteVISA.Enabled = false;
             btnQueryVISA.Enabled = false;
             textBoxResponse.ResetText();
@@ -37,7 +37,7 @@ namespace CMWtests
 
             if (resForm.ResourcesCount == 0)
             {
-                labelResource.Text = "";
+                labelResource.Text = string.Empty;
                 Thread.Sleep(250);
                 labelResource.Text = "No VISA resources available";
                 return;

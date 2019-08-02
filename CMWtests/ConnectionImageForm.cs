@@ -73,7 +73,7 @@ namespace CMWtests
             {
                 _result = MessageBox.Show("Ignore out of tolerance readings" + Environment.NewLine +
                                           "until next connection message?",
-                                          "",
+                                          string.Empty,
                                            MessageBoxButtons.YesNo,
                                            MessageBoxIcon.Information,
                                            MessageBoxDefaultButton.Button2);
@@ -94,7 +94,7 @@ namespace CMWtests
 
         private void button_KeyDown(object sender, KeyEventArgs e)
         {
-            //MessageBox.Show("Use a mouse to control this window.", "", 
+            //MessageBox.Show("Use a mouse to control this window.", string.Empty, 
             //                 MessageBoxButtons.OK,
             //                 MessageBoxIcon.Information);
         }
