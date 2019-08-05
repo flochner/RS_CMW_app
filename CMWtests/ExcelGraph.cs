@@ -50,8 +50,8 @@ namespace CMWgraph
             chart.SetPosition(44, 6);
             chart.SetSize(710, 280);
             chart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
-            chart.Legend.Remove();
-            //chart.Legend.Position = eLegendPosition.Right;
+            chart.Legend.Add();
+            chart.Legend.Position = eLegendPosition.Right;
 
             RemoveGridlines(chart);
 
