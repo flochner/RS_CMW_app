@@ -632,7 +632,7 @@ namespace CMWtests
                 cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
                 var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
-                visaResponse = "PASS";
+                var visaResponse = "PASS";
 #endif
                 if (!visaResponse.Contains("PASS"))
                 {
