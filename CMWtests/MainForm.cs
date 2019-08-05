@@ -31,6 +31,8 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
+            testHeader = "";
+            pictureBox1.Image = null;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
@@ -74,13 +76,13 @@ namespace CMWtests
             //    labelDebug.Text = text;
             //    labelDebug.Invalidate();
             //    Thread.Sleep(500);
-            //    labelDebug.Text = string.Empty;
+            //    labelDebug.Text = "";
             //    labelDebug.Invalidate();
             //}));
 #endif
         }
 
-        public void AddToResults(string item)
+        private void AddToResults(string item)
         {
             Invoke(new MethodInvoker(() =>
             {
