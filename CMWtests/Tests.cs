@@ -13,6 +13,7 @@ namespace CMWtests
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private long minFreq = 0;
+        public static long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
 /// !
@@ -25,6 +26,7 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
+        private string testHeader = "";
         private StreamWriter csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
@@ -104,6 +106,7 @@ namespace CMWtests
                        return GracefulExit(TestStatus.Abort);
             }
 
+            goto gentests;
             /// -------------------------------------------------------------
             testName = "RF2COM_RX";
 
@@ -178,7 +181,7 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 #if DEBUG
-            amplList = new int[] { -44 };
+            amplList = new int[] { -8 };
 #endif
 
             testName = "RF1COM_TX";
@@ -207,7 +210,7 @@ namespace CMWtests
             chartLimits6 = (",-1.8,-1.6,0,1.6,1.8");
             amplList = new int[] { 0, -36 };
 #if DEBUG
-            amplList = new int[] { -36 };
+            amplList = new int[] { 0 };
             //return GracefulExit(TestStatus.Complete);
 #endif
 
@@ -352,13 +355,10 @@ namespace CMWtests
             if (CancelTesting == true)
                 return TestStatus.Abort;
 
-            var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
+            testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
         start:
-
-            CreateGraph("Graph_" + testName);
-
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
@@ -394,8 +394,15 @@ namespace CMWtests
             csvStream.WriteLine("0," + chartLimits3);
             cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
 
-            var currentFreq = minFreq * (long)1e6;
+            currentFreq = minFreq * (long)1e6;
             var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
+
+            string chart;
+            if (hasKB036)
+                chart = chartLimits6;
+            else
+                chart = chartLimits3;
+            CreateGraph("Graph_" + (Convert.ToDouble(chart.Split(',')[5]) * 10));
             #endregion
 
             do  ///// Main Loop
@@ -431,6 +438,11 @@ namespace CMWtests
                 #region  Take sensor reading
                 do  //while (retry)
                 {
+                    SetDebugText("Waiting at Take sensor reading");
+                    mreMeasure.WaitOne();
+                    if (CancelTesting == true)
+                        return TestStatus.Abort;
+
                     retry = false;
                     visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 20000);
                     try
@@ -454,7 +466,7 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
+                        ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                         var btnCancelEnabled = GetBtnCancelEnabled();
@@ -462,7 +474,7 @@ namespace CMWtests
 
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
-                        img.ShowDialog();
+                        Invoke(new MethodInvoker(() => img.ShowDialog(this)));
 
                         SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -487,14 +499,14 @@ namespace CMWtests
                     cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
                     cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
 
-                    ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
+                    ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                     var btnCancelEnabled = GetBtnCancelEnabled();
                     SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
                     img.SetImage(testName + "_" + numOfFrontEnds);
-                    img.ShowDialog();
+                    Invoke(new MethodInvoker(() => img.ShowDialog(this)));
                     SetBtnCancelEnabled(btnCancelEnabled);
 
                     //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
@@ -616,9 +628,9 @@ namespace CMWtests
                 SetBtnCancelEnabled(false);
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
                 img.SetImage(connection + "_" + numOfFrontEnds);
-                img.ShowDialog();
+                Invoke(new MethodInvoker(() => img.ShowDialog(this)));
                 SetBtnCancelEnabled(btnCancelEnabled);
-                if (img.DialogResult == DialogResult.Abort)
+                if (img.DialogResult == DialogResult.Abort || CancelTesting == true)
                 {
                     SetMenuStripEnabled(true);
                     return TestStatus.Abort;
@@ -681,7 +693,7 @@ namespace CMWtests
                 return TestStatus.Abort;
             }
             if (resourceForm.ResourcesCount > 1)
-                resourceForm.ShowDialog();
+                Invoke(new MethodInvoker(() => resourceForm.ShowDialog(this)));
 
             SetBtnCancelEnabled(btnCancelEnabled);
             var resource = resourceForm.Resource;
@@ -928,7 +940,7 @@ namespace CMWtests
             {
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
-                result = MessageBox.Show(message, title, buttons, icon, defaultButton);
+                result = MessageBox.Show(this, message, title, buttons, icon, defaultButton);
                 SetBtnCancelEnabled(btnCancelEnabled);
             }));
             return result;
