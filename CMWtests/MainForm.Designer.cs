@@ -389,9 +389,9 @@ namespace CMWtests
             // labelHead1
             // 
             this.labelHead1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHead1.Location = new System.Drawing.Point(93, 27);
+            this.labelHead1.Location = new System.Drawing.Point(177, 27);
             this.labelHead1.Name = "labelHead1";
-            this.labelHead1.Size = new System.Drawing.Size(400, 16);
+            this.labelHead1.Size = new System.Drawing.Size(380, 16);
             this.labelHead1.TabIndex = 0;
             this.labelHead1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.labelHead1.TextChanged += new System.EventHandler(this.labelHead1_TextChanged);
@@ -399,9 +399,9 @@ namespace CMWtests
             // labelHead2
             // 
             this.labelHead2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHead2.Location = new System.Drawing.Point(93, 47);
+            this.labelHead2.Location = new System.Drawing.Point(177, 47);
             this.labelHead2.Name = "labelHead2";
-            this.labelHead2.Size = new System.Drawing.Size(400, 16);
+            this.labelHead2.Size = new System.Drawing.Size(380, 16);
             this.labelHead2.TabIndex = 0;
             this.labelHead2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             this.labelHead2.TextChanged += new System.EventHandler(this.labelHead2_TextChanged);
