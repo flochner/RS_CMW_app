@@ -63,9 +63,9 @@ namespace CMWtests.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Graph_07 {
+        internal static System.Drawing.Bitmap Graph_7 {
             get {
-                object obj = ResourceManager.GetObject("Graph_07", resourceCulture);
+                object obj = ResourceManager.GetObject("Graph_7", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace CMWtests.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Graph_08 {
+        internal static System.Drawing.Bitmap Graph_8 {
             get {
-                object obj = ResourceManager.GetObject("Graph_08", resourceCulture);
+                object obj = ResourceManager.GetObject("Graph_8", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -227,8 +227,8 @@
   <ItemGroup>
     <Content Include="app.ico" />
     <EmbeddedResource Include="Resources\Graph_10.png" />
-    <EmbeddedResource Include="Resources\Graph_08.png" />
-    <EmbeddedResource Include="Resources\Graph_07.png" />
+    <EmbeddedResource Include="Resources\Graph_8.png" />
+    <EmbeddedResource Include="Resources\Graph_7.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
