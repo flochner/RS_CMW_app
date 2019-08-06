@@ -31,6 +31,8 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
+            testHeader = "";
+            pictureBox1.Image = null;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
@@ -44,7 +46,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
-                labelHead1.Refresh();
+                labelHead1.Invalidate();
             }));
         }
 
@@ -53,7 +55,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
-                labelHead2.Refresh();
+                labelHead2.Invalidate();
             }));
         }
 
@@ -62,20 +64,22 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
-                labelStatus.Refresh();
+                labelStatus.Invalidate();
             }));
         }
 
         private void SetDebugText(string text)
         {
-            Invoke(new MethodInvoker(() =>
-            {
-                labelDebug.Text = text;
-                labelDebug.Refresh();
-                Thread.Sleep(500);
-                labelDebug.Text = string.Empty;
-                labelDebug.Refresh();
-            }));
+#if DEBUG
+            //Invoke(new MethodInvoker(() =>
+            //{
+            //    labelDebug.Text = text;
+            //    labelDebug.Invalidate();
+            //    Thread.Sleep(500);
+            //    labelDebug.Text = "";
+            //    labelDebug.Invalidate();
+            //}));
+#endif
         }
 
         private void AddToResults(string item)
@@ -83,7 +87,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
-                textBoxResults.Refresh();
+                textBoxResults.Invalidate();
             }));
         }
 
@@ -94,30 +98,19 @@ namespace CMWtests
                 if (maxValue > 0)
                     progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
-                progressBar1.Refresh();
+                progressBar1.Invalidate();
             }));
         }
 
-        private void ProgressBar2_Init(int maxValue = 0)
-        {
-            Invoke(new MethodInvoker(() =>
-            {
-                if (maxValue > 0)
-                    progressBar2.Maximum = maxValue;
-                progressBar2.Value = 0;
-                progressBar2.Refresh();
-            }));
-        }
-
-        private void ProgressBars_Update(int ampl)
+        private void ProgressBar1_Update(int ampl)
         {
             BeginInvoke(new MethodInvoker(() =>
             {
-                    progressBar1.PerformStep();
-                    progressBar2.PerformStep();
+                progressBar1.PerformStep();
+                progressBar1.Invalidate();
 #if DEBUG
-                labelDebug.Text = progressBar1.Value.ToString();
-                labelDebug.Refresh();
+                //labelDebug.Text = progressBar1.Value.ToString();
+                //labelDebug.Invalidate();
 #endif
             }));
         }
@@ -188,7 +181,7 @@ namespace CMWtests
             {
                 btnBeginTests.Enabled = v;
                 newToolStripMenuItem.Enabled = v;
-                //communicateWithInstrumentToolStripMenuItem.Enabled = v;
+                communicateWithInstrumentToolStripMenuItem.Enabled = v;
             }));
         }
 
@@ -227,16 +220,14 @@ namespace CMWtests
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            AboutBox about = new AboutBox();
-            about.ShowDialog();
+            using (var about = new AboutBox())
+                about.ShowDialog();
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             using (var query = new VISAqueryForm())
-            {
                 query.ShowDialog();
-            }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)

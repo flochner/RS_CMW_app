@@ -13,13 +13,20 @@ namespace CMWtests
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private long minFreq = 0;
+        public static long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
+/// !
+#if !DEBUG
         private bool isFirstTest = true;
+#else
+        private bool isFirstTest = false;
+#endif
         private string chartLimits3 = "";
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
+        private string testHeader = "";
         private StreamWriter csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
@@ -61,9 +68,9 @@ namespace CMWtests
             string testName = "";
 
             SetBtnCancelEnabled(true);
-            ProgressBar2_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
+            ProgressBar1_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 /// !
-#if DEBUG
+#if !DEBUG
             goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
@@ -98,7 +105,9 @@ namespace CMWtests
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
             }
-
+#if DEBUG
+            goto gentests;
+#endif
             /// -------------------------------------------------------------
             testName = "RF2COM_RX";
 
@@ -173,7 +182,7 @@ namespace CMWtests
             chartLimits6 = (",-1.4,-1.2,0,1.2,1.4");
             amplList = new int[] { -8, -44 };
 #if DEBUG
-            amplList = new int[] { -44 };
+            amplList = new int[] { -8 };
 #endif
 
             testName = "RF1COM_TX";
@@ -202,7 +211,7 @@ namespace CMWtests
             chartLimits6 = (",-1.8,-1.6,0,1.6,1.8");
             amplList = new int[] { 0, -36 };
 #if DEBUG
-            amplList = new int[] { -36 };
+            amplList = new int[] { 0 };
             //return GracefulExit(TestStatus.Complete);
 #endif
 
@@ -342,21 +351,15 @@ namespace CMWtests
             string visaResponse = "";
             string[] pmResponse = { };
 
-#if DEBUG
             SetDebugText("Waiting at Measure Start");
-#endif
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
-     //       mreMeasure.Set();
 
-            var testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
+            testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
-            ProgressBar1_Init(hasKB036 ? 60 : 33);
-
         start:
-
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
@@ -392,22 +395,27 @@ namespace CMWtests
             csvStream.WriteLine("0," + chartLimits3);
             cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
 
-            var currentFreq = minFreq * (long)1e6;
+            currentFreq = minFreq * (long)1e6;
             var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
+
+            string chart;
+            if (hasKB036)
+                chart = chartLimits6;
+            else
+                chart = chartLimits3;
+            CreateGraph("Graph_" + (Convert.ToDouble(chart.Split(',')[5]) * 10));
             #endregion
 
             do  ///// Main Loop
             {
-#if DEBUG
                 SetDebugText("Waiting at Measure main loop start");
-#endif
                 mreMeasure.WaitOne();
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
-                ProgressBars_Update(testAmpl);
+                ProgressBar1_Update(testAmpl);
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
@@ -431,6 +439,11 @@ namespace CMWtests
                 #region  Take sensor reading
                 do  //while (retry)
                 {
+                    SetDebugText("Waiting at Take sensor reading");
+                    mreMeasure.WaitOne();
+                    if (CancelTesting == true)
+                        return TestStatus.Abort;
+
                     retry = false;
                     visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 20000);
                     try
@@ -454,7 +467,7 @@ namespace CMWtests
                     {
                         cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
 
-                        ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
+                        ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                         var btnCancelEnabled = GetBtnCancelEnabled();
@@ -462,7 +475,7 @@ namespace CMWtests
 
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
-                        img.ShowDialog();
+                        Invoke(new MethodInvoker(() => img.ShowDialog(this)));
 
                         SetBtnCancelEnabled(btnCancelEnabled);
 
@@ -487,14 +500,14 @@ namespace CMWtests
                     cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
                     cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
 
-                    ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
+                    ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                     var btnCancelEnabled = GetBtnCancelEnabled();
                     SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
                     img.SetImage(testName + "_" + numOfFrontEnds);
-                    img.ShowDialog();
+                    Invoke(new MethodInvoker(() => img.ShowDialog(this)));
                     SetBtnCancelEnabled(btnCancelEnabled);
 
                     //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
@@ -543,6 +556,7 @@ namespace CMWtests
 
                 // Push frequency, point-error and limit-line values.
                 csvStream.WriteLine(currentFreq / 1e6 + "," + amplError + chartLimits);
+                PlotPoint(currentFreq, amplError);
 
                 // If current frequency is the minimum measurement frequency of CMW,
                 // then the next freq is 200 MHz, otherwise it is increased by 100 MHz
@@ -550,7 +564,7 @@ namespace CMWtests
                     currentFreq = (long)200e6;
                 else
                     currentFreq += (long)100e6;
-                #endregion
+            #endregion
 
             } while (currentFreq <= endFreq);
 
@@ -558,7 +572,7 @@ namespace CMWtests
             if (hasKB036)
                 AddToResults(string.Format("Max error 3.3 GHz to 6 GHz: {0} dB", maxError6.ToString("F2")));
 
-#region Cleanup - close files - create graph
+            #region Cleanup - close files - create graph
             /// Set instruments to standby.
             cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
             cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
@@ -574,8 +588,8 @@ namespace CMWtests
             //   or dynamic axis if error exceeds 2 dB.
             var maxError = Math.Max(Math.Abs(maxError3), Math.Abs(maxError6));
 
-            // Create graph
-            Graph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
+            // Create Excel graph
+            ExcelGraph.Create(cmwID, csvFileName, (hasKB036 ? 60 : 33), maxError, isFirstTest);
             File.Delete(csvFileName);
 
             isFirstTest = false;
@@ -584,7 +598,7 @@ namespace CMWtests
             ignoreAmplError = true;
 
             return TestStatus.Success;
-#endregion
+            #endregion
         }
 
         private TestStatus ConnectionMessage(string connection)
@@ -597,15 +611,12 @@ namespace CMWtests
 
             SetBtnCancelEnabled(false);
             SetMenuStripEnabled(false);
-            ProgressBar1_Init();
 
             do //while retryZero
             {
                 retryZero = false;
 
-#if DEBUG
                 SetDebugText("Waiting at ConnectionMessage start");
-#endif
                 mreMeasure.WaitOne();
                 if (CancelTesting == true)
                     return TestStatus.Abort;
@@ -618,9 +629,9 @@ namespace CMWtests
                 SetBtnCancelEnabled(false);
                 var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
                 img.SetImage(connection + "_" + numOfFrontEnds);
-                img.ShowDialog();
+                Invoke(new MethodInvoker(() => img.ShowDialog(this)));
                 SetBtnCancelEnabled(btnCancelEnabled);
-                if (img.DialogResult == DialogResult.Abort)
+                if (img.DialogResult == DialogResult.Abort || CancelTesting == true)
                 {
                     SetMenuStripEnabled(true);
                     return TestStatus.Abort;
@@ -676,8 +687,15 @@ namespace CMWtests
             var btnCancelEnabled = GetBtnCancelEnabled();
             SetBtnCancelEnabled(false);
             var resourceForm = new VISAresourceForm();
-            if (resourceForm.ResourcesCount != 1)
-                resourceForm.ShowDialog();
+
+            if (resourceForm.ResourcesCount == 0)
+            {
+                AddToResults("No resources available.");
+                return TestStatus.Abort;
+            }
+            if (resourceForm.ResourcesCount > 1)
+                Invoke(new MethodInvoker(() => resourceForm.ShowDialog(this)));
+
             SetBtnCancelEnabled(btnCancelEnabled);
             var resource = resourceForm.Resource;
             resourceForm.Dispose();
@@ -757,6 +775,9 @@ namespace CMWtests
             for (int i = 0; i < hwOptions.Length; i++)
             {
                 hasKB036 = hwOptions[i].Contains("KB036");
+#if DEBUG
+                //hasKB036 = false;
+#endif
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
                 if (hwOptions[i].Contains("H590"))
@@ -815,10 +836,6 @@ namespace CMWtests
                 }
             } while (retrySensor == true);
 
-#if DEBUG
-            hasKB036 = false;
-            numOfFrontEnds = 1;
-#endif
             SetHead2Text("");
             return TestStatus.Success;
         }
@@ -903,7 +920,6 @@ namespace CMWtests
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
                 ProgressBar1_Init();
-                ProgressBar2_Init();
             }
             else if (exitStatus == TestStatus.Complete)
             {
@@ -925,7 +941,7 @@ namespace CMWtests
             {
                 var btnCancelEnabled = GetBtnCancelEnabled();
                 SetBtnCancelEnabled(false);
-                result = MessageBox.Show(message, title, buttons, icon, defaultButton);
+                result = MessageBox.Show(this, message, title, buttons, icon, defaultButton);
                 SetBtnCancelEnabled(btnCancelEnabled);
             }));
             return result;

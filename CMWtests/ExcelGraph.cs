@@ -11,7 +11,7 @@ namespace CMWgraph
     /// <summary>
     /// Class for creating CMW graphs.
     /// </summary>
-    public static class Graph
+    public static class ExcelGraph
     {
         [STAThread]
         public static void Create(string dut, string fileName, int maxFreq, double maxError, bool isFirstTest)
@@ -46,11 +46,13 @@ namespace CMWgraph
                 chart.Series.Add(csvText.Offset(1, col, maxFreq + 2, 1), csvText.Offset(1, 0, maxFreq + 2, 1));
 
             chart.Title.Text = sheet.Cells[maxFreq + 4, 1].Value.ToString();
+            /// !
+            chart.Title.Overlay = false;
             chart.SetPosition(44, 6);
-            chart.SetSize(820, 270);
+            chart.SetSize(710, 280);   // 820,270
             chart.DisplayBlanksAs = eDisplayBlanksAs.Gap;
             chart.Legend.Add();
-            chart.Legend.Position = eLegendPosition.TopRight;
+            chart.Legend.Position = eLegendPosition.Right;  // TopRight
 
             RemoveGridlines(chart);
 
@@ -105,7 +107,7 @@ namespace CMWgraph
             data.LineColor = Color.CornflowerBlue;
             data.Header = "data";
 
-            sheet.PrinterSettings.PrintArea = sheet.Cells["A1:M15"];
+            sheet.PrinterSettings.PrintArea = sheet.Cells["A1:M16"]; //M15
             sheet.PrinterSettings.Orientation = eOrientation.Landscape;
 
             package.Save();
