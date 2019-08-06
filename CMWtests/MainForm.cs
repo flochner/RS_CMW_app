@@ -15,7 +15,6 @@ namespace CMWtests
         public MainForm()
         {
             InitializeComponent();
-            this.FormClosing += new FormClosingEventHandler(MainForm_FormClosing);
             mreMeasure = new ManualResetEvent(true);
             mreExit = new ManualResetEvent(false);
 
