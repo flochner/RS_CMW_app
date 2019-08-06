@@ -256,8 +256,5 @@ namespace CMWtests
         }
 
         private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
-        private void textBoxResults_TextChanged(object sender, EventArgs e) { }
-        private void labelHead1_TextChanged(object sender, EventArgs e) { }
-        private void labelHead2_TextChanged(object sender, EventArgs e) { }
     }
 }

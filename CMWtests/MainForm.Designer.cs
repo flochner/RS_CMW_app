@@ -375,7 +375,6 @@ namespace CMWtests
             this.textBoxResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxResults.Size = new System.Drawing.Size(710, 118);
             this.textBoxResults.TabIndex = 0;
-            this.textBoxResults.TextChanged += new System.EventHandler(this.textBoxResults_TextChanged);
             // 
             // btnBeginTests
             // 
@@ -395,7 +394,6 @@ namespace CMWtests
             this.labelHead1.Size = new System.Drawing.Size(380, 16);
             this.labelHead1.TabIndex = 0;
             this.labelHead1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.labelHead1.TextChanged += new System.EventHandler(this.labelHead1_TextChanged);
             // 
             // labelHead2
             // 
@@ -405,7 +403,6 @@ namespace CMWtests
             this.labelHead2.Size = new System.Drawing.Size(380, 16);
             this.labelHead2.TabIndex = 0;
             this.labelHead2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
-            this.labelHead2.TextChanged += new System.EventHandler(this.labelHead2_TextChanged);
             // 
             // btnCancelTests
             // 
