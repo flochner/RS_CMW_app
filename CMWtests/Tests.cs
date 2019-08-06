@@ -8,12 +8,12 @@ namespace CMWtests
 {
     public partial class MainForm
     {
-        public enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
+        private enum TestStatus : int { Abort = -1, Success, InProgress, Complete };
 
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private long minFreq = 0;
-        public static long currentFreq = 0;
+        private static long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
 /// !

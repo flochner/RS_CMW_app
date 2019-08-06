@@ -37,7 +37,7 @@ namespace CMWtests
                     y1 = y2;
                 }
 
-                g.DrawLine(new Pen(Color.CornflowerBlue, 2), x1, y1, x2, y2);
+                g.DrawLine(new Pen(Color.CornflowerBlue, 1), x1, y1, x2, y2);
 
                 x1 = x2;
                 y1 = y2;
