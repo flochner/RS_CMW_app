@@ -37,7 +37,7 @@ namespace CMWtests
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
 
-            Task.Factory.StartNew(Begin, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
 
         private void SetHead1Text(string text)
