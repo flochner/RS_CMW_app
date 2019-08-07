@@ -39,24 +39,12 @@
             // numericUpDown_EPS
             // 
             this.numericUpDown_EPS.Location = new System.Drawing.Point(135, 23);
-            this.numericUpDown_EPS.Maximum = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.numericUpDown_EPS.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
+            this.numericUpDown_EPS.Maximum = new decimal(new int[] {10, 0, 0, 0});
+            this.numericUpDown_EPS.Minimum = new decimal(new int[] {1, 0, 0, 0});
             this.numericUpDown_EPS.Name = "numericUpDown_EPS";
             this.numericUpDown_EPS.Size = new System.Drawing.Size(38, 20);
             this.numericUpDown_EPS.TabIndex = 0;
-            this.numericUpDown_EPS.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
+            this.numericUpDown_EPS.Value = new decimal(new int[] {2, 0, 0, 0});
             // 
             // labelStatisticsCount
             // 
@@ -121,7 +109,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
-
         }
 
         #endregion
