@@ -477,7 +477,8 @@ namespace CMWtests
             this.panel1.Controls.Add(this.pictureBox2);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Location = new System.Drawing.Point(548, 27);
+            this.panel1.Enabled = false;
+            this.panel1.Location = new System.Drawing.Point(539, 29);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(186, 41);
             this.panel1.TabIndex = 17;
@@ -490,6 +491,7 @@ namespace CMWtests
             this.tempSlider.Size = new System.Drawing.Size(2, 17);
             this.tempSlider.TabIndex = 18;
             this.tempSlider.TabStop = false;
+            this.tempSlider.Visible = false;
             // 
             // labelTemp
             // 
@@ -499,11 +501,12 @@ namespace CMWtests
             this.labelTemp.Size = new System.Drawing.Size(19, 13);
             this.labelTemp.TabIndex = 5;
             this.labelTemp.Text = "35";
+            this.labelTemp.Visible = false;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(163, 0);
+            this.label4.Location = new System.Drawing.Point(164, 0);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(19, 13);
             this.label4.TabIndex = 4;
@@ -530,7 +533,7 @@ namespace CMWtests
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(65, 0);
+            this.label2.Location = new System.Drawing.Point(63, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(19, 13);
             this.label2.TabIndex = 1;
@@ -539,7 +542,7 @@ namespace CMWtests
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 0);
+            this.label1.Location = new System.Drawing.Point(4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(19, 13);
             this.label1.TabIndex = 0;
@@ -623,14 +626,14 @@ namespace CMWtests
         private System.Windows.Forms.Label labelDebug;
         private System.Windows.Forms.Label labelStatus;
         private System.Windows.Forms.PictureBox pictureBox1;
-        private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.PictureBox tempSlider;
-        private System.Windows.Forms.Label labelTemp;
         private System.Windows.Forms.Label label4;
+        public System.Windows.Forms.PictureBox tempSlider;
+        public System.Windows.Forms.Label labelTemp;
+        public System.Windows.Forms.Panel panel1;
     }
 }
 
