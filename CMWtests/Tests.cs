@@ -41,7 +41,7 @@ namespace CMWtests
                 {
                     _status = value;
 #if DEBUG
-                    SetStatusLabel(_status.ToString());
+                    SetStatusText(_status.ToString());
 #endif
                 }
             }

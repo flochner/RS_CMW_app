@@ -58,7 +58,7 @@ namespace CMWtests
             }));
         }
 
-        private void SetStatusLabel(string text)
+        public void SetStatusText(string text)
         {
             Invoke(new MethodInvoker(() =>
             {
