@@ -1,91 +1,58 @@
 ﻿using System;
 using System.Threading;
-using System.Timers;
 using System.Windows.Forms;
 
 namespace CMWtests
 {
     partial class MainForm
     {
-        private System.Timers.Timer aTimer = null;
-        public bool TimerEnabled
-        {
-            get
-            {
-                try { return aTimer.Enabled; }
-                catch (Exception) { throw; }
-            }
-            set
-            {
-                try { aTimer.Enabled = value; }
-                catch (Exception) { throw; }
-                BeginInvoke(new MethodInvoker(() =>
-                {
-                    tempSlider.Visible = value;
-                    labelTemp.Visible = value;
-                    panel1.Enabled = value;
-                }));
-            }
-        }
-        
-        private double ReadTemp(VisaIO instr)
-        {
-            mreMeasure.Reset();
-            while (mreMeasure.WaitOne(0) == true)
-                Thread.Sleep(100);
+        private AutoResetEvent areTempGauge = null;
+        private double cmwTempC = 0.0;
 
-            var visaResponse = "25";// instr.QueryString("SENSe:BASE:TEMPerature:OPERating:INTernal?");
-            mreMeasure.Set();
-
-            var temp = Convert.ToDouble(visaResponse);
-            return temp;
-        }
-
-        private void SetTimer()
+        private void TempGauge()
         {
-            aTimer = new System.Timers.Timer(2000);
+            areTempGauge = new AutoResetEvent(true);
             
-            aTimer.Elapsed += OnTimedEvent;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
-
             Invoke(new MethodInvoker(() =>
             {
+                tempSlider.Visible = true;
+                labelTemp.Visible = true;
                 panel1.Enabled = true;
                 panel1.Invalidate();
             }));
-        }
 
-        private void OnTimedEvent(object source, ElapsedEventArgs e)
-        {
-            double temp = 0.0;
+            while (cmw != null && areTempGauge != null)
+            {
+                areTempGauge.WaitOne();
+                cmwTempC = ReadTemp(cmw);
+                var sliderPos = Convert.ToInt16(((cmwTempC - 25) * 4D) + 12);
+
+                Invoke(new MethodInvoker(() =>
+                {
+                    tempSlider.Left = sliderPos;
+                    tempSlider.Invalidate();
+
+                    labelTemp.Text = string.Format("{0:F1}", cmwTempC);
+                    labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
+                    labelTemp.Invalidate();
+                }));
+            }
 
             Invoke(new MethodInvoker(() =>
             {
-                try
-                {
-                    temp = ReadTemp(CMW);
-                }
-                catch (Exception)
-                {
-                    aTimer.Dispose();
-                    panel1.Enabled = false;
-                    tempSlider.Visible = false;
-                    labelTemp.Visible = false;
-                    return;
-                }
-
-                var sliderPos = Convert.ToInt16(((temp - 25) * 4D) + 12);
-
-                tempSlider.Visible = true;
-                tempSlider.Left = sliderPos;
-                tempSlider.Invalidate();
-
-                labelTemp.Visible = true;
-                labelTemp.Text = string.Format("{0:F1}", temp);
-                labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
-                labelTemp.Invalidate();
+                tempSlider.Visible = false;
+                labelTemp.Visible = false;
+                panel1.Enabled = false;
+                panel1.Invalidate();
             }));
+            Status = TestStatus.Abort;
+        }
+
+        private double ReadTemp(VisaIO instr)
+        {
+            var visaResponse = instr.QueryString("SENSe:BASE:TEMPerature:OPERating:INTernal?");
+            var temp = Convert.ToDouble(visaResponse);
+            return temp;
         }
     }
 }
