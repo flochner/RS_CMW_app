@@ -39,20 +39,6 @@ namespace CMWtests
             return status;
         }
 
-        public  void Lock()
-        {
-            while (mreIOLock.WaitOne(0) == false)  //Reset
-            {
-                Thread.Sleep(10);
-            }
-            mreIOLock.Reset();
-        }
-
-        public  void Unlock()
-        {
-            mreIOLock.Set();
-        }
-
         public ViStatus Read(out string response, bool readSTB = false)
         {
             StringBuilder viResponse = new StringBuilder(1024);
@@ -127,6 +113,20 @@ namespace CMWtests
             Lock();
             Write("*ESE 1", true);
             Unlock();
+        }
+
+        public  void Lock()
+        {
+            while (mreIOLock.WaitOne(0) == false)  //Reset
+            {
+                Thread.Sleep(10);
+            }
+            mreIOLock.Reset();
+        }
+
+        public  void Unlock()
+        {
+            mreIOLock.Set();
         }
 
         public void ClearStatus()
