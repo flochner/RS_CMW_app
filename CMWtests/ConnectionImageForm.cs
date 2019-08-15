@@ -113,5 +113,25 @@ namespace CMWtests
         {
 
         }
+
+        private void ConnectionImageForm_FormClosing(object sender, FormClosingEventArgs f)
+        {
+            switch (f.CloseReason)
+            {
+                case CloseReason.UserClosing:
+                    _result = MessageBox.Show("Abort all testing?",
+                                              "Warning!",
+                                               MessageBoxButtons.YesNo,
+                                               MessageBoxIcon.Warning,
+                                               MessageBoxDefaultButton.Button2);
+                    if (_result == DialogResult.Yes)
+                        this.DialogResult = DialogResult.Abort;
+                    else
+                        f.Cancel = true;
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
