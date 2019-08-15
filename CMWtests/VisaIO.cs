@@ -19,6 +19,7 @@ namespace CMWtests
     public class VisaIO
     {
         private static int vi = 0;
+        private  ManualResetEvent mreIOLock = new ManualResetEvent(true);  //Set
 
         public VisaIO(string viDesc)
         {
@@ -36,6 +37,20 @@ namespace CMWtests
         {
             ViStatus status = visa32.viClose(vi);
             return status;
+        }
+
+        public  void Lock()
+        {
+            while (mreIOLock.WaitOne(0) == false)  //Reset
+            {
+                Thread.Sleep(10);
+            }
+            mreIOLock.Reset();
+        }
+
+        public  void Unlock()
+        {
+            mreIOLock.Set();
         }
 
         public ViStatus Read(out string response, bool readSTB = false)
