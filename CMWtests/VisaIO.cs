@@ -118,14 +118,23 @@ namespace CMWtests
 
         public void Reset()
         {
+            Lock();
             Write("*RST", true);
+            Unlock();
+
             ClearStatus();
+
+            Lock();
             Write("*ESE 1", true);
+            Unlock();
         }
 
         public void ClearStatus()
         {
+            Lock();
             QueryString("*CLS;*OPC?");
+            Unlock();
+
             ErrorChecking();
         }
 
@@ -143,6 +152,7 @@ namespace CMWtests
         {
             var errors = new List<string>();
 
+            Lock() ;
             if (((QueryInteger("*STB?") >> 4) & 1) > 0)
             {
                 while (true)
@@ -162,12 +172,15 @@ namespace CMWtests
                     }
                 }
             }
+            Unlock();
             return errors;
         }
 
         private void WaitForOPC()
         {
+            Lock();
             QueryString("*OPC?");
+            Unlock();
         }
 
         private void ShowErrorText(string source, string message, ViStatus status)
