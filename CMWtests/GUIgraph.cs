@@ -12,17 +12,17 @@ namespace CMWtests
 
         private void CreateGraph(string resource)
         {
-            pictureBox1.Image = (Image)Properties.Resources.ResourceManager.GetObject(resource);
+            pictureBoxGraph.Image = (Image)Properties.Resources.ResourceManager.GetObject(resource);
             Invoke(new MethodInvoker(() =>
             {
-                pictureBox1.Show();
-                pictureBox1.Invalidate();
+                pictureBoxGraph.Show();
+                pictureBoxGraph.Invalidate();
             }));
         }
 
         private void PlotPoint(long currentFreq, double amplError)
         {
-            using (Graphics g = pictureBox1.CreateGraphics())
+            using (Graphics g = pictureBoxGraph.CreateGraphics())
             {
                 xScale = (hasKB036 ? 5 : 17);
 
@@ -37,7 +37,7 @@ namespace CMWtests
                     y1 = y2;
                 }
 
-                g.DrawLine(new Pen(Color.CornflowerBlue, 1), x1, y1, x2, y2);
+                g.DrawLine(new Pen(Color.CornflowerBlue, 2), x1, y1, x2, y2);
 
                 x1 = x2;
                 y1 = y2;
