@@ -8,15 +8,21 @@ namespace CMWtests
     public partial class MainForm : Form
     {
         public static int DefResMgr { get; private set; } = -1;
-        private bool CancelTesting { get; set; }
+        public static bool CancelTesting { get; set; }
+        private AutoResetEvent areExit;
         private ManualResetEvent mreMeasure;
-        private ManualResetEvent mreExit;
+        private TempGauge tempGauge = null;
 
         public MainForm()
         {
             InitializeComponent();
+            Thread.CurrentThread.Name = "MainForm";
+            tempGauge = new TempGauge
+            { Location = new System.Drawing.Point(539, 29) };
+            this.Controls.Add(tempGauge);
+
             mreMeasure = new ManualResetEvent(true);
-            mreExit = new ManualResetEvent(false);
+            areExit = new AutoResetEvent(false);
 
             DefResMgr = VisaIO.OpenResourceMgr();
             if (DefResMgr == 0)
@@ -31,7 +37,7 @@ namespace CMWtests
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
             testHeader = "";
-            pictureBox1.Image = null;
+            pictureBoxGraph.Image = null;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
@@ -45,7 +51,7 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
-                labelHead1.Invalidate();
+                labelHead1.Refresh();
             }));
         }
 
@@ -54,39 +60,39 @@ namespace CMWtests
             Invoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
-                labelHead2.Invalidate();
+                labelHead2.Refresh();
             }));
         }
 
-        public void SetStatusText(string text)
+        private void SetStatusText(string text)
         {
             Invoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
-                labelStatus.Invalidate();
+                labelStatus.Refresh();
             }));
         }
 
-        private void SetDebugText(string text)
+        public void SetDebugText(string text)
         {
 #if DEBUG
-            //Invoke(new MethodInvoker(() =>
-            //{
-            //    labelDebug.Text = text;
-            //    labelDebug.Invalidate();
-            //    Thread.Sleep(500);
-            //    labelDebug.Text = "";
-            //    labelDebug.Invalidate();
-            //}));
+            Invoke(new MethodInvoker(() =>
+            {
+                labelDebug.Text = text;
+                labelDebug.Refresh();
+                //Thread.Sleep(500);
+                //labelDebug.Text = "";
+                //labelDebug.Refresh();
+            }));
 #endif
         }
 
-        private void AddToResults(string item)
+        public void AddToResults(string item)
         {
             Invoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
-                textBoxResults.Invalidate();
+                textBoxResults.Refresh();
             }));
         }
 
@@ -97,19 +103,19 @@ namespace CMWtests
                 if (maxValue > 0)
                     progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
-                progressBar1.Invalidate();
+                progressBar1.Refresh();
             }));
         }
 
         private void ProgressBar1_Update(int ampl)
         {
-            BeginInvoke(new MethodInvoker(() =>
+            Invoke(new MethodInvoker(() =>
             {
                 progressBar1.PerformStep();
-                progressBar1.Invalidate();
+                progressBar1.Refresh();
 #if DEBUG
                 //labelDebug.Text = progressBar1.Value.ToString();
-                //labelDebug.Invalidate();
+                //labelDebug.Refresh();
 #endif
             }));
         }
@@ -117,16 +123,21 @@ namespace CMWtests
         private bool CancelTests()
         {
             mreMeasure.Reset();
-            while (Status != TestStatus.Complete &&
-                   mreMeasure.WaitOne(0) == true)
+            while (Status != TestStatus.Complete && mreMeasure.WaitOne(0) == true)
                 Thread.Sleep(100);
+
+            if (CancelTesting == true)
+            {
+                MessageBox.Show("Unexpected exit");
+                GracefulExit(TestStatus.Abort);
+            }
 
             if (Status == TestStatus.Complete ||
                 MessageBox.Show("Really abort testing?",
                                 "Warning",
-                                    MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Warning,
-                                    MessageBoxDefaultButton.Button2)
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button2)
                 == DialogResult.Yes)
             {
                 CancelTesting = true;
@@ -135,6 +146,7 @@ namespace CMWtests
             }
             else
             {
+                CancelTesting = false;
                 mreMeasure.Set();
                 return false;
             }
@@ -146,11 +158,10 @@ namespace CMWtests
                 Task.Factory.StartNew(() =>
                 {
                     if (Status != TestStatus.Complete)
-                        mreExit.WaitOne();
+                        areExit.WaitOne();
                     VisaIO.CloseDefMgr();
                     Application.Exit();
                 });
-            mreExit.Reset();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
@@ -250,11 +261,16 @@ namespace CMWtests
             options.Dispose();
 
             if (cmw != null)
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
+                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
 
             mreMeasure.Set();
         }
 
         private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
+
+        private void pictureBoxGraph_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
     }
 }
