@@ -178,9 +178,7 @@ namespace CMWtests
 
         private void WaitForOPC()
         {
-            Lock();
             QueryString("*OPC?");
-            Unlock();
         }
 
         private void ShowErrorText(string source, string message, ViStatus status)
