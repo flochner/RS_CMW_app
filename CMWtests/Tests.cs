@@ -40,7 +40,7 @@ namespace CMWtests
                 if (value != _status)
                 {
                     _status = value;
-#if DEBUG
+#if !DEBUG
                     SetStatusText(_status.ToString());
 #endif
                 }
@@ -369,7 +369,7 @@ namespace CMWtests
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
-            csvStream = OpenTempFile();
+            csvStream = OpenTempFile(out csvFileName);
             if (csvStream == null)
                 return TestStatus.Abort;
 
@@ -419,8 +419,6 @@ namespace CMWtests
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
                     return TestStatus.Abort;
-
-                ///tempGauge.Update();
 
                 #region Set up this loop - set freqs - get GPRF Measure Power
                 ProgressBar1_Update(testAmpl);
@@ -535,9 +533,14 @@ namespace CMWtests
                     {
                         if (File.Exists(csvFileName))
                             try
-                            { csvStream.Dispose();
-                                File.Delete(csvFileName); }
-                            catch { ModalMessageBox("Temp file delete Exception"); }
+                            {
+                                csvStream.Dispose();
+                                File.Delete(csvFileName);
+                            }
+                            catch
+                            {
+                                ModalMessageBox("Temp file delete Exception");
+                            }
                         goto start;
                     }
 
@@ -859,15 +862,17 @@ namespace CMWtests
             return TestStatus.Success;
         }
 
-        private StreamWriter OpenTempFile()
+        public StreamWriter OpenTempFile(out string tempFile)
         {
             try
             {
-                return new StreamWriter(GetTempFileName());
+                tempFile = GetTempFileName();
+                return new StreamWriter(tempFile);
             }
             catch (IOException e)
             {
                 ModalMessageBox(e.Message, e.GetType().ToString());
+                tempFile = null;
                 return null;
             }
         }
@@ -875,14 +880,15 @@ namespace CMWtests
         private string GetTempFileName()
         {
             int attempt = 0;
+            string fileName = "";
+
             while (true)
             {
-                csvFileName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-
+                fileName = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetRandomFileName(), "csv"));
                 try
                 {
-                    using (new FileStream(csvFileName, FileMode.CreateNew)) { }
-                    return csvFileName;
+                    using (new FileStream(fileName, FileMode.CreateNew)) { }
+                    return fileName;
                 }
                 catch (IOException ex)
                 {
@@ -931,7 +937,6 @@ namespace CMWtests
             try
             {
                 tempGauge.Stop();
-                //while (cmw.)
                 cmw.Reset();
                 cmw.CloseInstrument();
                 cmw = null;
@@ -975,7 +980,7 @@ namespace CMWtests
             return Status;
         }
 
-        private DialogResult ModalMessageBox(string message, string title = "",
+        public DialogResult ModalMessageBox(string message, string title = "",
                                              MessageBoxButtons buttons = MessageBoxButtons.OK,
                                              MessageBoxIcon icon = MessageBoxIcon.None,
                                              MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
