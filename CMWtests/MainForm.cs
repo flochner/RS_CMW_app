@@ -17,7 +17,7 @@ namespace CMWtests
         {
             InitializeComponent();
             Thread.CurrentThread.Name = "MainForm";
-            tempGauge = new TempGauge
+            tempGauge = new TempGauge(this)
             { Location = new System.Drawing.Point(539, 29) };
             this.Controls.Add(tempGauge);
 
@@ -48,7 +48,7 @@ namespace CMWtests
 
         private void SetHead1Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
                 labelHead1.Refresh();
@@ -57,7 +57,7 @@ namespace CMWtests
 
         private void SetHead2Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
                 labelHead2.Refresh();
@@ -66,7 +66,7 @@ namespace CMWtests
 
         private void SetStatusText(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
                 labelStatus.Refresh();
@@ -75,8 +75,8 @@ namespace CMWtests
 
         public void SetDebugText(string text)
         {
-#if DEBUG
-            Invoke(new MethodInvoker(() =>
+#if !DEBUG
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelDebug.Text = text;
                 labelDebug.Refresh();
@@ -89,7 +89,7 @@ namespace CMWtests
 
         public void AddToResults(string item)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
                 textBoxResults.Refresh();
@@ -98,7 +98,7 @@ namespace CMWtests
 
         private void ProgressBar1_Init(int maxValue = 0)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 if (maxValue > 0)
                     progressBar1.Maximum = maxValue;
@@ -109,7 +109,7 @@ namespace CMWtests
 
         private void ProgressBar1_Update(int ampl)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 progressBar1.PerformStep();
                 progressBar1.Refresh();
@@ -179,7 +179,7 @@ namespace CMWtests
 
         private void SetMenuStripEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 menuStrip1.Enabled = v;
             }));
@@ -187,7 +187,7 @@ namespace CMWtests
 
         private void SetBtnBeginEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 btnBeginTests.Enabled = v;
                 newToolStripMenuItem.Enabled = v;
@@ -202,7 +202,7 @@ namespace CMWtests
 
         private void SetBtnCancelEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 btnCancelTests.Enabled = v;
             }));
