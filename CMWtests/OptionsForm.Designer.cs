@@ -33,18 +33,31 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
+            this.checkBoxTempOverride = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).BeginInit();
             this.SuspendLayout();
             // 
             // numericUpDown_EPS
             // 
             this.numericUpDown_EPS.Location = new System.Drawing.Point(135, 23);
-            this.numericUpDown_EPS.Maximum = new decimal(new int[] {10, 0, 0, 0});
-            this.numericUpDown_EPS.Minimum = new decimal(new int[] {1, 0, 0, 0});
+            this.numericUpDown_EPS.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.numericUpDown_EPS.Minimum = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             this.numericUpDown_EPS.Name = "numericUpDown_EPS";
             this.numericUpDown_EPS.Size = new System.Drawing.Size(38, 20);
             this.numericUpDown_EPS.TabIndex = 0;
-            this.numericUpDown_EPS.Value = new decimal(new int[] {2, 0, 0, 0});
+            this.numericUpDown_EPS.Value = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
             // 
             // labelStatisticsCount
             // 
@@ -64,7 +77,7 @@
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
             this.buttonOK.TabIndex = 2;
-            this.buttonOK.Text = "Accept";
+            this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
             // 
@@ -91,6 +104,18 @@
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
+            // checkBoxTempOverride
+            // 
+            this.checkBoxTempOverride.AutoSize = true;
+            this.checkBoxTempOverride.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxTempOverride.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.checkBoxTempOverride.Location = new System.Drawing.Point(25, 49);
+            this.checkBoxTempOverride.Name = "checkBoxTempOverride";
+            this.checkBoxTempOverride.Size = new System.Drawing.Size(124, 19);
+            this.checkBoxTempOverride.TabIndex = 5;
+            this.checkBoxTempOverride.Text = "Override WarmUp";
+            this.checkBoxTempOverride.UseVisualStyleBackColor = true;
+            // 
             // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
@@ -98,6 +123,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(311, 231);
+            this.Controls.Add(this.checkBoxTempOverride);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
@@ -109,6 +135,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
+
         }
 
         #endregion
@@ -118,5 +145,6 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button btnReset;
+        private System.Windows.Forms.CheckBox checkBoxTempOverride;
     }
 }
