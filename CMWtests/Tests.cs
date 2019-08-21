@@ -659,12 +659,12 @@ namespace CMWtests
                 if (!visaResponse.Contains("PASS"))
                 {
                     var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
-                                                 "(Retry) after verifying all outputs are off." + Environment.NewLine +
-                                                 "(Cancel) all testing.",
-                                                 "Sensor Zero Failure",
-                                                  MessageBoxButtons.RetryCancel,
-                                                  MessageBoxIcon.Exclamation,
-                                                  MessageBoxDefaultButton.Button1);
+                                                           "(Retry) after verifying all outputs are off." + Environment.NewLine +
+                                                           "(Cancel) all testing.",
+                                                           "Sensor Zero Failure",
+                                                            MessageBoxButtons.RetryCancel,
+                                                            MessageBoxIcon.Exclamation,
+                                                            MessageBoxDefaultButton.Button1);
 
                     retryZero = (verifyConnection == DialogResult.Retry);
                     if (verifyConnection == DialogResult.Cancel)
