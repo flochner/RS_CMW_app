@@ -35,7 +35,7 @@ namespace CMWtests
 
             stopwatch = Stopwatch.StartNew();
 
-            Task.Factory.StartNew(Run, cts.Token);
+            Task.Factory.StartNew(Run, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             do
             {
@@ -95,10 +95,10 @@ namespace CMWtests
                 catch (Exception e)
                 {
                     MessageBox.Show("Broken at TempGauge read" +
-                                    Environment.NewLine + e.Source + ":" +
-                                    Environment.NewLine + e.Message + Environment.NewLine +
-                                    Environment.NewLine + e.StackTrace,
-                                    e.Source);
+                                     Environment.NewLine + e.Source + ":" +
+                                     Environment.NewLine + e.Message + Environment.NewLine +
+                                     Environment.NewLine + e.StackTrace,
+                                     e.Source);
                     Stop();
                     return;
                 }
@@ -115,7 +115,6 @@ namespace CMWtests
                     labelTemp.Visible = true;
                     
                     this.Refresh();
-
                 }));
 
                 labelTemp.ForeColor = System.Drawing.Color.Black;
