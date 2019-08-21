@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -7,42 +9,63 @@ namespace CMWtests
 {
     public partial class TempGauge : UserControl
     {
-        private CancellationTokenSource cts = null;
+        private bool runComplete = false;
         private double cmwTempC = 0.0;
+        private string elapsedTime = "";
+        private string csvFileName = "";
+        private CancellationTokenSource cts = null;
+        private MainForm mainForm = null;
+        private Stopwatch stopwatch = null;
+        private StreamWriter csvStream = null;
+        private TimeSpan ts = TimeSpan.Zero;
         private VisaIO cmw;
 
-        public TempGauge()
+        public TempGauge(MainForm obj)
         {
             InitializeComponent();
+            mainForm = obj;
         }
 
         public bool Start(VisaIO instr)
         {
             cmw = instr;
             cts = new CancellationTokenSource();
-            CancellationToken token = cts.Token;
 
-            Task.Factory.StartNew(Run, token);
+            csvStream = mainForm.OpenTempFile(out csvFileName);
 
-            while (cmwTempC == 0.0)
+            stopwatch = Stopwatch.StartNew();
+
+            Task.Factory.StartNew(Run, cts.Token);
+
+            do
             {
                 if (MainForm.CancelTesting == true)
                     return false;
                 Thread.Sleep(100);
             }
+            while (cmwTempC == 0.0);
 
-            while (cmwTempC < 40.0)
+            int i = 0;
+            while (cmwTempC < 45.0 && OptionsForm.TempOverride == false)
             {
                 if (MainForm.CancelTesting == true)
                     return false;
 
-                Thread.Sleep(1750);
-                Invoke(new MethodInvoker(() =>
-                {
-                    labelTemp.Text = "";
-                }));
-                Thread.Sleep(250);
+                Thread.Sleep(1650);
+                //Invoke(new MethodInvoker(() =>
+                //{
+                //    labelTemp.Text = "";
+                //}));
+                Thread.Sleep(350);
+                i++;
             }
+
+            stopwatch.Stop();
+            ts = stopwatch.Elapsed;
+            elapsedTime = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
+            mainForm.AddToResults("Warmup Time: " + elapsedTime);
+            mainForm.AddToResults(csvFileName);
+
             return true;
         }
 
@@ -59,20 +82,15 @@ namespace CMWtests
 
             while (cmw != null)
             {
-#if !DEBUG
-                Thread.Sleep(5000);
-#else
-                Thread.Sleep(900);
                 labelTemp.ForeColor = System.Drawing.Color.Red;
                 Thread.Sleep(100);
-                labelTemp.ForeColor = System.Drawing.Color.Black;
-#endif
-                if (cts.IsCancellationRequested)
-                    return;
 
                 try
                 {
                     cmwTempC = ReadTemp(cmw);
+#if DEBUG
+                    RecordTemp();
+#endif
                 }
                 catch (Exception e)
                 {
@@ -87,7 +105,7 @@ namespace CMWtests
 
                 var sliderPos = Convert.ToInt16(((cmwTempC - 25) * 4D) + 12);
 
-                Invoke(new MethodInvoker(() =>
+                BeginInvoke(new MethodInvoker(() =>
                 {
                     pictureBoxSlider.Left = sliderPos;
                     pictureBoxSlider.Visible = true;
@@ -95,14 +113,31 @@ namespace CMWtests
                     labelTemp.Text = string.Format("{0:F1}", cmwTempC);
                     labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
                     labelTemp.Visible = true;
-
+                    
                     this.Refresh();
+
                 }));
+
+                labelTemp.ForeColor = System.Drawing.Color.Black;
+                for (int i = 0; i < 10; i++)
+                {
+                    if (cts.IsCancellationRequested)
+                    {
+                        runComplete = true;
+                        return;
+                    }
+                    Thread.Sleep(10);
+                }
             }
         }
 
         public void Stop()
         {
+            cts.Cancel();
+
+            while (runComplete == false)
+                Thread.Sleep(100);
+
             Invoke(new MethodInvoker(() =>
             {
                 pictureBoxSlider.Visible = false;
@@ -110,17 +145,67 @@ namespace CMWtests
                 this.Enabled = false;
                 this.Refresh();
             }));
+            
+            try
+            {
+                csvStream.Dispose();
+            }
+            catch (Exception e)
+            {
+                mainForm.ModalMessageBox(e.Source + Environment.NewLine + e.Message, 
+                                        "Dispose TempGauge csvStream Exception");
+            }
 
-            cts.Cancel();
-        }
+            //Process proc = new Process();
+            //proc.StartInfo.FileName = "C:\\Program Files\\Sublime Text 3\\subl.exe";
+            //proc.StartInfo.Arguments = csvFileName;
+            //proc.Start();
+
+            //if (File.Exists(csvFileName))
+            //    try
+            //    {
+            //        File.Delete(csvFileName);
+            //    }
+            //    catch
+            //    {
+            //        mainForm.ModalMessageBox("Temp file delete Exception");
+            //    }
+            }
 
         private double ReadTemp(VisaIO instr)
         {
             cmw.Lock();
             var visaResponse = instr.QueryString("SENSe:BASE:TEMPerature:OPERating:INTernal?");
             cmw.Unlock();
-            var temp = Convert.ToDouble(visaResponse);
-            return temp;
+            return Convert.ToDouble(visaResponse);
+        }
+
+        private void RecordTemp()
+        {
+            ts = stopwatch.Elapsed;
+            elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+
+            try
+            {
+                csvStream.WriteLine(elapsedTime + "," + cmwTempC.ToString());
+            }
+            catch (Exception e)
+            {
+                mainForm.ModalMessageBox("RecordTemp():\n" + e.Message, e.GetType().ToString());
+            }
+        }
+
+        private void contextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (OptionsForm.TempOverride == true)
+                overrideWarmUpToolStripMenuItem.CheckState = CheckState.Checked;
+            else
+                overrideWarmUpToolStripMenuItem.CheckState = CheckState.Unchecked;
+        }
+
+        private void overrideWarmUpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OptionsForm.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
         }
     }
 }
