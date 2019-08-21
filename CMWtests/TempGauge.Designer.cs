@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.pictureBoxGauge = new System.Windows.Forms.PictureBox();
             this.pictureBoxSlider = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
@@ -35,8 +36,11 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.labelTemp = new System.Windows.Forms.Label();
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.overrideWarmUpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxGauge)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSlider)).BeginInit();
+            this.contextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // pictureBoxGauge
@@ -106,8 +110,27 @@
             this.labelTemp.Text = "35";
             this.labelTemp.Visible = false;
             // 
+            // contextMenu
+            // 
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.overrideWarmUpToolStripMenuItem});
+            this.contextMenu.Name = "contextMenu";
+            this.contextMenu.Size = new System.Drawing.Size(181, 48);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            // 
+            // overrideWarmUpToolStripMenuItem
+            // 
+            this.overrideWarmUpToolStripMenuItem.Checked = true;
+            this.overrideWarmUpToolStripMenuItem.CheckOnClick = true;
+            this.overrideWarmUpToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.overrideWarmUpToolStripMenuItem.Name = "overrideWarmUpToolStripMenuItem";
+            this.overrideWarmUpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.overrideWarmUpToolStripMenuItem.Text = "Override WarmUp";
+            this.overrideWarmUpToolStripMenuItem.Click += new System.EventHandler(this.overrideWarmUpToolStripMenuItem_Click);
+            // 
             // TempGauge
             // 
+            this.ContextMenuStrip = this.contextMenu;
             this.Controls.Add(this.labelTemp);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -120,6 +143,7 @@
             this.Size = new System.Drawing.Size(186, 41);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxGauge)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSlider)).EndInit();
+            this.contextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -134,5 +158,7 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         public System.Windows.Forms.Label labelTemp;
+        private System.Windows.Forms.ContextMenuStrip contextMenu;
+        private System.Windows.Forms.ToolStripMenuItem overrideWarmUpToolStripMenuItem;
     }
 }
