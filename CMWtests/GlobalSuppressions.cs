@@ -118,3 +118,4 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.MainForm.pictureBoxGraph_Click(System.Object,System.Windows.Forms.MouseEventArgs)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.MainForm.textBoxResults_Click(System.Object,System.EventArgs)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.MainForm.toolStripDropDown_Opening(System.Object,System.ComponentModel.CancelEventArgs)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.MainForm.contextMenu_Opening(System.Object,System.ComponentModel.CancelEventArgs)")]
