@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -44,6 +45,11 @@ namespace CMWtests
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
 
             Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+
+        private void btnCancelTests_Click(object sender, EventArgs e)
+        {
+            CancelTests();
         }
 
         private void SetHead1Text(string text)
@@ -208,11 +214,6 @@ namespace CMWtests
             }));
         }
 
-        private void btnCancelTests_Click(object sender, EventArgs e)
-        {
-            CancelTests();
-        }
-
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             btnBeginTests_Click(sender, e);
@@ -226,18 +227,6 @@ namespace CMWtests
             //    FileInfo book = new FileInfo(bookName);
             //}
             //catch { }
-        }
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var about = new AboutBox())
-                about.ShowDialog();
-        }
-
-        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var query = new VISAqueryForm())
-                query.ShowDialog();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -266,11 +255,66 @@ namespace CMWtests
             mreMeasure.Set();
         }
 
-        private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
-
-        private void pictureBoxGraph_Paint(object sender, PaintEventArgs e)
+        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            using (var query = new VISAqueryForm())
+                query.ShowDialog();
+        }
 
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var about = new AboutBox())
+                about.ShowDialog();
+        }
+
+        private void pictureBoxGraph_Paint(object sender, PaintEventArgs e) { }
+
+        private void pictureBoxGraph_Click(object sender, MouseEventArgs e) { }
+
+        private void textBoxResults_Click(object sender, EventArgs e){ }
+
+        private void contextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            if (this.contextMenu.SourceControl.Name == "pictureBoxGraph")
+            {
+                selectAllContextMenuItem.Enabled = false;
+                if (pictureBoxGraph.Image == null)
+                    copyContextMenuItem.Enabled = false;
+                else
+                {
+                    pictureBoxGraph.Select();
+                    copyContextMenuItem.Enabled = true;
+                }
+            }
+            else if (this.contextMenu.SourceControl.Name == "textBoxResults")
+            {
+                if (string.IsNullOrEmpty(textBoxResults.Text))
+                {
+                    selectAllContextMenuItem.Enabled = false;
+                    copyContextMenuItem.Enabled = false;
+                }
+                else
+                {
+                    selectAllContextMenuItem.Enabled = true;
+                    if (string.IsNullOrEmpty(textBoxResults.SelectedText))
+                        copyContextMenuItem.Enabled = false;
+                    else
+                        copyContextMenuItem.Enabled = true;
+                }
+            }
+        }
+
+        private void copyContextMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.contextMenu.SourceControl.Name == "pictureBoxGraph" && pictureBoxGraph.Image != null)
+                Clipboard.SetImage(pictureBoxGraph.Image);
+            else if (this.contextMenu.SourceControl.Name == "textBoxResults")
+                Clipboard.SetText(textBoxResults.SelectedText);
+        }
+
+        private void selectAllContextMenuItem_Click(object sender, EventArgs e)
+        {
+            textBoxResults.SelectAll();
         }
     }
 }
