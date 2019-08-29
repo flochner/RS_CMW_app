@@ -245,12 +245,12 @@ namespace CMWtests
                    mreMeasure.WaitOne(0) == true)
                 Thread.Sleep(100);
 
-            var options = new OptionsForm();
+            var options = new Options();
             options.ShowDialog(this);
             options.Dispose();
 
             if (cmw != null)
-                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
+                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + Options.StatsCount);
 
             mreMeasure.Set();
         }
