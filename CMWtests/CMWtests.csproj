@@ -97,6 +97,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.XML" />
@@ -121,6 +122,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="TempGauge.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TempGauge.Designer.cs">
+      <DependentUpon>TempGauge.cs</DependentUpon>
     </Compile>
     <Compile Include="VisaIO.cs" />
     <Compile Include="ConnectionImageForm.cs">
@@ -165,6 +172,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="OptionsForm.resx">
       <DependentUpon>OptionsForm.cs</DependentUpon>
@@ -173,6 +181,10 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TempGauge.resx">
+      <DependentUpon>TempGauge.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="VISAresourceForm.resx">
       <DependentUpon>VISAresourceForm.cs</DependentUpon>
@@ -223,12 +235,16 @@
     <EmbeddedResource Include="Resources\RF3OUT_TX_2.png" />
     <EmbeddedResource Include="Resources\RF4COM_RX_2.png" />
     <EmbeddedResource Include="Resources\RF4COM_TX_2.png" />
+    <EmbeddedResource Include="Resources\Gauge.png" />
+    <EmbeddedResource Include="Resources\Graph_7.png" />
+    <EmbeddedResource Include="Resources\Graph_8.png" />
+    <EmbeddedResource Include="Resources\Graph_10.png" />
+    <EmbeddedResource Include="Resources\Graph_12.png" />
+    <EmbeddedResource Include="Resources\Graph_14.png" />
+    <EmbeddedResource Include="Resources\Graph_18.png" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="app.ico" />
-    <EmbeddedResource Include="Resources\Graph_10.png" />
-    <EmbeddedResource Include="Resources\Graph_8.png" />
-    <EmbeddedResource Include="Resources\Graph_7.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

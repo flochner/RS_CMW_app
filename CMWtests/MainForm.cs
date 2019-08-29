@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -8,15 +9,21 @@ namespace CMWtests
     public partial class MainForm : Form
     {
         public static int DefResMgr { get; private set; } = -1;
-        private bool CancelTesting { get; set; }
+        public static bool CancelTesting { get; set; }
+        private AutoResetEvent areExit;
         private ManualResetEvent mreMeasure;
-        private ManualResetEvent mreExit;
+        private TempGauge tempGauge = null;
 
         public MainForm()
         {
             InitializeComponent();
+            Thread.CurrentThread.Name = "MainForm";
+            tempGauge = new TempGauge(this)
+            { Location = new System.Drawing.Point(539, 29) };
+            this.Controls.Add(tempGauge);
+
             mreMeasure = new ManualResetEvent(true);
-            mreExit = new ManualResetEvent(false);
+            areExit = new AutoResetEvent(false);
 
             DefResMgr = VisaIO.OpenResourceMgr();
             if (DefResMgr == 0)
@@ -31,73 +38,78 @@ namespace CMWtests
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
             testHeader = "";
-            pictureBox1.Image = null;
+            pictureBoxGraph.Image = null;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;
             newToolStripMenuItem.Enabled = false;
             communicateWithInstrumentToolStripMenuItem.Enabled = false;
 
-            Task.Factory.StartNew(Begin, TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(Begin, CancellationToken.None, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+        }
+
+        private void btnCancelTests_Click(object sender, EventArgs e)
+        {
+            CancelTests();
         }
 
         private void SetHead1Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelHead1.Text = text;
-                labelHead1.Invalidate();
+                labelHead1.Refresh();
             }));
         }
 
         private void SetHead2Text(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelHead2.Text = text;
-                labelHead2.Invalidate();
+                labelHead2.Refresh();
             }));
         }
 
-        private void SetStatusLabel(string text)
+        private void SetStatusText(string text)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
-                labelStatus.Invalidate();
+                labelStatus.Refresh();
             }));
         }
 
-        private void SetDebugText(string text)
+        public void SetDebugText(string text)
         {
-#if DEBUG
-            //Invoke(new MethodInvoker(() =>
-            //{
-            //    labelDebug.Text = text;
-            //    labelDebug.Invalidate();
-            //    Thread.Sleep(500);
-            //    labelDebug.Text = "";
-            //    labelDebug.Invalidate();
-            //}));
+#if !DEBUG
+            BeginInvoke(new MethodInvoker(() =>
+            {
+                labelDebug.Text = text;
+                labelDebug.Refresh();
+                //Thread.Sleep(500);
+                //labelDebug.Text = "";
+                //labelDebug.Refresh();
+            }));
 #endif
         }
 
-        private void AddToResults(string item)
+        public void AddToResults(string item)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 textBoxResults.AppendText(item + Environment.NewLine);
-                textBoxResults.Invalidate();
+                textBoxResults.Refresh();
             }));
         }
 
         private void ProgressBar1_Init(int maxValue = 0)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 if (maxValue > 0)
                     progressBar1.Maximum = maxValue;
                 progressBar1.Value = 0;
-                progressBar1.Invalidate();
+                progressBar1.Refresh();
             }));
         }
 
@@ -106,10 +118,10 @@ namespace CMWtests
             BeginInvoke(new MethodInvoker(() =>
             {
                 progressBar1.PerformStep();
-                progressBar1.Invalidate();
+                progressBar1.Refresh();
 #if DEBUG
                 //labelDebug.Text = progressBar1.Value.ToString();
-                //labelDebug.Invalidate();
+                //labelDebug.Refresh();
 #endif
             }));
         }
@@ -117,16 +129,21 @@ namespace CMWtests
         private bool CancelTests()
         {
             mreMeasure.Reset();
-            while (Status != TestStatus.Complete &&
-                   mreMeasure.WaitOne(0) == true)
+            while (Status != TestStatus.Complete && mreMeasure.WaitOne(0) == true)
                 Thread.Sleep(100);
+
+            if (CancelTesting == true)
+            {
+                MessageBox.Show("Unexpected exit");
+                GracefulExit(TestStatus.Abort);
+            }
 
             if (Status == TestStatus.Complete ||
                 MessageBox.Show("Really abort testing?",
                                 "Warning",
-                                    MessageBoxButtons.YesNo,
-                                    MessageBoxIcon.Warning,
-                                    MessageBoxDefaultButton.Button2)
+                                MessageBoxButtons.YesNo,
+                                MessageBoxIcon.Warning,
+                                MessageBoxDefaultButton.Button2)
                 == DialogResult.Yes)
             {
                 CancelTesting = true;
@@ -135,6 +152,7 @@ namespace CMWtests
             }
             else
             {
+                CancelTesting = false;
                 mreMeasure.Set();
                 return false;
             }
@@ -146,11 +164,10 @@ namespace CMWtests
                 Task.Factory.StartNew(() =>
                 {
                     if (Status != TestStatus.Complete)
-                        mreExit.WaitOne();
+                        areExit.WaitOne();
                     VisaIO.CloseDefMgr();
                     Application.Exit();
                 });
-            mreExit.Reset();
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs f)
@@ -168,7 +185,7 @@ namespace CMWtests
 
         private void SetMenuStripEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 menuStrip1.Enabled = v;
             }));
@@ -176,7 +193,7 @@ namespace CMWtests
 
         private void SetBtnBeginEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 btnBeginTests.Enabled = v;
                 newToolStripMenuItem.Enabled = v;
@@ -191,15 +208,10 @@ namespace CMWtests
 
         private void SetBtnCancelEnabled(bool v)
         {
-            Invoke(new MethodInvoker(() =>
+            BeginInvoke(new MethodInvoker(() =>
             {
                 btnCancelTests.Enabled = v;
             }));
-        }
-
-        private void btnCancelTests_Click(object sender, EventArgs e)
-        {
-            CancelTests();
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -215,18 +227,6 @@ namespace CMWtests
             //    FileInfo book = new FileInfo(bookName);
             //}
             //catch { }
-        }
-
-        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var about = new AboutBox())
-                about.ShowDialog();
-        }
-
-        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            using (var query = new VISAqueryForm())
-                query.ShowDialog();
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -245,16 +245,76 @@ namespace CMWtests
                    mreMeasure.WaitOne(0) == true)
                 Thread.Sleep(100);
 
-            var options = new OptionsForm();
+            var options = new Options();
             options.ShowDialog(this);
             options.Dispose();
 
             if (cmw != null)
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
+                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + Options.StatsCount);
 
             mreMeasure.Set();
         }
 
-        private void copyToolStripMenuItem1_Click(object sender, EventArgs e) { }
+        private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var query = new VISAqueryForm())
+                query.ShowDialog();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var about = new AboutBox())
+                about.ShowDialog();
+        }
+
+        private void pictureBoxGraph_Paint(object sender, PaintEventArgs e) { }
+
+        private void pictureBoxGraph_Click(object sender, MouseEventArgs e) { }
+
+        private void textBoxResults_Click(object sender, EventArgs e){ }
+
+        private void contextMenu_Opening(object sender, CancelEventArgs e)
+        {
+            if (this.contextMenu.SourceControl.Name == "pictureBoxGraph")
+            {
+                selectAllContextMenuItem.Enabled = false;
+                if (pictureBoxGraph.Image == null)
+                    copyContextMenuItem.Enabled = false;
+                else
+                {
+                    pictureBoxGraph.Select();
+                    copyContextMenuItem.Enabled = true;
+                }
+            }
+            else if (this.contextMenu.SourceControl.Name == "textBoxResults")
+            {
+                if (string.IsNullOrEmpty(textBoxResults.Text))
+                {
+                    selectAllContextMenuItem.Enabled = false;
+                    copyContextMenuItem.Enabled = false;
+                }
+                else
+                {
+                    selectAllContextMenuItem.Enabled = true;
+                    if (string.IsNullOrEmpty(textBoxResults.SelectedText))
+                        copyContextMenuItem.Enabled = false;
+                    else
+                        copyContextMenuItem.Enabled = true;
+                }
+            }
+        }
+
+        private void copyContextMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.contextMenu.SourceControl.Name == "pictureBoxGraph" && pictureBoxGraph.Image != null)
+                Clipboard.SetImage(pictureBoxGraph.Image);
+            else if (this.contextMenu.SourceControl.Name == "textBoxResults")
+                Clipboard.SetText(textBoxResults.SelectedText);
+        }
+
+        private void selectAllContextMenuItem_Click(object sender, EventArgs e)
+        {
+            textBoxResults.SelectAll();
+        }
     }
 }

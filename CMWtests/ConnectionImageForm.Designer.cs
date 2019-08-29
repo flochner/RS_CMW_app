@@ -106,6 +106,7 @@
             this.Name = "ConnectionImageForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Connection Message";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConnectionImageForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 

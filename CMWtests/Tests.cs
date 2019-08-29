@@ -16,12 +16,7 @@ namespace CMWtests
         private static long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
-/// !
-#if !DEBUG
         private bool isFirstTest = true;
-#else
-        private bool isFirstTest = false;
-#endif
         private string chartLimits3 = "";
         private string chartLimits6 = "";
         private string cmwID = "";
@@ -33,15 +28,15 @@ namespace CMWtests
         {
             get
             {
-                return _status; 
+                return _status;
             }
             set
             {
                 if (value != _status)
                 {
                     _status = value;
-#if DEBUG
-                    SetStatusLabel(_status.ToString());
+#if !DEBUG
+                    SetStatusText(_status.ToString());
 #endif
                 }
             }
@@ -50,15 +45,23 @@ namespace CMWtests
 
         private TestStatus Begin()
         {
+            Thread.CurrentThread.Name = "Tests";
             Status = TestStatus.InProgress;
             CancelTesting = false;
 
             if (ConnectIdentifyDUT() == TestStatus.Abort)
-              return GracefulExit(TestStatus.Abort);
+                return GracefulExit(TestStatus.Abort);
 
+            if (CheckSensor() == TestStatus.Abort)
+                return GracefulExit(TestStatus.Abort);
+
+            SetBtnCancelEnabled(true);
+
+            if (tempGauge.Start(cmw) == false)
+                return GracefulExit(TestStatus.Abort);
+            
             Status = Sequencer();
             
-            SetBtnBeginEnabled(true);
             return Status;
         }
 
@@ -67,11 +70,10 @@ namespace CMWtests
             int[] amplList = { };
             string testName = "";
 
-            SetBtnCancelEnabled(true);
             ProgressBar1_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
-/// !
-#if !DEBUG
-            goto gentests;
+#if DEBUG
+            /// !
+            // goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + "GPRF CW Measurement Tests");
@@ -90,7 +92,7 @@ namespace CMWtests
                return GracefulExit(TestStatus.Abort);
             InitMeasureSettings();
 
-            cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX1", true);
+            Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX1");
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
@@ -98,9 +100,9 @@ namespace CMWtests
             if (numOfTRX > 1)
             {
                 if (numOfFrontEnds == 1)
-                    cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX2", true);
+                    Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX2");
                 else
-                    cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX3", true);
+                    Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF1C, RX3");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -115,7 +117,7 @@ namespace CMWtests
                return GracefulExit(TestStatus.Abort);
             InitMeasureSettings();
 
-            cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX1", true);
+            Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX1");
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
@@ -123,9 +125,9 @@ namespace CMWtests
             if (numOfTRX > 1)
             {
                 if (numOfFrontEnds == 1)
-                    cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX2", true);
+                    Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX2");
                 else
-                    cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX3", true);
+                    Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF2C, RX3");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -140,12 +142,12 @@ namespace CMWtests
                    return GracefulExit(TestStatus.Abort);
                 InitMeasureSettings();
 
-                cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX2", true);
+                Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX2");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX4", true);
+                Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF3C, RX4");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -157,12 +159,12 @@ namespace CMWtests
                    return GracefulExit(TestStatus.Abort);
                 InitMeasureSettings();
 
-                cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX2", true);
+                Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX2");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX4", true);
+                Write(cmw, "ROUTe:GPRF:MEAS:SCENario:SALone RF4C, RX4");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -190,7 +192,7 @@ namespace CMWtests
             if (ConnectionMessage(testName) == TestStatus.Abort)
                return GracefulExit(TestStatus.Abort);
 
-            cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX1", true);
+            Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX1");
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
@@ -198,9 +200,9 @@ namespace CMWtests
             if (numOfTRX > 1)
             {
                 if (numOfFrontEnds == 1)
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX2", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX2");
                 else
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX3", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1C, TX3");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -220,7 +222,7 @@ namespace CMWtests
             if (ConnectionMessage(testName) == TestStatus.Abort)
                return GracefulExit(TestStatus.Abort);
 
-            cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1", true);
+            Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1");
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
@@ -228,9 +230,9 @@ namespace CMWtests
             if (numOfTRX > 1)
             {
                 if (numOfFrontEnds == 1)
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX2", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX2");
                 else
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX3", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX3");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -249,7 +251,7 @@ namespace CMWtests
             if (ConnectionMessage(testName) == TestStatus.Abort)
                return GracefulExit(TestStatus.Abort);
 
-            cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX1", true);
+            Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX1");
             foreach (int ampl in amplList)
                 if (Measure(testName, ampl, "") == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
@@ -257,9 +259,9 @@ namespace CMWtests
             if (numOfTRX > 1)
             {
                 if (numOfFrontEnds == 1)
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX2", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX2");
                 else
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX3", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF2C, TX3");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 2") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -280,12 +282,12 @@ namespace CMWtests
                 if (ConnectionMessage(testName) == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX2", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX2");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX4", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3C, TX4");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -303,12 +305,12 @@ namespace CMWtests
                 if (ConnectionMessage(testName) == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX4", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX4");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -326,12 +328,12 @@ namespace CMWtests
                 if (ConnectionMessage(testName) == TestStatus.Abort)
                    return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX2", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX2");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 3") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
 
-                cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX4", true);
+                Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF4C, TX4");
                 foreach (int ampl in amplList)
                     if (Measure(testName, ampl, "  Path 4") == TestStatus.Abort)
                        return GracefulExit(TestStatus.Abort);
@@ -351,7 +353,7 @@ namespace CMWtests
             string visaResponse = "";
             string[] pmResponse = { };
 
-            SetDebugText("Waiting at Measure Start");
+            //SetDebugText("Waiting at Measure Start");
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
@@ -363,37 +365,37 @@ namespace CMWtests
             double maxError3 = 0.0;
             double maxError6 = 0.0;
 
-            csvStream = OpenTempFile();
+            csvStream = OpenTempFile(out csvFileName);
             if (csvStream == null)
                 return TestStatus.Abort;
 
             #region Config RX / TX
 
             /// setup sensor to read
-            cmw.Write("CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
-                      "RESolution PD2; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
+            Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
+                      "RESolution PD2; SCOunt " + Options.StatsCount + "; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
             {
                 csvStream.WriteLine("    GPRF CW Measurement Tests - " + cmwID);
-                cmw.Write("INIT:GPRF:MEAS:POWer");
-                cmw.Write("CONFigure:GPRF:MEAS:RFSettings:ENPower " + testAmpl);
+                Write(cmw, "INIT:GPRF:MEAS:POWer");
+                Write(cmw, "CONFigure:GPRF:MEAS:RFSettings:ENPower " + testAmpl);
                 if (testName.Contains("1COM") || testName.Contains("2COM"))
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1", true);
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1");
                 else
-                    cmw.Write("ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2", true);
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + (testAmpl + 6.5));
+                    Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2");
+                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + (testAmpl + 6.5));
             }
             else if (testName.Contains("TX"))
             {
                 csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
+                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
                 minFreq = 70;
             }
 
             csvStream.WriteLine("0," + chartLimits3);
-            cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
+            Write(cmw, "SOURce:GPRF:GEN:STATe ON");
 
             currentFreq = minFreq * (long)1e6;
             var endFreq = hasKB036 ? (long)6000e6 : (long)3300e6;
@@ -408,7 +410,7 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                SetDebugText("Waiting at Measure main loop start");
+                //SetDebugText("Waiting at Measure main loop start");
                 mreMeasure.WaitOne();
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
@@ -419,12 +421,12 @@ namespace CMWtests
 
                 SetHead2Text((currentFreq / 1e6).ToString() + " MHz");
 
-                cmw.Write("SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq);
-                cmw.Write("CONFigure:GPRF:MEAS:EPSensor:FREQuency " + currentFreq);
+                Write(cmw, "SOURce:GPRF:GEN:RFSettings:FREQuency " + currentFreq);
+                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:FREQuency " + currentFreq);
                 if (testName.Contains("RX"))
                 {
-                    cmw.Write("CONFigure:GPRF:MEAS:RFSettings:FREQuency " + currentFreq);
-                    visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:POWer:AVERage?", 5000);
+                    Write(cmw, "CONFigure:GPRF:MEAS:RFSettings:FREQuency " + currentFreq);
+                    visaResponse = Query(cmw, "READ:GPRF:MEAS:POWer:AVERage?", 5000);
                     try
                     {
                         cmwMeasPower = Convert.ToDouble(visaResponse.Split(',')[1]);
@@ -439,13 +441,13 @@ namespace CMWtests
                 #region  Take sensor reading
                 do  //while (retry)
                 {
-                    SetDebugText("Waiting at Take sensor reading");
+                    //SetDebugText("Waiting at Take sensor reading");
                     mreMeasure.WaitOne();
                     if (CancelTesting == true)
                         return TestStatus.Abort;
 
                     retry = false;
-                    visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 20000);
+                    visaResponse = Query(cmw, "READ:GPRF:MEAS:EPSensor?", 20000);
                     try
                     {
                         pmResponse = visaResponse.Split(',');
@@ -465,7 +467,7 @@ namespace CMWtests
                     //else 
                     if (pmStatus != 0)
                     {
-                        cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
+                        Write(cmw, "SOURce:GPRF:GEN:STATe OFF");
 
                         ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -483,7 +485,7 @@ namespace CMWtests
                             return TestStatus.Abort;
 
                         retry = (img.DialogResult == DialogResult.Retry);
-                        cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
+                        Write(cmw, "SOURce:GPRF:GEN:STATe ON");
                     }
                 } while (retry);
 
@@ -497,8 +499,8 @@ namespace CMWtests
                 // If error is excessive, assume improper connections and prompt to fix.
                 if ((currentFreq <= 400e6) && (Math.Abs(amplError) > 3) && !ignoreAmplError)
                 {
-                    cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
-                    cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
+                    Write(cmw, "SOURce:GPRF:GEN:STATe OFF");
+                    Write(cmw, "SYSTem:MEASurement:ALL:OFF");
 
                     ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -527,14 +529,19 @@ namespace CMWtests
                     {
                         if (File.Exists(csvFileName))
                             try
-                            { csvStream.Dispose();
-                                File.Delete(csvFileName); }
-                            catch { ModalMessageBox("Temp file delete Exception"); }
+                            {
+                                csvStream.Dispose();
+                                File.Delete(csvFileName);
+                            }
+                            catch
+                            {
+                                ModalMessageBox("Temp file delete Exception");
+                            }
                         goto start;
                     }
 
                     if (ignoreAmplError)
-                        cmw.Write("SOURce:GPRF:GEN:STATe ON", true);
+                        Write(cmw, "SOURce:GPRF:GEN:STATe ON");
                 }
                 #endregion
 
@@ -574,8 +581,8 @@ namespace CMWtests
 
             #region Cleanup - close files - create graph
             /// Set instruments to standby.
-            cmw.Write("SOURce:GPRF:GEN:STATe OFF", true);
-            cmw.Write("SYSTem:MEASurement:ALL:OFF", true);
+            Write(cmw, "SOURce:GPRF:GEN:STATe OFF");
+            Write(cmw, "SYSTem:MEASurement:ALL:OFF");
 
             // Push one frequency point beyond test to make whitespace in graph (3400 or 6100 MHz).
             csvStream.WriteLine(currentFreq / 1e6 + "," + chartLimits);
@@ -616,12 +623,12 @@ namespace CMWtests
             {
                 retryZero = false;
 
-                SetDebugText("Waiting at ConnectionMessage start");
+                //SetDebugText("Waiting at ConnectionMessage start");
                 mreMeasure.WaitOne();
                 if (CancelTesting == true)
                     return TestStatus.Abort;
 
-                cmw.Write("*RST");
+                Write(cmw, "*RST");
                 cmw.ClearStatus();
                 cmw.ErrorChecking();
 
@@ -640,20 +647,20 @@ namespace CMWtests
                 SetHead2Text("Zeroing Sensor...");
 /// !
 #if !DEBUG
-                cmw.Write("ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
-                var visaResponse = cmw.QueryWithSTB("CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
+                Write(cmw, "ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
+                var visaResponse = Query(cmw, "CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
 #else
                 var visaResponse = "PASS";
 #endif
                 if (!visaResponse.Contains("PASS"))
                 {
                     var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
-                                                 "(Retry) after verifying all outputs are off." + Environment.NewLine +
-                                                 "(Cancel) all testing.",
-                                                 "Sensor Zero Failure",
-                                                  MessageBoxButtons.RetryCancel,
-                                                  MessageBoxIcon.Exclamation,
-                                                  MessageBoxDefaultButton.Button1);
+                                                           "(Retry) after verifying all outputs are off." + Environment.NewLine +
+                                                           "(Cancel) all testing.",
+                                                           "Sensor Zero Failure",
+                                                            MessageBoxButtons.RetryCancel,
+                                                            MessageBoxIcon.Exclamation,
+                                                            MessageBoxDefaultButton.Button1);
 
                     retryZero = (verifyConnection == DialogResult.Retry);
                     if (verifyConnection == DialogResult.Cancel)
@@ -675,8 +682,6 @@ namespace CMWtests
 
         private TestStatus ConnectIdentifyDUT()
         {
-            int pmStatus = 0;
-            bool retrySensor = false;
             string cmwModel = "";
             string cmwSerNum = "";
             string[] identFields = { };
@@ -712,7 +717,7 @@ namespace CMWtests
             }
 
             // CMW Identification
-            var visaResponse = cmw.QueryString("*IDN?");
+            var visaResponse = Query(cmw, "*IDN?");
             try
             {
                 identFields = visaResponse.Split(',');
@@ -766,7 +771,7 @@ namespace CMWtests
             AddToResults("FW " + cmwFW);
 
             // CMW Options
-            visaResponse = cmw.QueryString("SYSTem:BASE:OPTion:LIST? HWOPtion");
+            visaResponse = Query(cmw, "SYSTem:BASE:OPTion:LIST? HWOPtion");
 #if DEBUG
             AddToResults(visaResponse);
 #endif
@@ -774,10 +779,7 @@ namespace CMWtests
 
             for (int i = 0; i < hwOptions.Length; i++)
             {
-                hasKB036 = hwOptions[i].Contains("KB036");
-#if DEBUG
-                //hasKB036 = false;
-#endif
+                hasKB036 = hwOptions[i].Contains("KB036") && Options.KB036Override;
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
                 if (hwOptions[i].Contains("H590"))
@@ -788,15 +790,26 @@ namespace CMWtests
             AddToResults("numOfTRX: " + numOfTRX.ToString());
             AddToResults("numOfFrontEnds: " + numOfFrontEnds.ToString());
 #endif
-            // Check Sensor connection
+            return TestStatus.Success;
+        }
+
+        private TestStatus CheckSensor()
+        {
+            int pmStatus = 0;
+            bool retrySensor = false;
+
             SetHead2Text("Please wait...");
             do
             {
+                mreMeasure.WaitOne();
+                Status = TestStatus.InProgress;
+                if (CancelTesting == true)
+                    return TestStatus.Abort;
 /// !
 #if !DEBUG
-                visaResponse = cmw.QueryWithSTB("READ:GPRF:MEAS:EPSensor?", 15000);
+                var visaResponse = Query(cmw, "READ:GPRF:MEAS:EPSensor?", 15000);
 #else
-                visaResponse = "0,0";
+                var visaResponse = "0,0";
 #endif
                 try
                 {
@@ -811,12 +824,12 @@ namespace CMWtests
                 if (pmStatus == 27)
                 {
                     var verifyConnection = ModalMessageBox("Ensure an NRP sensor is connected to the SENSOR port." + Environment.NewLine + Environment.NewLine +
-                                                 "(Retry) after verifying the connection." + Environment.NewLine +
-                                                 "(Cancel) all testing.",
-                                                 "Sensor Status Error",
-                                                  MessageBoxButtons.RetryCancel,
-                                                  MessageBoxIcon.Exclamation,
-                                                  MessageBoxDefaultButton.Button1);
+                                                           "(Retry) after verifying the connection." + Environment.NewLine +
+                                                           "(Cancel) all testing.",
+                                                           "Sensor Status Error",
+                                                            MessageBoxButtons.RetryCancel,
+                                                            MessageBoxIcon.Exclamation,
+                                                            MessageBoxDefaultButton.Button1);
 
                     if (verifyConnection == DialogResult.Retry)
                     {
@@ -824,7 +837,9 @@ namespace CMWtests
                         Thread.Sleep(5000);
                     }
                     else
+                    {
                         return TestStatus.Abort;
+                    }
                 }
                 else if (pmStatus == 0 || pmStatus == 4)
                 {
@@ -840,15 +855,17 @@ namespace CMWtests
             return TestStatus.Success;
         }
 
-        private StreamWriter OpenTempFile()
+        public StreamWriter OpenTempFile(out string tempFile)
         {
             try
             {
-                return new StreamWriter(GetTempFileName());
+                tempFile = GetTempFileName();
+                return new StreamWriter(tempFile);
             }
             catch (IOException e)
             {
                 ModalMessageBox(e.Message, e.GetType().ToString());
+                tempFile = null;
                 return null;
             }
         }
@@ -856,14 +873,15 @@ namespace CMWtests
         private string GetTempFileName()
         {
             int attempt = 0;
+            string fileName = "";
+
             while (true)
             {
-                csvFileName = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
-
+                fileName = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetRandomFileName(), "csv"));
                 try
                 {
-                    using (new FileStream(csvFileName, FileMode.CreateNew)) { }
-                    return csvFileName;
+                    using (new FileStream(fileName, FileMode.CreateNew)) { }
+                    return fileName;
                 }
                 catch (IOException ex)
                 {
@@ -876,8 +894,23 @@ namespace CMWtests
 
         private void InitMeasureSettings()
         {
-            cmw.Write("CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6");
-            cmw.Write("TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
+            Write(cmw, "CONFigure:GPRF:MEAS:POWer:MODE POWer; SCOunt 50; SLENgth 1000e-6; MLENgth 950e-6");
+            Write(cmw, "TRIGger:GPRF:MEAS:POWer:OFFSet 10e-6");
+        }
+
+        private void Write(VisaIO instr, string message, int timeout = 2000)
+        {
+            instr.IoLock();
+            instr.WriteWithSTB(message, timeout);
+            instr.IoUnlock();
+        }
+
+        private string Query(VisaIO instr, string message, int timeout = 2000)
+        {
+            instr.IoLock();
+            var response = instr.QueryWithSTB(message, timeout);
+            instr.IoUnlock();
+            return response;
         }
 
         private TestStatus GracefulExit(TestStatus exitStatus)
@@ -888,6 +921,7 @@ namespace CMWtests
 
             try
             {
+                tempGauge.Stop();
                 cmw.Reset();
                 cmw.CloseInstrument();
                 cmw = null;
@@ -914,8 +948,6 @@ namespace CMWtests
                     ModalMessageBox("Temp file delete Exception");
                 }
 
-            SetBtnBeginEnabled(true);
-
             if (exitStatus == TestStatus.Abort)
             {
                 AddToResults(Environment.NewLine + "Tests Aborted.");
@@ -926,15 +958,18 @@ namespace CMWtests
                 AddToResults(Environment.NewLine + "Tests Complete.");
             }
 
+            SetBtnBeginEnabled(true);
             Status = TestStatus.Complete;
-            mreExit.Set();
+            CancelTesting = false;
+            areExit.Set();
             return Status;
         }
 
-        private DialogResult ModalMessageBox(string message, string title = "",
-                                             MessageBoxButtons buttons = MessageBoxButtons.OK,
-                                             MessageBoxIcon icon = MessageBoxIcon.None,
-                                             MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
+        public DialogResult ModalMessageBox(
+            string message, string title = "",
+            MessageBoxButtons buttons = MessageBoxButtons.OK,
+            MessageBoxIcon icon = MessageBoxIcon.None,
+            MessageBoxDefaultButton defaultButton = MessageBoxDefaultButton.Button1)
         {
             DialogResult result = DialogResult.OK;
             Invoke(new MethodInvoker(() =>

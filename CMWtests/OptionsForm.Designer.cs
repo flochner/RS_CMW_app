@@ -1,6 +1,6 @@
 ﻿namespace CMWtests
 {
-    partial class OptionsForm
+    partial class Options
     {
         /// <summary>
         /// Required designer variable.
@@ -33,6 +33,9 @@
             this.buttonOK = new System.Windows.Forms.Button();
             this.buttonCancel = new System.Windows.Forms.Button();
             this.btnReset = new System.Windows.Forms.Button();
+            this.checkBoxTempOverride = new System.Windows.Forms.CheckBox();
+            this.checkBoxKB036 = new System.Windows.Forms.CheckBox();
+            this.checkBoxRecordTemp = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).BeginInit();
             this.SuspendLayout();
             // 
@@ -75,8 +78,8 @@
             this.buttonOK.Location = new System.Drawing.Point(143, 196);
             this.buttonOK.Name = "buttonOK";
             this.buttonOK.Size = new System.Drawing.Size(75, 23);
-            this.buttonOK.TabIndex = 2;
-            this.buttonOK.Text = "Accept";
+            this.buttonOK.TabIndex = 5;
+            this.buttonOK.Text = "OK";
             this.buttonOK.UseVisualStyleBackColor = true;
             this.buttonOK.Click += new System.EventHandler(this.buttonOK_Click);
             // 
@@ -87,7 +90,7 @@
             this.buttonCancel.Location = new System.Drawing.Point(224, 196);
             this.buttonCancel.Name = "buttonCancel";
             this.buttonCancel.Size = new System.Drawing.Size(75, 23);
-            this.buttonCancel.TabIndex = 3;
+            this.buttonCancel.TabIndex = 6;
             this.buttonCancel.Text = "Cancel";
             this.buttonCancel.UseVisualStyleBackColor = true;
             this.buttonCancel.Click += new System.EventHandler(this.buttonCancel_Click);
@@ -103,6 +106,44 @@
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
             // 
+            // checkBoxTempOverride
+            // 
+            this.checkBoxTempOverride.AutoSize = true;
+            this.checkBoxTempOverride.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxTempOverride.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.checkBoxTempOverride.Location = new System.Drawing.Point(25, 49);
+            this.checkBoxTempOverride.Name = "checkBoxTempOverride";
+            this.checkBoxTempOverride.Size = new System.Drawing.Size(124, 19);
+            this.checkBoxTempOverride.TabIndex = 2;
+            this.checkBoxTempOverride.Text = "Override WarmUp";
+            this.checkBoxTempOverride.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            this.checkBoxTempOverride.UseVisualStyleBackColor = true;
+            // 
+            // checkBoxKB036
+            // 
+            this.checkBoxKB036.AutoSize = true;
+            this.checkBoxKB036.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxKB036.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.checkBoxKB036.Location = new System.Drawing.Point(66, 99);
+            this.checkBoxKB036.Name = "checkBoxKB036";
+            this.checkBoxKB036.Size = new System.Drawing.Size(83, 19);
+            this.checkBoxKB036.TabIndex = 3;
+            this.checkBoxKB036.Text = "hasKB036";
+            this.checkBoxKB036.UseVisualStyleBackColor = true;
+            this.checkBoxKB036.Visible = false;
+            // 
+            // checkBoxRecordTemp
+            // 
+            this.checkBoxRecordTemp.AutoSize = true;
+            this.checkBoxRecordTemp.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxRecordTemp.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
+            this.checkBoxRecordTemp.Location = new System.Drawing.Point(9, 74);
+            this.checkBoxRecordTemp.Name = "checkBoxRecordTemp";
+            this.checkBoxRecordTemp.Size = new System.Drawing.Size(140, 19);
+            this.checkBoxRecordTemp.TabIndex = 7;
+            this.checkBoxRecordTemp.Text = "Record Temperature";
+            this.checkBoxRecordTemp.UseVisualStyleBackColor = true;
+            // 
             // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
@@ -110,12 +151,15 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.buttonCancel;
             this.ClientSize = new System.Drawing.Size(311, 231);
+            this.Controls.Add(this.checkBoxRecordTemp);
+            this.Controls.Add(this.checkBoxKB036);
+            this.Controls.Add(this.checkBoxTempOverride);
             this.Controls.Add(this.btnReset);
             this.Controls.Add(this.buttonCancel);
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.labelStatisticsCount);
             this.Controls.Add(this.numericUpDown_EPS);
-            this.Name = "OptionsForm";
+            this.Name = "Options";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Options";
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).EndInit();
@@ -131,5 +175,8 @@
         private System.Windows.Forms.Button buttonOK;
         private System.Windows.Forms.Button buttonCancel;
         private System.Windows.Forms.Button btnReset;
+        private System.Windows.Forms.CheckBox checkBoxTempOverride;
+        private System.Windows.Forms.CheckBox checkBoxKB036;
+        private System.Windows.Forms.CheckBox checkBoxRecordTemp;
     }
 }

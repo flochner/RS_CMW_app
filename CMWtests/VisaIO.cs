@@ -18,7 +18,9 @@ namespace CMWtests
 
     public class VisaIO
     {
+        private bool ioLocked;
         private static int vi = 0;
+        private string _message = "";
 
         public VisaIO(string viDesc)
         {
@@ -34,23 +36,23 @@ namespace CMWtests
 
         public ViStatus CloseInstrument()
         {
-            ViStatus status = visa32.viClose(vi);
-            return status;
+            return visa32.viClose(vi);
         }
 
-        public ViStatus Read(out string response, bool readSTB = false)
+        public ViStatus Read(out string response)
         {
             StringBuilder viResponse = new StringBuilder(1024);
             ViStatus stat = visa32.viRead(vi, viResponse, 1024, out int retCnt);
             response = viResponse.ToString().Truncate(retCnt > 0 ? retCnt : 0);
 
             if (stat < ViStatus.VI_SUCCESS)
-                ShowErrorText("VisaIO.Read", stat);
+                ShowErrorText("VisaIO.Read", _message, stat);
             return stat;
         }
 
         public ViStatus Write(string message, bool waitForOPC = false)
         {
+            _message = message;
             ViStatus stat = visa32.viWrite(vi, message, message.Length, out int viRetCount);
             if (waitForOPC == true)
                 WaitForOPC();
@@ -80,11 +82,12 @@ namespace CMWtests
             return response.TrimEnd('\n');
         }
 
-        public void WriteWithSTB(string command, int timeout)
+        public void WriteWithSTB(string message, int timeout)
         {
+            _message = message;
             QueryInteger("*ESR?"); //Clear the Event Status Register
-            Write(command + ";*OPC");
-            string exMessage = String.Format("WriteWithSTB - Timeout occurred. Command: \"{0}\", timeout {1} ms", command, timeout);
+            Write(message + ";*OPC");
+            string exMessage = String.Format("WriteWithSTB - Timeout occurred. Command: \"{0}\", timeout {1} ms", message, timeout);
             STBpolling(exMessage, timeout);
             QueryInteger("*ESR?"); //Clear the Event Status Register
         }
@@ -103,14 +106,35 @@ namespace CMWtests
 
         public void Reset()
         {
+            IoLock();
             Write("*RST", true);
+            IoUnlock();
+
             ClearStatus();
+
+            IoLock();
             Write("*ESE 1", true);
+            IoUnlock();
+        }
+
+        public void IoLock()
+        {
+            while (ioLocked == true)
+                Thread.Sleep(1);
+            ioLocked = true;
+        }
+
+        public void IoUnlock()
+        {
+            ioLocked = false;
         }
 
         public void ClearStatus()
         {
+            IoLock();
             QueryString("*CLS;*OPC?");
+            IoUnlock();
+
             ErrorChecking();
         }
 
@@ -128,6 +152,7 @@ namespace CMWtests
         {
             var errors = new List<string>();
 
+            IoLock() ;
             if (((QueryInteger("*STB?") >> 4) & 1) > 0)
             {
                 while (true)
@@ -147,6 +172,7 @@ namespace CMWtests
                     }
                 }
             }
+            IoUnlock();
             return errors;
         }
 

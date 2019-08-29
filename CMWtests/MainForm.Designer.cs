@@ -19,7 +19,7 @@ namespace CMWtests
             if (disposing && (components != null))
             {
                 components.Dispose();
-                mreExit.Dispose();
+                areExit.Dispose();
                 mreMeasure.Dispose();
             }
             base.Dispose(disposing);
@@ -34,6 +34,7 @@ namespace CMWtests
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -76,9 +77,16 @@ namespace CMWtests
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
             this.labelDebug = new System.Windows.Forms.Label();
             this.labelStatus = new System.Windows.Forms.Label();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.pictureBoxGraph = new System.Windows.Forms.PictureBox();
             this.menuStrip1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cutContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.copyContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.pasteContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.ContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.selectAllContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextMenu.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxGraph)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -118,7 +126,7 @@ namespace CMWtests
             this.newToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(146, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -207,17 +215,16 @@ namespace CMWtests
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
             this.editToolStripMenuItem.Text = "&Edit";
+            this.editToolStripMenuItem.Visible = false;
             // 
             // undoToolStripMenuItem
             // 
-            this.undoToolStripMenuItem.Enabled = false;
             this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
             this.undoToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.undoToolStripMenuItem.Text = "&Undo";
             // 
             // redoToolStripMenuItem
             // 
-            this.redoToolStripMenuItem.Enabled = false;
             this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
             this.redoToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.redoToolStripMenuItem.Text = "&Redo";
@@ -229,7 +236,6 @@ namespace CMWtests
             // 
             // cutToolStripMenuItem
             // 
-            this.cutToolStripMenuItem.Enabled = false;
             this.cutToolStripMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutToolStripMenuItem.Image")));
             this.cutToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.cutToolStripMenuItem.Name = "cutToolStripMenuItem";
@@ -364,6 +370,7 @@ namespace CMWtests
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxResults.BackColor = System.Drawing.SystemColors.Window;
+            this.textBoxResults.ContextMenuStrip = this.contextMenu;
             this.textBoxResults.Cursor = System.Windows.Forms.Cursors.Default;
             this.textBoxResults.HideSelection = false;
             this.textBoxResults.Location = new System.Drawing.Point(12, 359);
@@ -374,6 +381,62 @@ namespace CMWtests
             this.textBoxResults.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBoxResults.Size = new System.Drawing.Size(710, 118);
             this.textBoxResults.TabIndex = 0;
+            this.textBoxResults.Click += new System.EventHandler(this.textBoxResults_Click);
+            // 
+            // contextMenu
+            // 
+            this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cutContextMenuItem,
+            this.copyContextMenuItem,
+            this.pasteContextMenuItem,
+            this.ContextMenuSeparator1,
+            this.selectAllContextMenuItem});
+            this.contextMenu.Name = "contextMenu";
+            this.contextMenu.Size = new System.Drawing.Size(165, 98);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            // 
+            // cutContextMenuItem
+            // 
+            this.cutContextMenuItem.Enabled = false;
+            this.cutContextMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("cutContextMenuItem.Image")));
+            this.cutContextMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.cutContextMenuItem.Name = "cutContextMenuItem";
+            this.cutContextMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
+            this.cutContextMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.cutContextMenuItem.Text = "Cu&t";
+            // 
+            // copyContextMenuItem
+            // 
+            this.copyContextMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("copyContextMenuItem.Image")));
+            this.copyContextMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.copyContextMenuItem.Name = "copyContextMenuItem";
+            this.copyContextMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
+            this.copyContextMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.copyContextMenuItem.Text = "&Copy";
+            this.copyContextMenuItem.Click += new System.EventHandler(this.copyContextMenuItem_Click);
+            // 
+            // pasteContextMenuItem
+            // 
+            this.pasteContextMenuItem.Enabled = false;
+            this.pasteContextMenuItem.Image = ((System.Drawing.Image)(resources.GetObject("pasteContextMenuItem.Image")));
+            this.pasteContextMenuItem.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.pasteContextMenuItem.Name = "pasteContextMenuItem";
+            this.pasteContextMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
+            this.pasteContextMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.pasteContextMenuItem.Text = "&Paste";
+            // 
+            // ContextMenuSeparator1
+            // 
+            this.ContextMenuSeparator1.Name = "ContextMenuSeparator1";
+            this.ContextMenuSeparator1.Size = new System.Drawing.Size(161, 6);
+            // 
+            // selectAllContextMenuItem
+            // 
+            this.selectAllContextMenuItem.Name = "selectAllContextMenuItem";
+            this.selectAllContextMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.selectAllContextMenuItem.Size = new System.Drawing.Size(164, 22);
+            this.selectAllContextMenuItem.Text = "Select &All";
+            this.selectAllContextMenuItem.Click += new System.EventHandler(this.selectAllContextMenuItem_Click);
             // 
             // btnBeginTests
             // 
@@ -388,18 +451,18 @@ namespace CMWtests
             // labelHead1
             // 
             this.labelHead1.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHead1.Location = new System.Drawing.Point(177, 27);
+            this.labelHead1.Location = new System.Drawing.Point(192, 27);
             this.labelHead1.Name = "labelHead1";
-            this.labelHead1.Size = new System.Drawing.Size(380, 16);
+            this.labelHead1.Size = new System.Drawing.Size(345, 16);
             this.labelHead1.TabIndex = 0;
             this.labelHead1.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
             // labelHead2
             // 
             this.labelHead2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.labelHead2.Location = new System.Drawing.Point(177, 47);
+            this.labelHead2.Location = new System.Drawing.Point(192, 47);
             this.labelHead2.Name = "labelHead2";
-            this.labelHead2.Size = new System.Drawing.Size(380, 16);
+            this.labelHead2.Size = new System.Drawing.Size(345, 16);
             this.labelHead2.TabIndex = 0;
             this.labelHead2.TextAlign = System.Drawing.ContentAlignment.BottomCenter;
             // 
@@ -445,24 +508,26 @@ namespace CMWtests
             this.labelStatus.TabIndex = 15;
             this.labelStatus.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // pictureBox1
+            // pictureBoxGraph
             // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.Window;
-            this.pictureBox1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBox1.Location = new System.Drawing.Point(12, 73);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(710, 280);
-            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
-            this.pictureBox1.TabIndex = 16;
-            this.pictureBox1.TabStop = false;
-            this.pictureBox1.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            this.pictureBoxGraph.BackColor = System.Drawing.SystemColors.Window;
+            this.pictureBoxGraph.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pictureBoxGraph.ContextMenuStrip = this.contextMenu;
+            this.pictureBoxGraph.Location = new System.Drawing.Point(12, 73);
+            this.pictureBoxGraph.Name = "pictureBoxGraph";
+            this.pictureBoxGraph.Size = new System.Drawing.Size(710, 280);
+            this.pictureBoxGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pictureBoxGraph.TabIndex = 16;
+            this.pictureBoxGraph.TabStop = false;
+            this.pictureBoxGraph.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
+            this.pictureBoxGraph.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxGraph_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(734, 511);
-            this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.pictureBoxGraph);
             this.Controls.Add(this.labelStatus);
             this.Controls.Add(this.labelDebug);
             this.Controls.Add(this.progressBar1);
@@ -480,7 +545,8 @@ namespace CMWtests
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
+            this.contextMenu.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxGraph)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -529,7 +595,13 @@ namespace CMWtests
         private System.Windows.Forms.ProgressBar progressBar1;
         private System.Windows.Forms.Label labelDebug;
         private System.Windows.Forms.Label labelStatus;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.PictureBox pictureBoxGraph;
+        private System.Windows.Forms.ContextMenuStrip contextMenu;
+        private System.Windows.Forms.ToolStripMenuItem cutContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem copyContextMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem pasteContextMenuItem;
+        private System.Windows.Forms.ToolStripSeparator ContextMenuSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem selectAllContextMenuItem;
     }
 }
 
