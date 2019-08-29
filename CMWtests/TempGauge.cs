@@ -9,7 +9,7 @@ namespace CMWtests
 {
     public partial class TempGauge : UserControl
     {
-        private bool runComplete = false;
+        private bool stopRecording;
         private double cmwTempC = 0.0;
         private string elapsedTime = "";
         private string csvFileName = "";
@@ -19,6 +19,8 @@ namespace CMWtests
         private StreamWriter csvStream = null;
         private TimeSpan ts = TimeSpan.Zero;
         private VisaIO cmw;
+        private Task task;
+
 
         public TempGauge(MainForm obj)
         {
@@ -31,11 +33,16 @@ namespace CMWtests
             cmw = instr;
             cts = new CancellationTokenSource();
 
-            csvStream = mainForm.OpenTempFile(out csvFileName);
+            Options.RecordTempEnabled = false;
+            if (Options.RecordTemp == true)
+            {
+                csvStream = mainForm.OpenTempFile(out csvFileName);
+                csvStream.AutoFlush = true;
+            }
 
             stopwatch = Stopwatch.StartNew();
 
-            Task.Factory.StartNew(Run, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            task = Task.Factory.StartNew(Run, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             do
             {
@@ -45,19 +52,12 @@ namespace CMWtests
             }
             while (cmwTempC == 0.0);
 
-            int i = 0;
-            while (cmwTempC < 45.0 && OptionsForm.TempOverride == false)
+            while (cmwTempC < 45.0 && Options.TempOverride == false)
             {
                 if (MainForm.CancelTesting == true)
                     return false;
 
-                Thread.Sleep(1650);
-                //Invoke(new MethodInvoker(() =>
-                //{
-                //    labelTemp.Text = "";
-                //}));
-                Thread.Sleep(350);
-                i++;
+                Thread.Sleep(500);
             }
 
             stopwatch.Stop();
@@ -75,6 +75,7 @@ namespace CMWtests
 
             Invoke(new MethodInvoker(() =>
             {
+                stopRecordingToolStripMenuItem.Enabled = true;
                 this.Visible = true;
                 this.Enabled = true;
                 this.Refresh();
@@ -82,60 +83,61 @@ namespace CMWtests
 
             while (cmw != null)
             {
-                labelTemp.ForeColor = System.Drawing.Color.Red;
-                Thread.Sleep(100);
-
                 try
                 {
                     cmwTempC = ReadTemp(cmw);
-#if DEBUG
-                    RecordTemp();
-#endif
+                    if (stopwatch.IsRunning && Options.RecordTemp == true)
+                        RecordTemp();
                 }
                 catch (Exception e)
                 {
-                    MessageBox.Show("Broken at TempGauge read" +
-                                     Environment.NewLine + e.Source + ":" +
-                                     Environment.NewLine + e.Message + Environment.NewLine +
-                                     Environment.NewLine + e.StackTrace,
-                                     e.Source);
+                    mainForm.ModalMessageBox(
+                        "Broken at TempGauge read" +
+                         Environment.NewLine + e.Source + ":" +
+                         Environment.NewLine + e.Message + Environment.NewLine +
+                         Environment.NewLine + e.StackTrace,
+                         e.Source);
                     Stop();
                     return;
                 }
 
-                var sliderPos = Convert.ToInt16(((cmwTempC - 25) * 4D) + 12);
+                var sliderPos = Convert.ToInt16(((cmwTempC - 25.0) * 4.0) + 12.0);
 
                 BeginInvoke(new MethodInvoker(() =>
                 {
                     pictureBoxSlider.Left = sliderPos;
                     pictureBoxSlider.Visible = true;
 
+                    labelTemp.ForeColor = System.Drawing.Color.Red;
+                    labelTemp.Visible = true;
                     labelTemp.Text = string.Format("{0:F1}", cmwTempC);
                     labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
-                    labelTemp.Visible = true;
                     
                     this.Refresh();
                 }));
 
+                Thread.Sleep(100);  //1000
                 labelTemp.ForeColor = System.Drawing.Color.Black;
-                for (int i = 0; i < 10; i++)
+
+                for (int i = 0; i < 9; i++)  //29
                 {
                     if (cts.IsCancellationRequested)
-                    {
-                        runComplete = true;
                         return;
-                    }
-                    Thread.Sleep(10);
+                    
+                    Thread.Sleep(100);  //1000
                 }
             }
         }
 
-        public void Stop()
+        public bool Stop()
         {
+            if (cts == null || cts.IsCancellationRequested == true)
+                return true;
+
             cts.Cancel();
 
-            while (runComplete == false)
-                Thread.Sleep(100);
+            while (task.Status == TaskStatus.Running)
+                Thread.Sleep(10);
 
             Invoke(new MethodInvoker(() =>
             {
@@ -144,38 +146,71 @@ namespace CMWtests
                 this.Enabled = false;
                 this.Refresh();
             }));
-            
-            try
-            {
-                csvStream.Dispose();
-            }
-            catch (Exception e)
-            {
-                mainForm.ModalMessageBox(e.Source + Environment.NewLine + e.Message, 
-                                        "Dispose TempGauge csvStream Exception");
-            }
+
+            if (Options.RecordTemp == true)
+                StopRecording();
+
+            Options.RecordTempEnabled = true;
+            cts.Dispose();
 
             //Process proc = new Process();
             //proc.StartInfo.FileName = "C:\\Program Files\\Sublime Text 3\\subl.exe";
-            //proc.StartInfo.Arguments = csvFileName;
+            //proc.StartInfo.Arguments = newFullName;
             //proc.Start();
 
-            //if (File.Exists(csvFileName))
-            //    try
-            //    {
-            //        File.Delete(csvFileName);
-            //    }
-            //    catch
-            //    {
-            //        mainForm.ModalMessageBox("Temp file delete Exception");
-            //    }
+            return true; 
+        }
+
+        public bool StopRecording()
+        {
+            stopRecording = true;
+
+            try
+            {
+                csvStream.Close();
+                csvStream.Dispose();
             }
+            catch (ObjectDisposedException) { }
+            catch (Exception e)
+            {
+                mainForm.ModalMessageBox(
+                    "Close TempGauge csvStream Exception" +
+                     Environment.NewLine + e.Source + ":" +
+                     Environment.NewLine + e.Message + Environment.NewLine +
+                     Environment.NewLine + e.StackTrace,
+                     e.Source);
+                return false;
+            }
+
+            var desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+            var dataDir = Path.Combine(desktop, "Data");
+            var newFullName = Path.Combine(dataDir, Path.GetFileName(csvFileName));
+
+            if (Directory.Exists(dataDir) == false)
+                Directory.CreateDirectory(dataDir);
+
+            try
+            {
+                File.Move(csvFileName, newFullName);
+            }
+            catch (Exception e)
+            {
+                mainForm.ModalMessageBox(
+                    "File move Exception" +
+                     Environment.NewLine + e.Source + ":" +
+                     Environment.NewLine + e.Message + Environment.NewLine +
+                     Environment.NewLine + e.StackTrace,
+                     e.Source);
+                return false;
+            }
+            return true;
+        }
 
         private double ReadTemp(VisaIO instr)
         {
-            cmw.Lock();
-            var visaResponse = instr.QueryString("SENSe:BASE:TEMPerature:OPERating:INTernal?");
-            cmw.Unlock();
+            cmw.IoLock();
+            var visaResponse = instr.QueryWithSTB("SENSe:BASE:TEMPerature:OPERating:INTernal?", 2000);
+            cmw.IoUnlock();
             return Convert.ToDouble(visaResponse);
         }
 
@@ -184,27 +219,48 @@ namespace CMWtests
             ts = stopwatch.Elapsed;
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
 
-            try
-            {
-                csvStream.WriteLine(elapsedTime + "," + cmwTempC.ToString());
-            }
-            catch (Exception e)
-            {
-                mainForm.ModalMessageBox("RecordTemp():\n" + e.Message, e.GetType().ToString());
-            }
+            if (csvStream != null && stopRecording == false)
+                try
+                {
+                    csvStream.WriteLine(elapsedTime + "," + cmwTempC.ToString());
+                }
+                catch (ObjectDisposedException) { }
+                catch (Exception e)
+                {
+                    mainForm.ModalMessageBox("RecordTemp():\n" + e.Message, e.GetType().ToString());
+                }
+        }
+
+        public int KillTask()
+        {
+            cts.Dispose();
+            task.Dispose();
+            return 0;
         }
 
         private void contextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (OptionsForm.TempOverride == true)
+            if (Options.TempOverride == true)
                 overrideWarmUpToolStripMenuItem.CheckState = CheckState.Checked;
             else
                 overrideWarmUpToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+            if (Options.RecordTemp == true)
+                stopRecordingToolStripMenuItem.Enabled = true;
+            else
+                stopRecordingToolStripMenuItem.Enabled = false;
         }
 
         private void overrideWarmUpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            OptionsForm.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
+            Options.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
+        }
+
+        private void stopRecordingToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Options.RecordTemp = false;
+            stopRecordingToolStripMenuItem.Enabled = false;
+            StopRecording();
         }
     }
 }

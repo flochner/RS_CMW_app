@@ -38,6 +38,7 @@
             this.labelTemp = new System.Windows.Forms.Label();
             this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.overrideWarmUpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.stopRecordingToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxGauge)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxSlider)).BeginInit();
             this.contextMenu.SuspendLayout();
@@ -113,20 +114,28 @@
             // contextMenu
             // 
             this.contextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.overrideWarmUpToolStripMenuItem});
+            this.overrideWarmUpToolStripMenuItem,
+            this.stopRecordingToolStripMenuItem});
             this.contextMenu.Name = "contextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(181, 48);
+            this.contextMenu.Size = new System.Drawing.Size(170, 48);
             this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // overrideWarmUpToolStripMenuItem
             // 
-            this.overrideWarmUpToolStripMenuItem.Checked = true;
             this.overrideWarmUpToolStripMenuItem.CheckOnClick = true;
-            this.overrideWarmUpToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.overrideWarmUpToolStripMenuItem.Name = "overrideWarmUpToolStripMenuItem";
-            this.overrideWarmUpToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.overrideWarmUpToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.overrideWarmUpToolStripMenuItem.Text = "Override WarmUp";
             this.overrideWarmUpToolStripMenuItem.Click += new System.EventHandler(this.overrideWarmUpToolStripMenuItem_Click);
+            // 
+            // stopRecordingToolStripMenuItem
+            // 
+            this.stopRecordingToolStripMenuItem.CheckOnClick = true;
+            this.stopRecordingToolStripMenuItem.Enabled = false;
+            this.stopRecordingToolStripMenuItem.Name = "stopRecordingToolStripMenuItem";
+            this.stopRecordingToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.stopRecordingToolStripMenuItem.Text = "Stop Recording";
+            this.stopRecordingToolStripMenuItem.Click += new System.EventHandler(this.stopRecordingToolStripMenuItem_Click);
             // 
             // TempGauge
             // 
@@ -157,8 +166,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        public System.Windows.Forms.Label labelTemp;
+        private System.Windows.Forms.Label labelTemp;
         private System.Windows.Forms.ContextMenuStrip contextMenu;
         private System.Windows.Forms.ToolStripMenuItem overrideWarmUpToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem stopRecordingToolStripMenuItem;
     }
 }
