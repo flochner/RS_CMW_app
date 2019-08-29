@@ -64,7 +64,8 @@ namespace CMWtests
             ts = stopwatch.Elapsed;
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
             mainForm.AddToResults("Warmup Time: " + elapsedTime);
-            mainForm.AddToResults(csvFileName);
+            if (Options.RecordTemp == true)
+                mainForm.AddToResults(csvFileName);
 
             return true;
         }
