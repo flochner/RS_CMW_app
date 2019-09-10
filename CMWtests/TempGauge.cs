@@ -17,10 +17,7 @@ namespace CMWtests
         private MainForm mainForm = null;
         private Stopwatch stopwatch = null;
         private StreamWriter csvStream = null;
-        private TimeSpan ts = TimeSpan.Zero;
-        private VisaIO cmw;
         private Task task;
-
 
         public TempGauge(MainForm obj)
         {
@@ -30,7 +27,6 @@ namespace CMWtests
 
         public bool Start(VisaIO instr)
         {
-            cmw = instr;
             cts = new CancellationTokenSource();
 
             Options.RecordTempEnabled = false;
@@ -42,7 +38,7 @@ namespace CMWtests
 
             stopwatch = Stopwatch.StartNew();
 
-            task = Task.Factory.StartNew(Run, cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            task = Task.Factory.StartNew(() => Run(instr), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
 
             do
             {
@@ -61,7 +57,7 @@ namespace CMWtests
             }
 
             stopwatch.Stop();
-            ts = stopwatch.Elapsed;
+            TimeSpan ts = stopwatch.Elapsed;
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
             mainForm.AddToResults("Warmup Time: " + elapsedTime);
             if (Options.RecordTemp == true)
@@ -70,7 +66,7 @@ namespace CMWtests
             return true;
         }
 
-        private void Run()
+        private void Run(VisaIO instr)
         {
             Thread.CurrentThread.Name = "TempGauge";
 
@@ -82,11 +78,11 @@ namespace CMWtests
                 this.Refresh();
             }));
 
-            while (cmw != null)
+            while (instr != null)
             {
                 try
                 {
-                    cmwTempC = ReadTemp(cmw);
+                    cmwTempC = ReadTemp(instr);
                     if (stopwatch.IsRunning && Options.RecordTemp == true)
                         RecordTemp();
                 }
@@ -117,15 +113,15 @@ namespace CMWtests
                     this.Refresh();
                 }));
 
-                Thread.Sleep(100);  //1000
+                Thread.Sleep(1000);  //1000
                 labelTemp.ForeColor = System.Drawing.Color.Black;
 
-                for (int i = 0; i < 9; i++)  //29
+                for (int i = 0; i < 29; i++)  //29
                 {
                     if (cts.IsCancellationRequested)
                         return;
                     
-                    Thread.Sleep(100);  //1000
+                    Thread.Sleep(1000);  //1000
                 }
             }
         }
@@ -209,15 +205,15 @@ namespace CMWtests
 
         private double ReadTemp(VisaIO instr)
         {
-            cmw.IoLock();
+            instr.IoLock();
             var visaResponse = instr.QueryWithSTB("SENSe:BASE:TEMPerature:OPERating:INTernal?", 2000);
-            cmw.IoUnlock();
+            instr.IoUnlock();
             return Convert.ToDouble(visaResponse);
         }
 
         private void RecordTemp()
         {
-            ts = stopwatch.Elapsed;
+            TimeSpan ts = stopwatch.Elapsed;
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
 
             if (csvStream != null && stopRecording == false)
