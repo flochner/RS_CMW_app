@@ -36,7 +36,7 @@ namespace RsVisaLoader
     @return - VI_TRUE: the default library value has changed.
             - VI_FALSE: uManfID is invalid
     ******************************************************************************/
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#060", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#060", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern UInt16 RsViSetDefaultLibrary(UInt16 iManfId);
 
 
@@ -50,7 +50,7 @@ namespace RsVisaLoader
     @postcondition - none
     @side_effects  - none
     ******************************************************************************/
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#061", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#061", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern void RsViUnloadVisaLibrary();
 
     /* FUNCTION ******************************************************************/
@@ -71,7 +71,7 @@ namespace RsVisaLoader
     @return - VI_TRUE: the VISA library is installed.
             - VI_FALSE: not installed or uManfID is isvalid.
     ******************************************************************************/
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#062", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#062", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern UInt16 RsViIsVisaLibraryInstalled(UInt16 iManfId);
 
     #endregion
@@ -342,134 +342,134 @@ namespace RsVisaLoader
     public delegate ViStatus ViEventHandler(int vi, ViEventType inEventType, int inContext, int inUserHandle);
 
     #region - Resource Template Functions and Operations ----------------------------
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#141", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#141", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viOpenDefaultRM(out int sesn);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#128", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#128", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGetDefaultRM(out int sesn);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#129", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#129", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viFindRsrc(int sesn, string expr, out int vi, out int retCount, StringBuilder desc);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#130", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#130", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viFindNext(int vi, StringBuilder desc);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#146", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#146", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viParseRsrc(int sesn, string desc, out short intfType, out short intfNum);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#147", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#147", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viParseRsrcEx(int sesn, string desc, out short intfType, out short intfNum, StringBuilder rsrcClass, StringBuilder expandedUnaliasedName, StringBuilder aliasIfExists);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#131", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#131", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viOpen(int sesn, string viDesc, int mode, int timeout, out int vi);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#132", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#132", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viClose(int vi);
 
     #region viGetAttribute Overloads
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGetAttribute(int vi, ViAttr attrName, out byte attrValue);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGetAttribute(int vi, ViAttr attrName, out short attrValue);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGetAttribute(int vi, ViAttr attrName, out int attrValue);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#133", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGetAttribute(int vi, ViAttr attrName, StringBuilder attrValue);
     #endregion
 
     #region viSetAttribute Overloads
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viSetAttribute(int vi, ViAttr attrName, byte attrValue);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viSetAttribute(int vi, ViAttr attrName, short attrValue);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#134", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viSetAttribute(int vi, ViAttr attrName, int attrValue);
     #endregion
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#142", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#142", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viStatusDesc(int vi, ViStatus status, StringBuilder desc);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#143", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#143", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viTerminate(int vi, short degree, int jobId);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#144", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#144", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viLock(int vi, int lockType, int timeout, string requestedKey, StringBuilder accessKey);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#145", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#145", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viUnlock(int vi);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#135", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#135", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viEnableEvent(int vi, ViEventType eventType, short mechanism, int context);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#136", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#136", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viDisableEvent(int vi, ViEventType eventType, short mechanism);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#137", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#137", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viDiscardEvents(int vi, ViEventType eventType, short mechanism);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#138", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#138", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWaitOnEvent(int vi, ViEventType inEventType, int timeout, out ViEventType outEventType, out int outEventContext);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#139", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#139", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viInstallHandler(int vi, ViEventType inEventType, ViEventHandler inHandler, int inUserHandle);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#140", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#140", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viUninstallHandler(int vi, ViEventType inEventType, ViEventHandler inHandler, int inUserHandle);
     #endregion
 
     #region - Basic I/O Operations --------------------------------------------------
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#256", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#256", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viRead(int vi, byte[] buffer, int count, out int retCount);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#277", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#277", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viReadAsync(int vi, byte[] buffer, int count, out int jobId);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#219", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#219", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viReadToFile(int vi, string filename, int count, out int retCount);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#257", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#257", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWrite(int vi, byte[] buffer, int count, out int retCount);
 
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#278", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#278", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWriteAsync(int vi, byte[] buffer, int count, out int jobId);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#218", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#218", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWriteFromFile(int vi, string filename, int count, out int retCount);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#258", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#258", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viAssertTrigger(int vi, short protocol);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#259", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#259", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viReadSTB(int vi, out short status);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#260", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#260", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viClear(int vi);
     #endregion
 
     #region - Basic I/O Operations with convenient types ----------------------------
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#256", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#256", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viRead(int vi, StringBuilder buffer, int count, out int retCount);
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#257", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#257", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWrite(int vi, string buffer, int count, out int retCount);
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#277", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#277", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viReadAsync(int vi, StringBuilder buffer, int count, out int jobId);
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#278", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#278", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viWriteAsync(int vi, string buffer, int count, out int jobId);
     #endregion
 
     #region - Shared Memory Operations ----------------------------------------------
 
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#291", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#291", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viMemAlloc(int vi, int memSize, out int offset);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#292", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#292", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viMemFree(int vi, int offset);
     #endregion
 
     #region - Interface Specific Operations -----------------------------------------
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#208", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#208", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGpibControlREN(int vi, short mode);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#210", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#210", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGpibControlATN(int vi, short mode);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#211", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#211", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGpibSendIFC(int vi);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#212", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#212", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGpibCommand(int vi, string buffer, int count, out int retCount);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#213", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#213", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viGpibPassControl(int vi, short primAddr, short secAddr);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#209", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#209", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viVxiCommandQuery(int vi, short mode, int devCmd, out int devResponse);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#214", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#214", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viAssertUtilSignal(int vi, short line);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#215", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#215", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viAssertIntrSignal(int vi, short mode, int statusID);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#216", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#216", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viMapTrigger(int vi, short trigSrc, short trigDest, short mode);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#217", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#217", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viUnmapTrigger(int vi, short trigSrc, short trigDest);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#293", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#293", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viUsbControlOut(int vi, short bmRequestType, short bRequest, short wValue, short wIndex, short wLength, byte[] buf);
-    [DllImport("RsVisaLoader.dll", EntryPoint = "#294", ExactSpelling = true, CharSet = CharSet.Unicode)]
+    [DllImport("RsVisaLoader.dll", EntryPoint = "#294", ExactSpelling = true, CharSet = CharSet.Ansi)]
     public static extern ViStatus viUsbControlIn(int vi, short bmRequestType, short bRequest, short wValue, short wIndex, short wLength, byte[] buf, out short retCnt);
     #endregion
 
