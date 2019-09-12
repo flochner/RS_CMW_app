@@ -39,7 +39,7 @@ namespace CMWtests
             stopwatch = Stopwatch.StartNew();
 
             task = Task.Factory.StartNew(() => Run(instr), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
-
+            
             do
             {
                 if (MainForm.CancelTesting == true)
@@ -100,7 +100,7 @@ namespace CMWtests
 
                 var sliderPos = Convert.ToInt16(((cmwTempC - 25.0) * 4.0) + 12.0);
 
-                BeginInvoke(new MethodInvoker(() =>
+                Invoke(new MethodInvoker(() =>    // BeginInvoke
                 {
                     pictureBoxSlider.Left = sliderPos;
                     pictureBoxSlider.Visible = true;
@@ -109,19 +109,27 @@ namespace CMWtests
                     labelTemp.Visible = true;
                     labelTemp.Text = string.Format("{0:F1}", cmwTempC);
                     labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
-                    
+
+                    this.Refresh();
+
+                    for (int i = 0; i < 10; i++)  //  10
+                    {
+                        if (cts.IsCancellationRequested)
+                            return;
+                        Thread.Sleep(1);  //  100
+                    }
+
+                    labelTemp.ForeColor = System.Drawing.Color.Black;
+
                     this.Refresh();
                 }));
 
-                Thread.Sleep(1000);  //1000
-                labelTemp.ForeColor = System.Drawing.Color.Black;
 
-                for (int i = 0; i < 29; i++)  //29
+                for (int i = 0; i < 29; i++)  // 290
                 {
                     if (cts.IsCancellationRequested)
                         return;
-                    
-                    Thread.Sleep(1000);  //1000
+                    Thread.Sleep(1);  // 100
                 }
             }
         }
@@ -133,8 +141,13 @@ namespace CMWtests
 
             cts.Cancel();
 
+            int i = 0;
             while (task.Status == TaskStatus.Running)
+            {
                 Thread.Sleep(10);
+                if (i++ > 1000)
+                    KillTask();
+            }
 
             Invoke(new MethodInvoker(() =>
             {
@@ -251,6 +264,8 @@ namespace CMWtests
         private void overrideWarmUpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Options.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
+            if (Options.TempOverride == true)
+                overrideWarmUpToolStripMenuItem.Enabled = false;
         }
 
         private void stopRecordingToolStripMenuItem_Click(object sender, EventArgs e)
