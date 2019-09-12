@@ -958,6 +958,7 @@ namespace CMWtests
                 AddToResults(Environment.NewLine + "Tests Complete.");
             }
 
+            Options.TempOverride = false;
             SetBtnBeginEnabled(true);
             Status = TestStatus.Complete;
             CancelTesting = false;

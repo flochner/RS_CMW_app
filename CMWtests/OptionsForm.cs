@@ -8,9 +8,9 @@ namespace CMWtests
         const int STATSRESET = 2;
 
         public static int StatsCount { get; private set; } = STATSRESET;
-        public static bool TempOverride { get; set; }
+        public static bool TempOverride { get; set; } = false;
         public static bool KB036Override { get; set; } = true;
-        public static bool RecordTemp { get; set; }
+        public static bool RecordTemp { get; set; } = false;
         public static bool RecordTempEnabled { get; set; } = true;
 
         public Options()
@@ -36,6 +36,8 @@ namespace CMWtests
                 checkBoxRecordTemp.CheckState = CheckState.Checked;
             else
                 checkBoxRecordTemp.CheckState = CheckState.Unchecked;
+
+            checkBoxTempOverride.Enabled = TempGauge.OptionsOverrideTempEnabled;
         }
 
         private void buttonOK_Click(object sender, EventArgs e)

@@ -18,6 +18,7 @@ namespace CMWtests
         private Stopwatch stopwatch = null;
         private StreamWriter csvStream = null;
         private Task task;
+        public static bool OptionsOverrideTempEnabled = true;
 
         public TempGauge(MainForm obj)
         {
@@ -55,6 +56,12 @@ namespace CMWtests
 
                 Thread.Sleep(500);
             }
+
+            OptionsOverrideTempEnabled = false;
+            Invoke(new MethodInvoker(() =>
+            {
+                overrideWarmUpToolStripMenuItem.Enabled = false;
+            }));
 
             stopwatch.Stop();
             TimeSpan ts = stopwatch.Elapsed;
@@ -148,6 +155,12 @@ namespace CMWtests
                 if (i++ > 1000)
                     KillTask();
             }
+
+            OptionsOverrideTempEnabled = true;
+            Invoke(new MethodInvoker(() =>
+            {
+                overrideWarmUpToolStripMenuItem.Enabled = true;
+            }));
 
             Invoke(new MethodInvoker(() =>
             {
@@ -264,8 +277,6 @@ namespace CMWtests
         private void overrideWarmUpToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Options.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
-            if (Options.TempOverride == true)
-                overrideWarmUpToolStripMenuItem.Enabled = false;
         }
 
         private void stopRecordingToolStripMenuItem_Click(object sender, EventArgs e)

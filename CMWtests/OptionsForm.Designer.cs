@@ -144,7 +144,7 @@
             this.checkBoxRecordTemp.Text = "Record Temperature";
             this.checkBoxRecordTemp.UseVisualStyleBackColor = true;
             // 
-            // OptionsForm
+            // Options
             // 
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
