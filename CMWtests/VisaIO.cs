@@ -24,7 +24,7 @@ namespace CMWtests
 
         public VisaIO(string viDesc)
         {
-            visa32.viOpen(MainForm.DefResMgr, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_IMMEDIATE, out vi);
+            visa32.viOpen(MainForm.DefResMgr, viDesc, visa32.VI_NO_LOCK, visa32.VI_TMO_INFINITE, out vi);
         }
 
         public static ViStatus CloseDefMgr()
