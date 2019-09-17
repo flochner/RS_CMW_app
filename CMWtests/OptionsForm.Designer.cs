@@ -1,6 +1,6 @@
 ﻿namespace CMWtests
 {
-    partial class Options
+    partial class OptionsForm
     {
         /// <summary>
         /// Required designer variable.
@@ -54,7 +54,7 @@
             0});
             this.numericUpDown_EPS.Name = "numericUpDown_EPS";
             this.numericUpDown_EPS.Size = new System.Drawing.Size(38, 20);
-            this.numericUpDown_EPS.TabIndex = 0;
+            this.numericUpDown_EPS.TabIndex = 1;
             this.numericUpDown_EPS.Value = new decimal(new int[] {
             2,
             0,
@@ -68,7 +68,7 @@
             this.labelStatisticsCount.Location = new System.Drawing.Point(12, 23);
             this.labelStatisticsCount.Name = "labelStatisticsCount";
             this.labelStatisticsCount.Size = new System.Drawing.Size(117, 15);
-            this.labelStatisticsCount.TabIndex = 1;
+            this.labelStatisticsCount.TabIndex = 0;
             this.labelStatisticsCount.Text = "EPS Statistics Count";
             // 
             // buttonOK
@@ -101,7 +101,7 @@
             this.btnReset.Location = new System.Drawing.Point(12, 196);
             this.btnReset.Name = "btnReset";
             this.btnReset.Size = new System.Drawing.Size(75, 23);
-            this.btnReset.TabIndex = 4;
+            this.btnReset.TabIndex = 7;
             this.btnReset.Text = "Reset";
             this.btnReset.UseVisualStyleBackColor = true;
             this.btnReset.Click += new System.EventHandler(this.btnReset_Click);
@@ -123,11 +123,13 @@
             // 
             this.checkBoxKB036.AutoSize = true;
             this.checkBoxKB036.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.checkBoxKB036.Checked = true;
+            this.checkBoxKB036.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxKB036.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F);
             this.checkBoxKB036.Location = new System.Drawing.Point(66, 99);
             this.checkBoxKB036.Name = "checkBoxKB036";
             this.checkBoxKB036.Size = new System.Drawing.Size(83, 19);
-            this.checkBoxKB036.TabIndex = 3;
+            this.checkBoxKB036.TabIndex = 4;
             this.checkBoxKB036.Text = "hasKB036";
             this.checkBoxKB036.UseVisualStyleBackColor = true;
             this.checkBoxKB036.Visible = false;
@@ -140,11 +142,11 @@
             this.checkBoxRecordTemp.Location = new System.Drawing.Point(9, 74);
             this.checkBoxRecordTemp.Name = "checkBoxRecordTemp";
             this.checkBoxRecordTemp.Size = new System.Drawing.Size(140, 19);
-            this.checkBoxRecordTemp.TabIndex = 7;
+            this.checkBoxRecordTemp.TabIndex = 3;
             this.checkBoxRecordTemp.Text = "Record Temperature";
             this.checkBoxRecordTemp.UseVisualStyleBackColor = true;
             // 
-            // Options
+            // OptionsForm
             // 
             this.AcceptButton = this.buttonOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -159,7 +161,7 @@
             this.Controls.Add(this.buttonOK);
             this.Controls.Add(this.labelStatisticsCount);
             this.Controls.Add(this.numericUpDown_EPS);
-            this.Name = "Options";
+            this.Name = "OptionsForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Options";
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_EPS)).EndInit();

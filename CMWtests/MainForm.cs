@@ -18,6 +18,7 @@ namespace CMWtests
         {
             InitializeComponent();
             Thread.CurrentThread.Name = "MainForm";
+
             tempGauge = new TempGauge(this)
             { Location = new System.Drawing.Point(539, 29) };
             this.Controls.Add(tempGauge);
@@ -32,6 +33,7 @@ namespace CMWtests
                 newToolStripMenuItem.Enabled = false;
                 optionsToolStripMenuItem.Enabled = false;
                 communicateWithInstrumentToolStripMenuItem.Enabled = false;
+                MessageBox.Show("No VISA Resource Manager installed.");
             }
         }
 
@@ -245,12 +247,11 @@ namespace CMWtests
                    mreMeasure.WaitOne(0) == true)
                 Thread.Sleep(100);
 
-            var options = new Options();
-            options.ShowDialog(this);
-            options.Dispose();
+            using (var options = new OptionsForm())
+                options.ShowDialog(this);
 
             if (cmw != null)
-                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + Options.StatsCount);
+                Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
 
             mreMeasure.Set();
         }

@@ -18,7 +18,6 @@ namespace CMWtests
         private Stopwatch stopwatch = null;
         private StreamWriter csvStream = null;
         private Task task;
-        public static bool OptionsOverrideTempEnabled = true;
 
         public TempGauge(MainForm obj)
         {
@@ -30,8 +29,9 @@ namespace CMWtests
         {
             cts = new CancellationTokenSource();
 
-            Options.RecordTempEnabled = false;
-            if (Options.RecordTemp == true)
+            OptionsForm.RecordTempEnabled = false;
+
+            if (OptionsForm.RecordTemp == true)
             {
                 csvStream = mainForm.OpenTempFile(out csvFileName);
                 csvStream.AutoFlush = true;
@@ -49,7 +49,7 @@ namespace CMWtests
             }
             while (cmwTempC == 0.0);
 
-            while (cmwTempC < 45.0 && Options.TempOverride == false)
+            while (cmwTempC < 45.0 && OptionsForm.TempOverride == false)
             {
                 if (MainForm.CancelTesting == true)
                     return false;
@@ -57,17 +57,15 @@ namespace CMWtests
                 Thread.Sleep(500);
             }
 
-            OptionsOverrideTempEnabled = false;
-            Invoke(new MethodInvoker(() =>
-            {
-                overrideWarmUpToolStripMenuItem.Enabled = false;
-            }));
+            OptionsForm.TempOverrideEnabled = false;
+            Invoke((MethodInvoker)(() =>
+                overrideWarmUpToolStripMenuItem.Enabled = false));
 
             stopwatch.Stop();
             TimeSpan ts = stopwatch.Elapsed;
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}", ts.Hours, ts.Minutes, ts.Seconds);
             mainForm.AddToResults("Warmup Time: " + elapsedTime);
-            if (Options.RecordTemp == true)
+            if (OptionsForm.RecordTemp == true)
                 mainForm.AddToResults(csvFileName);
 
             return true;
@@ -90,7 +88,7 @@ namespace CMWtests
                 try
                 {
                     cmwTempC = ReadTemp(instr);
-                    if (stopwatch.IsRunning && Options.RecordTemp == true)
+                    if (stopwatch.IsRunning && (OptionsForm.RecordTemp == true))
                         RecordTemp();
                 }
                 catch (Exception e)
@@ -107,7 +105,7 @@ namespace CMWtests
 
                 var sliderPos = Convert.ToInt16(((cmwTempC - 25.0) * 4.0) + 12.0);
 
-                Invoke(new MethodInvoker(() =>    // BeginInvoke
+                Invoke((MethodInvoker)(() =>
                 {
                     pictureBoxSlider.Left = sliderPos;
                     pictureBoxSlider.Visible = true;
@@ -118,25 +116,26 @@ namespace CMWtests
                     labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
 
                     this.Refresh();
-
-                    for (int i = 0; i < 10; i++)  //  10
-                    {
-                        if (cts.IsCancellationRequested)
-                            return;
-                        Thread.Sleep(1);  //  100
-                    }
-
-                    labelTemp.ForeColor = System.Drawing.Color.Black;
-
-                    this.Refresh();
                 }));
 
-
-                for (int i = 0; i < 29; i++)  // 290
+                for (int i = 0; i < 10; i++)
                 {
                     if (cts.IsCancellationRequested)
                         return;
-                    Thread.Sleep(1);  // 100
+                    Thread.Sleep(100);
+                }
+
+                Invoke((MethodInvoker)(() =>
+                {
+                    labelTemp.ForeColor = System.Drawing.Color.Black;
+                    this.Refresh();
+                }));
+
+                for (int i = 0; i < 290; i++)
+                {
+                    if (cts.IsCancellationRequested)
+                        return;
+                    Thread.Sleep(100);
                 }
             }
         }
@@ -156,12 +155,6 @@ namespace CMWtests
                     KillTask();
             }
 
-            OptionsOverrideTempEnabled = true;
-            Invoke(new MethodInvoker(() =>
-            {
-                overrideWarmUpToolStripMenuItem.Enabled = true;
-            }));
-
             Invoke(new MethodInvoker(() =>
             {
                 pictureBoxSlider.Visible = false;
@@ -170,10 +163,15 @@ namespace CMWtests
                 this.Refresh();
             }));
 
-            if (Options.RecordTemp == true)
+            if (OptionsForm.RecordTemp == true)
                 StopRecording();
 
-            Options.RecordTempEnabled = true;
+            OptionsForm.TempOverrideEnabled = true;
+            Invoke(new MethodInvoker(() =>
+            {
+                overrideWarmUpToolStripMenuItem.Enabled = true;
+            }));
+
             cts.Dispose();
 
             //Process proc = new Process();
@@ -263,25 +261,18 @@ namespace CMWtests
 
         private void contextMenu_Opening(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (Options.TempOverride == true)
-                overrideWarmUpToolStripMenuItem.CheckState = CheckState.Checked;
-            else
-                overrideWarmUpToolStripMenuItem.CheckState = CheckState.Unchecked;
-
-            if (Options.RecordTemp == true)
-                stopRecordingToolStripMenuItem.Enabled = true;
-            else
-                stopRecordingToolStripMenuItem.Enabled = false;
+            overrideWarmUpToolStripMenuItem.Checked = OptionsForm.TempOverride;
+            stopRecordingToolStripMenuItem.Enabled = OptionsForm.RecordTemp;
         }
 
         private void overrideWarmUpToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Options.TempOverride = (overrideWarmUpToolStripMenuItem.CheckState == CheckState.Checked);
+            OptionsForm.TempOverride = overrideWarmUpToolStripMenuItem.Checked;
         }
 
         private void stopRecordingToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Options.RecordTemp = false;
+            OptionsForm.RecordTemp = false;
             stopRecordingToolStripMenuItem.Enabled = false;
             StopRecording();
         }

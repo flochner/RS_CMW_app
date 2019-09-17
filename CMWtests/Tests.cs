@@ -373,7 +373,7 @@ namespace CMWtests
 
             /// setup sensor to read
             Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
-                      "RESolution PD2; SCOunt " + Options.StatsCount + "; ATTenuation:STATe OFF");
+                      "RESolution PD2; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -779,7 +779,7 @@ namespace CMWtests
 
             for (int i = 0; i < hwOptions.Length; i++)
             {
-                hasKB036 = hwOptions[i].Contains("KB036") && Options.KB036Override;
+                hasKB036 = hwOptions[i].Contains("KB036") && OptionsForm.KB036Override;
                 if (hwOptions[i].Contains("H570"))
                     numOfTRX++;
                 if (hwOptions[i].Contains("H590"))
@@ -958,7 +958,7 @@ namespace CMWtests
                 AddToResults(Environment.NewLine + "Tests Complete.");
             }
 
-            Options.TempOverride = false;
+            OptionsForm.TempOverride = false;
             SetBtnBeginEnabled(true);
             Status = TestStatus.Complete;
             CancelTesting = false;

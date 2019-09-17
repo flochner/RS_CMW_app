@@ -3,57 +3,43 @@ using System.Windows.Forms;
 
 namespace CMWtests
 {
-    public partial class Options : Form
+    public partial class OptionsForm : Form
     {
         const int STATSRESET = 2;
+        public static int StatsCount = STATSRESET;
+        public static bool TempOverride = false;
+        public static bool TempOverrideEnabled = true;
+        public static bool RecordTemp = false;
+        public static bool RecordTempEnabled = true;
+        public static bool KB036Override = true;
 
-        public static int StatsCount { get; private set; } = STATSRESET;
-        public static bool TempOverride { get; set; } = false;
-        public static bool KB036Override { get; set; } = true;
-        public static bool RecordTemp { get; set; } = false;
-        public static bool RecordTempEnabled { get; set; } = true;
-
-        public Options()
+        public OptionsForm()
         {
             InitializeComponent();
+            //ReadOptionsFile();
+            numericUpDown_EPS.Value = StatsCount;
+            checkBoxTempOverride.Checked = TempOverride;
+            checkBoxRecordTemp.Checked = RecordTemp;
+            checkBoxKB036.Checked = KB036Override;
 #if DEBUG
             checkBoxKB036.Visible = true;
 #endif
-            numericUpDown_EPS.Value = StatsCount;
-            checkBoxRecordTemp.Enabled = RecordTempEnabled;
-
-            if (TempOverride == true)
-                checkBoxTempOverride.CheckState = CheckState.Checked;
-            else
-                checkBoxTempOverride.CheckState = CheckState.Unchecked;
-
-            if (KB036Override == true)
-                checkBoxKB036.CheckState = CheckState.Checked;
-            else
-                checkBoxKB036.CheckState = CheckState.Unchecked;
-
-            if (RecordTemp == true)
-                checkBoxRecordTemp.CheckState = CheckState.Checked;
-            else
-                checkBoxRecordTemp.CheckState = CheckState.Unchecked;
-
-            checkBoxTempOverride.Enabled = TempGauge.OptionsOverrideTempEnabled;
         }
 
         private void buttonOK_Click(object sender, EventArgs e)
         {
             StatsCount = (int)numericUpDown_EPS.Value;
-            TempOverride = (checkBoxTempOverride.CheckState == CheckState.Checked);
-            RecordTemp = (checkBoxRecordTemp.CheckState == CheckState.Checked);
-            KB036Override = (checkBoxKB036.CheckState == CheckState.Checked);
+            TempOverride = checkBoxTempOverride.Checked;
+            RecordTemp = checkBoxRecordTemp.Checked;
+            KB036Override = checkBoxKB036.Checked;
         }
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            numericUpDown_EPS.Value = StatsCount = STATSRESET;
-            checkBoxTempOverride.CheckState = CheckState.Unchecked;
-            checkBoxKB036.CheckState = CheckState.Checked;
-            checkBoxRecordTemp.CheckState = CheckState.Unchecked;
+            numericUpDown_EPS.Value = STATSRESET;
+            checkBoxTempOverride.Checked = false;
+            checkBoxRecordTemp.Checked = false;
+            checkBoxKB036.Checked = true;
         }
 
         private void buttonCancel_Click(object sender, EventArgs e) { }
