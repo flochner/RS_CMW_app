@@ -198,3 +198,7 @@
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "1", Scope = "member", Target = "RsVisaLoader.visa32.#viGpibCommand(System.Int32,System.String,System.Int32,System.Int32&)")]
 [assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Globalization", "CA2101:SpecifyMarshalingForPInvokeStringArguments", MessageId = "3", Scope = "member", Target = "RsVisaLoader.visa32.#viLock(System.Int32,System.Int32,System.Int32,System.String,System.Text.StringBuilder)")]
 
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.OptionsForm.buttonOK_Click(System.Object,System.EventArgs)")]
+
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.OptionsForm.buttonCancel_Click(System.Object,System.EventArgs)")]
+[assembly: System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~M:CMWtests.OptionsForm.btnReset_Click(System.Object,System.EventArgs)")]
