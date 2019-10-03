@@ -519,7 +519,6 @@ namespace CMWtests
             this.pictureBoxGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.pictureBoxGraph.TabIndex = 16;
             this.pictureBoxGraph.TabStop = false;
-            this.pictureBoxGraph.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox1_Paint);
             this.pictureBoxGraph.MouseClick += new System.Windows.Forms.MouseEventHandler(this.pictureBoxGraph_Click);
             // 
             // MainForm
