@@ -23,17 +23,22 @@ namespace CMWtests
             yBase = (hasKB036 ? 116 : 121);
 
             pictureBoxGraph.Image = (Image)Properties.Resources.ResourceManager.GetObject(resource);
-            Invoke(new MethodInvoker(() =>
+
+            using (Font font = new Font("Calibri", 14))
             {
-                pictureBoxGraph.Show();
-                pictureBoxGraph.Invalidate();
-            }));
+                StringFormat sf = new StringFormat()
+                { Alignment = StringAlignment.Center };
+
+                Graphics e = Graphics.FromImage(pictureBoxGraph.Image);
+                e.TextRenderingHint = TextRenderingHint.AntiAlias;
+                e.DrawString(testHeader, font, Brushes.Black, new RectangleF(0, 8, 710, 30), sf);
+            }
         }
 
         private void PlotPoint(long currentFreq, double amplError)
         {
             currentFreq = (currentFreq < (long)200e6 ? (long)100e6 : currentFreq);
-            using (Graphics g = pictureBoxGraph.CreateGraphics())
+            using (Graphics g = Graphics.FromImage(pictureBoxGraph.Image))
             {
                 float x2, y2;
                 if (Math.Abs(amplError) > 2)
@@ -58,18 +63,9 @@ namespace CMWtests
                 x1 = x2;
                 y1 = y2;
             }
+            pictureBoxGraph.Invalidate();
         }
 
-        private void pictureBox1_Paint(object sender, PaintEventArgs e)
-        {
-            using (Font font = new Font("Calibri", 14))
-            {
-                StringFormat sf = new StringFormat()
-                { Alignment = StringAlignment.Center };
-
-                e.Graphics.TextRenderingHint = TextRenderingHint.AntiAlias;
-                e.Graphics.DrawString(testHeader, font, Brushes.Black, new RectangleF(0, 0, 710, 30), sf);
-            }
-        }
+        private void pictureBox1_Paint(object sender, PaintEventArgs e) {}
     }
 }
