@@ -49,7 +49,7 @@ namespace CMWtests
             }
             while (cmwTempC == 0.0);
 
-            while (cmwTempC < 45.0 && OptionsForm.TempOverride == false)
+            while (cmwTempC < 40.0 && OptionsForm.TempOverride == false)
             {
                 if (MainForm.CancelTesting == true)
                     return false;

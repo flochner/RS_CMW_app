@@ -35,7 +35,7 @@ namespace CMWtests
                 if (value != _status)
                 {
                     _status = value;
-#if !DEBUG
+#if DEBUG
                     SetStatusText(_status.ToString());
 #endif
                 }
