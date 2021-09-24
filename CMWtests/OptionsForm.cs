@@ -5,7 +5,7 @@ namespace CMWtests
 {
     public partial class OptionsForm : Form
     {
-        const int STATSRESET = 2;
+        const int STATSRESET = 3;
         public static int StatsCount = STATSRESET;
         public static bool TempOverride = false;
         public static bool TempOverrideEnabled = true;
