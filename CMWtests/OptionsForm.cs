@@ -5,8 +5,7 @@ namespace CMWtests
 {
     public partial class OptionsForm : Form
     {
-        const int STATSRESET = 3;
-        public static int StatsCount = STATSRESET;
+        public static int StatsCount = 3;
         public static bool TempOverride = false;
         public static bool TempOverrideEnabled = true;
         public static bool RecordTemp = false;
@@ -16,7 +15,6 @@ namespace CMWtests
         public OptionsForm()
         {
             InitializeComponent();
-            //ReadOptionsFile();
             numericUpDown_EPS.Value = StatsCount;
             checkBoxTempOverride.Checked = TempOverride;
             checkBoxRecordTemp.Checked = RecordTemp;
@@ -36,7 +34,7 @@ namespace CMWtests
 
         private void btnReset_Click(object sender, EventArgs e)
         {
-            numericUpDown_EPS.Value = STATSRESET;
+            numericUpDown_EPS.Value = 3;
             checkBoxTempOverride.Checked = false;
             checkBoxRecordTemp.Checked = false;
             checkBoxKB036.Checked = true;
