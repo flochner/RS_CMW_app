@@ -83,14 +83,14 @@ namespace CMWtests
 
         public void SetDebugText(string text)
         {
-#if !DEBUG
+#if DEBUG
             BeginInvoke(new MethodInvoker(() =>
             {
                 labelDebug.Text = text;
                 labelDebug.Refresh();
-                //Thread.Sleep(500);
-                //labelDebug.Text = "";
-                //labelDebug.Refresh();
+                Thread.Sleep(500);
+                labelDebug.Text = "";
+                labelDebug.Refresh();
             }));
 #endif
         }
