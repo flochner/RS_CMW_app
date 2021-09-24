@@ -39,7 +39,6 @@ namespace CMWtests
 
         private void btnBeginTests_Click(object sender, EventArgs e)
         {
-            testHeader = "";
             pictureBoxGraph.Image = null;
             textBoxResults.Clear();
             btnBeginTests.Enabled = false;

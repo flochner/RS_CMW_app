@@ -11,7 +11,7 @@ namespace CMWtests
         private float yBase;
         private float x1, y1;
 
-        private void CreateGraph(string resource)
+        private void CreateGraph(string resource, string testHeader)
         {
             xMin = (hasKB036 ? 91 : 105);
             xMax = (hasKB036 ? 675 : 647);

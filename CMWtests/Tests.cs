@@ -13,7 +13,6 @@ namespace CMWtests
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
         private int minRecvFreq = 70;
-        private long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
         private bool isFirstTest = true;
@@ -21,7 +20,6 @@ namespace CMWtests
         private string chartLimits6 = "";
         private string cmwID = "";
         private string csvFileName = "";
-        private string testHeader = "";
         private StreamWriter csvStream = null;
         private TestStatus _status = TestStatus.Complete;
         private TestStatus Status
@@ -73,7 +71,7 @@ namespace CMWtests
             ProgressBar1_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 #if DEBUG
             /// !
-            goto gentests;
+            //goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + "GPRF CW Measurement Tests");
@@ -352,8 +350,10 @@ namespace CMWtests
             double cmwGenPower = 0.0;
             double cmwMeasPower = 0.0;
             double pmPower = 0.0;
+            long currentFreq = 0;
             bool retry = false;
             string chartLimits = "";
+            string testHeader = "";
             string visaResponse = "";
             string[] pmResponse = { };
 
@@ -411,7 +411,7 @@ namespace CMWtests
                 chart = chartLimits6;
             else
                 chart = chartLimits3;
-            CreateGraph("Graph_" + (Convert.ToDouble(chart.Split(',')[5]) * 10));
+            CreateGraph("Graph_" + (Convert.ToDouble(chart.Split(',')[5]) * 10), testHeader);
             #endregion
 
             do  ///// Main Loop
