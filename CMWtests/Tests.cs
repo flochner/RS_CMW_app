@@ -12,8 +12,8 @@ namespace CMWtests
 
         private int numOfFrontEnds = 0;
         private int numOfTRX = 0;
-        private long minFreq = 0;
-        private static long currentFreq = 0;
+        private int minRecvFreq = 70;
+        private long currentFreq = 0;
         private bool hasKB036 = false;
         private bool ignoreAmplError = false;
         private bool isFirstTest = true;
@@ -344,6 +344,7 @@ namespace CMWtests
 
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
+            int minFreq = 70;
             int pmStatus = -1;
             int adjRounds = 0;
             double amplError = 0.0;
@@ -390,13 +391,13 @@ namespace CMWtests
                     Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2");
                 cmwGenPower = testAmpl + 6.5;
                 Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + (cmwGenPower));
+                minFreq = minRecvFreq;
             }
             else if (testName.Contains("TX"))
             {
                 cmwGenPower = testAmpl;
                 csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
                 Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + cmwGenPower);
-                minFreq = 70;
             }
 
             csvStream.WriteLine("0," + chartLimits3);
@@ -766,19 +767,16 @@ namespace CMWtests
                 visaResponse.Contains("1201.0002K50"))
             {
                 cmwModel = "CMW500";
-                minFreq = 70;
             }
             else if (visaResponse.Contains("1201.0002k29") ||
                      visaResponse.Contains("1201.0002K29"))
             {
                 cmwModel = "CMW290";
-                minFreq = 70;
             }
             else if (visaResponse.Contains("1201.0002k75") ||
                      visaResponse.Contains("1201.0002K75"))
             {
                 cmwModel = "CMW270";
-                minFreq = 150;
             }
             else if (visaResponse.Contains("1201.0002k") ||
                      visaResponse.Contains("1201.0002K"))
@@ -805,13 +803,15 @@ namespace CMWtests
 #endif
             var hwOptions = visaResponse.Split(',');
 
-            for (int i = 0; i < hwOptions.Length; i++)
+            foreach (string option in hwOptions)
             {
-                hasKB036 = hwOptions[i].Contains("KB036") && OptionsForm.KB036Override;
-                if (hwOptions[i].Contains("H570"))
+                hasKB036 = option.Contains("KB036") && OptionsForm.KB036Override;
+                if (option.Contains("H570"))
                     numOfTRX++;
-                if (hwOptions[i].Contains("H590"))
+                if (option.Contains("H590"))
                     numOfFrontEnds++;
+                if (option.Contains("H570H"))
+                    minRecvFreq = 150;
             }
 #if DEBUG
             AddToResults("hasKB036: " + hasKB036.ToString());
