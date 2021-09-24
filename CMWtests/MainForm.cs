@@ -88,9 +88,9 @@ namespace CMWtests
             {
                 labelDebug.Text = text;
                 labelDebug.Refresh();
-                Thread.Sleep(500);
-                labelDebug.Text = "";
-                labelDebug.Refresh();
+                //Thread.Sleep(500);
+                //labelDebug.Text = "";
+                //labelDebug.Refresh();
             }));
 #endif
         }
