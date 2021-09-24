@@ -73,7 +73,7 @@ namespace CMWtests
             ProgressBar1_Init(12 * numOfTRX * (hasKB036 ? 60 : 33));
 #if DEBUG
             /// !
-            // goto gentests;
+            goto gentests;
 #endif
             SetHead1Text("GPRF CW Measurement Tests");
             AddToResults(Environment.NewLine + "GPRF CW Measurement Tests");
@@ -345,7 +345,10 @@ namespace CMWtests
         private TestStatus Measure(string testName, int testAmpl, string path)
         {
             int pmStatus = -1;
+            int adjRounds = 0;
             double amplError = 0.0;
+            double correction = 0.0;
+            double cmwGenPower = 0.0;
             double cmwMeasPower = 0.0;
             double pmPower = 0.0;
             bool retry = false;
@@ -385,12 +388,14 @@ namespace CMWtests
                     Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF1O, TX1");
                 else
                     Write(cmw, "ROUTe:GPRF:GEN:SCENario:SALone RF3O, TX2");
-                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + (testAmpl + 6.5));
+                cmwGenPower = testAmpl + 6.5;
+                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + (cmwGenPower));
             }
             else if (testName.Contains("TX"))
             {
+                cmwGenPower = testAmpl;
                 csvStream.WriteLine("    GPRF CW Generator Tests - " + cmwID);
-                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + testAmpl);
+                Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + cmwGenPower);
                 minFreq = 70;
             }
 
@@ -488,6 +493,29 @@ namespace CMWtests
                         Write(cmw, "SOURce:GPRF:GEN:STATe ON");
                     }
                 } while (retry);
+
+                if (testName.Contains("RX"))
+                {
+                    adjRounds = 0;
+                    do
+                    {
+                        correction = testAmpl - pmPower;
+                        cmwGenPower = Math.Min(cmwGenPower + correction, 13.0);
+                        Write(cmw, "SOURce:GPRF:GEN:RFSettings:LEVel " + (cmwGenPower));
+                        visaResponse = Query(cmw, "READ:GPRF:MEAS:EPSensor?", 20000);
+                        try
+                        {
+                            pmResponse = visaResponse.Split(',');
+                            double.TryParse(pmResponse[2], out pmPower);
+                        }
+                        catch (Exception e)
+                        {
+                            ModalMessageBox(e.Message, e.GetType().ToString());
+                        }
+                        adjRounds += 1;
+                    } while (Math.Abs(testAmpl - pmPower) >= 0.01 && adjRounds <= 2);
+                    SetDebugText("Rounds: " + adjRounds.ToString());
+                }
 
                 if (testName.Contains("RX"))
                     amplError = cmwMeasPower - pmPower;
