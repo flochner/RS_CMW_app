@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace CMWtests
@@ -133,25 +134,21 @@ namespace CMWtests
                 else
                     cmwSerNum = identFields[2];
 
-            if (visaResponse.Contains("1201.0002k50") ||
-                visaResponse.Contains("1201.0002K50"))
+            if (visaResponse.ToLower().Contains("1201.0002k50"))
             {
                 cmwModel = "CMW500";
             }
-            else if (visaResponse.Contains("1201.0002k29") ||
-                     visaResponse.Contains("1201.0002K29"))
+            else if (visaResponse.ToLower().Contains("1201.0002k29"))
             {
                 cmwModel = "CMW290";
             }
-            else if (visaResponse.Contains("1201.0002k75") ||
-                     visaResponse.Contains("1201.0002K75"))
+            else if (visaResponse.ToLower().Contains("1201.0002k75"))
             {
                 cmwModel = "CMW270";
             }
-            else if (visaResponse.Contains("1201.0002k") ||
-                     visaResponse.Contains("1201.0002K"))
+            else if (visaResponse.ToLower().Contains("1201.0002k"))
             {
-                ModalMessageBox("DUT not yet covered under this procedure.");
+                ModalMessageBox("This CMW is not yet covered under this procedure.");
                 return TestStatus.Abort;
             }
             else
@@ -203,7 +200,6 @@ namespace CMWtests
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
                     return TestStatus.Abort;
-                /// !
 #if !DEBUG
                 var visaResponse = Query(cmw, "READ:GPRF:MEAS:EPSensor?", 15000);
 #else
@@ -232,7 +228,7 @@ namespace CMWtests
                     if (verifyConnection == DialogResult.Retry)
                     {
                         retrySensor = true;
-                        //Thread.Sleep(5000);
+                        Thread.Sleep(5000);
                     }
                     else
                     {
