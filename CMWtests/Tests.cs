@@ -53,8 +53,6 @@ namespace CMWtests
             if (CheckSensor() == TestStatus.Abort)
                 return GracefulExit(TestStatus.Abort);
 
-            SetBtnCancelEnabled(true);
-
             if (tempGauge.Start(cmw) == false)
                 return GracefulExit(TestStatus.Abort);
             
@@ -360,6 +358,8 @@ namespace CMWtests
             if (CancelTesting == true)
                 return TestStatus.Abort;
 
+            SetBtnCancelEnabled(true);
+
             testHeader = testName.Split('_')[0] + " @ " + testAmpl + " dBm  " + path;
             AddToResults(Environment.NewLine + testHeader);
 
@@ -476,14 +476,9 @@ namespace CMWtests
                         ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                        var btnCancelEnabled = GetBtnCancelEnabled();
-                        SetBtnCancelEnabled(false);
-
                         var img = new ConnectionImageForm(MessageBoxButtons.RetryCancel);
                         img.SetImage(testName + "_" + numOfFrontEnds);
                         Invoke(new MethodInvoker(() => img.ShowDialog(this)));
-
-                        SetBtnCancelEnabled(btnCancelEnabled);
 
                         if (img.DialogResult == DialogResult.Abort)
                             return TestStatus.Abort;
@@ -532,12 +527,9 @@ namespace CMWtests
                     ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                    var btnCancelEnabled = GetBtnCancelEnabled();
-                    SetBtnCancelEnabled(false);
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
                     img.SetImage(testName + "_" + numOfFrontEnds);
                     Invoke(new MethodInvoker(() => img.ShowDialog(this)));
-                    SetBtnCancelEnabled(btnCancelEnabled);
 
                     //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
                     //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
@@ -630,6 +622,8 @@ namespace CMWtests
 
             // Suppress connection error message until the next connection change.
             ignoreAmplError = true;
+
+            SetBtnCancelEnabled(false);
 
             return TestStatus.Success;
             #endregion
