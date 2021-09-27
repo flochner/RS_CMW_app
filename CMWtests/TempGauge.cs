@@ -17,7 +17,7 @@ namespace CMWtests
         private MainForm mainForm = null;
         private Stopwatch stopwatch = null;
         private StreamWriter csvStream = null;
-        private Task task;
+        private Task gaugeTask;
 
         public TempGauge(MainForm obj)
         {
@@ -39,7 +39,7 @@ namespace CMWtests
 
             stopwatch = Stopwatch.StartNew();
 
-            task = Task.Factory.StartNew(() => Run(instr), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            gaugeTask = Task.Factory.StartNew(() => Run(instr), cts.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
             
             do
             {
@@ -148,8 +148,11 @@ namespace CMWtests
             cts.Cancel();
 
             int i = 0;
-            while (task.Status == TaskStatus.Running)
+            while (gaugeTask.Status == TaskStatus.Running)
             {
+#if DEBUG
+                Invoke(new MethodInvoker(() => { mainForm.SetDebugText("tempGauge.Stop()"); }));
+#endif
                 Thread.Sleep(10);
                 if (i++ > 1000)
                     KillTask();
@@ -254,8 +257,10 @@ namespace CMWtests
 
         public int KillTask()
         {
-            cts.Dispose();
-            task.Dispose();
+            if (cts != null)
+                cts.Dispose();
+            if (gaugeTask != null)
+                gaugeTask.Dispose();
             return 0;
         }
 
