@@ -9,72 +9,20 @@ namespace CMWtests
     {
         private TestStatus ConnectionMessage(string connection)
         {
-            bool retryZero = false;
-            string[] pmResponse = { };
-
             if (CancelTesting == true)
                 return TestStatus.Abort;
 
-            SetBtnCancelEnabled(false);
-            SetMenuStripEnabled(false);
-
-            do //while retryZero
-            {
-                retryZero = false;
-
-                //SetDebugText("Waiting at ConnectionMessage start");
-                mreMeasure.WaitOne();
-                if (CancelTesting == true)
-                    return TestStatus.Abort;
-
-                Write(cmw, "*RST");
-                cmw.ClearStatus();
-                cmw.ErrorChecking();
-
-                var btnCancelEnabled = GetBtnCancelEnabled();
-                SetBtnCancelEnabled(false);
-                var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
-                img.SetImage(connection + "_" + numOfFrontEnds);
-                Invoke(new MethodInvoker(() => img.ShowDialog(this)));
-                SetBtnCancelEnabled(btnCancelEnabled);
-                if (img.DialogResult == DialogResult.Abort || CancelTesting == true)
-                {
-                    SetMenuStripEnabled(true);
-                    return TestStatus.Abort;
-                }
-
-                SetHead2Text("Zeroing Sensor...");
-                /// !
-#if !DEBUG
-                Write(cmw, "ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
-                var visaResponse = Query(cmw, "CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
-#else
-                var visaResponse = "PASS";
-#endif
-                if (!visaResponse.Contains("PASS"))
-                {
-                    var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
-                                                           "(Retry) after verifying all outputs are off." + Environment.NewLine +
-                                                           "(Cancel) all testing.",
-                                                           "Sensor Zero Failure",
-                                                            MessageBoxButtons.RetryCancel,
-                                                            MessageBoxIcon.Exclamation,
-                                                            MessageBoxDefaultButton.Button1);
-
-                    retryZero = (verifyConnection == DialogResult.Retry);
-                    if (verifyConnection == DialogResult.Cancel)
-                    {
-                        SetMenuStripEnabled(true);
-                        return TestStatus.Abort;
-                    }
-                }
-            } while (retryZero);
-
             ignoreAmplError = false;
 
-            SetHead2Text("");
-            SetBtnCancelEnabled(true);
-            SetMenuStripEnabled(true);
+            var img = new ConnectionImageForm(MessageBoxButtons.OKCancel);
+            img.SetImage(connection + "_" + numOfFrontEnds);
+            Invoke(new MethodInvoker(() => img.ShowDialog(this)));
+
+            if (img.DialogResult == DialogResult.Abort || CancelTesting == true)
+                return TestStatus.Abort;
+
+            if (ZeroSensor() == TestStatus.Abort)
+                return TestStatus.Abort;
 
             return TestStatus.Success;
         }
@@ -358,6 +306,53 @@ namespace CMWtests
             CancelTesting = false;
             areExit.Set();
             return Status;
+        }
+
+        private TestStatus ZeroSensor()
+        {
+            bool retryZero = false;
+            string[] pmResponse = { };
+
+            //if (CancelTesting == true)
+            //    return TestStatus.Abort;
+
+            do //while retryZero
+            {
+                retryZero = false;
+
+                mreMeasure.WaitOne();
+                if (CancelTesting == true)
+                    return TestStatus.Abort;
+
+                Write(cmw, "*RST");
+                cmw.ClearStatus();
+                cmw.ErrorChecking();
+
+                SetHead2Text("Zeroing Sensor...");
+#if !DEBUG
+                Write(cmw, "ABORt:GPRF:MEAS:EPSensor;:CALibration:GPRF:MEAS:EPSensor:ZERO");
+                var visaResponse = Query(cmw, "CALibration:GPRF:MEAS:EPSensor:ZERO?", 20000);
+#else
+                var visaResponse = "PASS";
+#endif
+                if (!visaResponse.Contains("PASS"))
+                {
+                    var verifyConnection = ModalMessageBox("Ensure sensor is not connected to an active source." + Environment.NewLine + Environment.NewLine +
+                                                           "(Retry) after verifying all outputs are off." + Environment.NewLine +
+                                                           "(Cancel) all testing.",
+                                                           "Sensor Zero Failure",
+                                                            MessageBoxButtons.RetryCancel,
+                                                            MessageBoxIcon.Exclamation,
+                                                            MessageBoxDefaultButton.Button1);
+
+                    retryZero = (verifyConnection == DialogResult.Retry);
+                    if (verifyConnection == DialogResult.Cancel)
+                        return TestStatus.Abort;
+                }
+            } while (retryZero);
+
+            SetHead2Text("");
+            return TestStatus.Success;
         }
 
         public DialogResult ModalMessageBox(
