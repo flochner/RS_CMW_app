@@ -463,13 +463,12 @@ namespace CMWtests
                         ModalMessageBox(e.Message, e.GetType().ToString());
                     }
 
-                    //if (pmStatus == 1)
-                    //{
-                    //    retry = true;
-                    //    ModalMessageBox("Measurement Timeout");
-                    //}
-                    //else 
-                    if (pmStatus != 0)
+                    if (pmStatus == 1)
+                    {
+                        retry = true;
+                        ModalMessageBox("Measurement Timeout");
+                    }
+                    else if (pmStatus != 0)
                     {
                         Write(cmw, "SOURce:GPRF:GEN:STATe OFF");
 
@@ -524,7 +523,7 @@ namespace CMWtests
                     Write(cmw, "SOURce:GPRF:GEN:STATe OFF");
                     Write(cmw, "SYSTem:MEASurement:ALL:OFF");
 
-                    ModalMessageBox("Recheck connections using the following diagram.", "Test Setup",
+                    ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                     var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
