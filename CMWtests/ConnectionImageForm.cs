@@ -20,8 +20,6 @@ namespace CMWtests
 
             if (_buttons == MessageBoxButtons.AbortRetryIgnore)
             {
-                toolTipAbort.InitialDelay = 0;
-                toolTipAbort.SetToolTip(button1, "test");
                 button1.Visible = true;
                 button1.Text = "Abort";
                 button2.Text = "Retry";
@@ -97,41 +95,6 @@ namespace CMWtests
             //MessageBox.Show("Use a mouse to control this window.", "", 
             //                 MessageBoxButtons.OK,
             //                 MessageBoxIcon.Information);
-        }
-
-        private void toolTipAbort_Popup(object sender, PopupEventArgs e)
-        {
-
-        }
-
-        private void toolTipRetry_Popup(object sender, PopupEventArgs e)
-        {
-
-        }
-
-        private void toolTipIgnore_Popup(object sender, PopupEventArgs e)
-        {
-
-        }
-
-        private void ConnectionImageForm_FormClosing(object sender, FormClosingEventArgs f)
-        {
-            switch (f.CloseReason)
-            {
-                case CloseReason.UserClosing:
-                    _result = MessageBox.Show("Abort all testing?",
-                                              "Warning!",
-                                               MessageBoxButtons.YesNo,
-                                               MessageBoxIcon.Warning,
-                                               MessageBoxDefaultButton.Button2);
-                    if (_result == DialogResult.Yes)
-                        this.DialogResult = DialogResult.Abort;
-                    else
-                        f.Cancel = true;
-                    break;
-                default:
-                    break;
-            }
         }
     }
 }

@@ -33,9 +33,6 @@
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
-            this.toolTipAbort = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTipRetry = new System.Windows.Forms.ToolTip(this.components);
-            this.toolTipIgnore = new System.Windows.Forms.ToolTip(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -81,23 +78,12 @@
             this.button3.MouseClick += new System.Windows.Forms.MouseEventHandler(this.button3_MouseClick);
             this.button3.KeyDown += new System.Windows.Forms.KeyEventHandler(this.button_KeyDown);
             // 
-            // toolTipAbort
-            // 
-            this.toolTipAbort.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipAbort_Popup);
-            // 
-            // toolTipRetry
-            // 
-            this.toolTipRetry.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipRetry_Popup);
-            // 
-            // toolTipIgnore
-            // 
-            this.toolTipIgnore.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTipIgnore_Popup);
-            // 
             // ConnectionImageForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(302, 346);
+            this.ControlBox = false;
             this.Controls.Add(this.button1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.pictureBox1);
@@ -106,7 +92,6 @@
             this.Name = "ConnectionImageForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Connection Message";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ConnectionImageForm_FormClosing);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
@@ -117,8 +102,5 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.ToolTip toolTipAbort;
-        private System.Windows.Forms.ToolTip toolTipRetry;
-        private System.Windows.Forms.ToolTip toolTipIgnore;
     }
 }
