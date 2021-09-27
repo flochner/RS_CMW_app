@@ -184,14 +184,6 @@ namespace CMWtests
             }
         }
 
-        private void SetMenuStripEnabled(bool v)
-        {
-            BeginInvoke(new MethodInvoker(() =>
-            {
-                menuStrip1.Enabled = v;
-            }));
-        }
-
         private void SetBtnBeginEnabled(bool v)
         {
             BeginInvoke(new MethodInvoker(() =>
