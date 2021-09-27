@@ -33,9 +33,7 @@ namespace CMWtests
                 if (value != _status)
                 {
                     _status = value;
-#if DEBUG
                     SetStatusText(_status.ToString());
-#endif
                 }
             }
         }
@@ -526,9 +524,9 @@ namespace CMWtests
                     ModalMessageBox("Re-check connections using the following diagram.", "Test Setup",
                                      MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                    var img = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
-                    img.SetImage(testName + "_" + numOfFrontEnds);
-                    Invoke(new MethodInvoker(() => img.ShowDialog(this)));
+                    var connection = new ConnectionImageForm(MessageBoxButtons.AbortRetryIgnore);
+                    connection.SetImage(testName + "_" + numOfFrontEnds);
+                    Invoke(new MethodInvoker(() => connection.ShowDialog(this)));
 
                     //DialogResult resp = ModalMessageBox("(Retry) after fixing the connections" + Environment.NewLine +
                     //                                    "(Ignore) further level errors and continue test" + Environment.NewLine +
@@ -538,12 +536,12 @@ namespace CMWtests
                     //                                     MessageBoxIcon.Question,
                     //                                     MessageBoxDefaultButton.Button3);
 
-                    ignoreAmplError = (img.DialogResult == DialogResult.Ignore);
+                    ignoreAmplError = (connection.DialogResult == DialogResult.Ignore);
 
-                    if (img.DialogResult == DialogResult.Abort)
+                    if (connection.DialogResult == DialogResult.Abort)
                         return TestStatus.Abort;
 
-                    if (img.DialogResult == DialogResult.Retry)
+                    if (connection.DialogResult == DialogResult.Retry)
                     {
                         if (File.Exists(csvFileName))
                             try

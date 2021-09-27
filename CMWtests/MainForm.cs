@@ -73,11 +73,13 @@ namespace CMWtests
 
         private void SetStatusText(string text)
         {
+#if DEBUG
             BeginInvoke(new MethodInvoker(() =>
             {
                 labelStatus.Text = text;
                 labelStatus.Refresh();
             }));
+#endif
         }
 
         public void SetDebugText(string text)
