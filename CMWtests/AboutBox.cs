@@ -13,7 +13,7 @@ namespace CMWtests
             this.LabelProductName.Text = AssemblyProduct;
             this.LabelVersion.Text = String.Format("Version {0}", AssemblyVersion);
             this.LabelCopyright.Text = AssemblyCopyright;
-            this.LabelCompanyName.Text = "Continental Resources, Inc.";//AssemblyCompany;
+            this.LabelCompanyName.Text = AssemblyCompany;
             this.TextBoxDescription.Text = AssemblyDescription;
         }
 

@@ -59,8 +59,8 @@
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
-            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 17F));
+            this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 43F));
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel.Size = new System.Drawing.Size(417, 265);
             this.tableLayoutPanel.TabIndex = 0;
@@ -87,7 +87,6 @@
             this.LabelProductName.Size = new System.Drawing.Size(271, 17);
             this.LabelProductName.TabIndex = 19;
             this.LabelProductName.Text = "Product Name";
-            this.LabelProductName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // LabelVersion
             // 
@@ -99,7 +98,6 @@
             this.LabelVersion.Size = new System.Drawing.Size(271, 17);
             this.LabelVersion.TabIndex = 0;
             this.LabelVersion.Text = "Version";
-            this.LabelVersion.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // LabelCopyright
             // 
@@ -111,30 +109,28 @@
             this.LabelCopyright.Size = new System.Drawing.Size(271, 17);
             this.LabelCopyright.TabIndex = 21;
             this.LabelCopyright.Text = "Copyright";
-            this.LabelCopyright.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // LabelCompanyName
             // 
             this.LabelCompanyName.Dock = System.Windows.Forms.DockStyle.Fill;
             this.LabelCompanyName.Location = new System.Drawing.Point(143, 78);
             this.LabelCompanyName.Margin = new System.Windows.Forms.Padding(6, 0, 3, 0);
-            this.LabelCompanyName.MaximumSize = new System.Drawing.Size(0, 17);
+            this.LabelCompanyName.MaximumSize = new System.Drawing.Size(0, 40);
             this.LabelCompanyName.Name = "LabelCompanyName";
-            this.LabelCompanyName.Size = new System.Drawing.Size(271, 17);
+            this.LabelCompanyName.Size = new System.Drawing.Size(271, 40);
             this.LabelCompanyName.TabIndex = 22;
-            this.LabelCompanyName.Text = "Continental Resources, Inc.";
-            this.LabelCompanyName.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.LabelCompanyName.Text = "Company";
             // 
             // TextBoxDescription
             // 
             this.TextBoxDescription.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TextBoxDescription.Location = new System.Drawing.Point(143, 107);
+            this.TextBoxDescription.Location = new System.Drawing.Point(143, 126);
             this.TextBoxDescription.Margin = new System.Windows.Forms.Padding(6, 3, 3, 3);
             this.TextBoxDescription.Multiline = true;
             this.TextBoxDescription.Name = "TextBoxDescription";
             this.TextBoxDescription.ReadOnly = true;
             this.TextBoxDescription.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.TextBoxDescription.Size = new System.Drawing.Size(271, 126);
+            this.TextBoxDescription.Size = new System.Drawing.Size(271, 107);
             this.TextBoxDescription.TabIndex = 23;
             this.TextBoxDescription.TabStop = false;
             this.TextBoxDescription.Text = "Description\r\ngoes here.";
@@ -169,6 +165,7 @@
             this.tableLayoutPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.LogoPictureBox)).EndInit();
             this.ResumeLayout(false);
+
         }
         #endregion
 
