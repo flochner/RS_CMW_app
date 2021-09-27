@@ -18,7 +18,7 @@ namespace CMWtests
             img.SetImage(connection + "_" + numOfFrontEnds);
             Invoke(new MethodInvoker(() => img.ShowDialog(this)));
 
-            if (img.DialogResult == DialogResult.Abort || CancelTesting == true)
+            if (img.DialogResult == DialogResult.Abort)
                 return TestStatus.Abort;
 
             if (ZeroSensor() == TestStatus.Abort)
@@ -310,19 +310,11 @@ namespace CMWtests
 
         private TestStatus ZeroSensor()
         {
-            bool retryZero = false;
-            string[] pmResponse = { };
+            bool retryZero;
 
-            //if (CancelTesting == true)
-            //    return TestStatus.Abort;
-
-            do //while retryZero
+            do
             {
                 retryZero = false;
-
-                mreMeasure.WaitOne();
-                if (CancelTesting == true)
-                    return TestStatus.Abort;
 
                 Write(cmw, "*RST");
                 cmw.ClearStatus();
