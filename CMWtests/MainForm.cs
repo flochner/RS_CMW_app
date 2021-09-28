@@ -53,7 +53,7 @@ namespace CMWtests
             CancelTests();
         }
 
-        private void SetHead1Text(string text)
+        public void SetHead1Text(string text)
         {
             BeginInvoke(new MethodInvoker(() =>
             {
@@ -62,7 +62,7 @@ namespace CMWtests
             }));
         }
 
-        private void SetHead2Text(string text)
+        public void SetHead2Text(string text)
         {
             BeginInvoke(new MethodInvoker(() =>
             {
