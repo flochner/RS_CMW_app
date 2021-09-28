@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -216,12 +217,12 @@ namespace CMWtests
 
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            //try
-            //{
-            //    string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + tests?.cmwID + ".xlsx";
-            //    FileInfo book = new FileInfo(bookName);
-            //}
-            //catch { }
+            try
+            {
+                string bookName = Environment.GetEnvironmentVariable("USERPROFILE") + @"\Desktop\" + cmwID + ".xlsx";
+                FileInfo book = new FileInfo(bookName);
+            }
+            catch { }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -309,6 +310,11 @@ namespace CMWtests
         private void selectAllContextMenuItem_Click(object sender, EventArgs e)
         {
             textBoxResults.SelectAll();
+        }
+
+        private void printToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
