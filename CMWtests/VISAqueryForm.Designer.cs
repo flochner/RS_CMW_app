@@ -151,6 +151,7 @@
             this.Controls.Add(this.btnWriteVISA);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBoxStringToWrite);
+            this.MinimumSize = new System.Drawing.Size(196, 240);
             this.Name = "VISAqueryForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "VISAquery";
