@@ -10,6 +10,7 @@ namespace CMWtests
     public partial class TempGauge : UserControl
     {
         private bool stopRecording;
+        private bool warmingUp = false;
         private double cmwTempC = 0.0;
         private string elapsedTime = "";
         private string csvFileName = "";
@@ -54,8 +55,12 @@ namespace CMWtests
                 if (MainForm.CancelTesting == true)
                     return false;
 
+                warmingUp = true;
+                mainForm.SetHead2Text("Please wait while warming up...");
                 Thread.Sleep(500);
             }
+            warmingUp = false;
+            mainForm.SetHead2Text("");
 
             OptionsForm.TempOverrideEnabled = false;
             Invoke((MethodInvoker)(() =>
@@ -110,7 +115,8 @@ namespace CMWtests
                     pictureBoxSlider.Left = sliderPos;
                     pictureBoxSlider.Visible = true;
 
-                    labelTemp.ForeColor = System.Drawing.Color.Red;
+                    if (warmingUp == true)
+                        labelTemp.ForeColor = System.Drawing.Color.Red;
                     labelTemp.Visible = true;
                     labelTemp.Text = string.Format("{0:F1}", cmwTempC);
                     labelTemp.Left = sliderPos - (labelTemp.Size.Width / 2);
@@ -131,7 +137,7 @@ namespace CMWtests
                     this.Refresh();
                 }));
 
-                for (int i = 0; i < 290; i++)
+                for (int i = 0; i < 90; i++)
                 {
                     if (cts.IsCancellationRequested)
                         return;
