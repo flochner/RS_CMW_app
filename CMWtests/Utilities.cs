@@ -260,33 +260,33 @@ namespace CMWtests
             SetBtnCancelEnabled(false);
             SetHead1Text("");
             SetHead2Text("");
+            tempGauge.Stop();
 
-            try
+            if (cmw != null)
             {
-                tempGauge.Stop();
-                cmw.Reset();
-                cmw.CloseInstrument();
-                cmw = null;
+                try {
+                    cmw.Reset();
+                    cmw.CloseInstrument();
+                    cmw = null;
+                }
+                catch {
+                    ModalMessageBox("Reset/Close CMW Exception");
+                }
             }
-            catch (NullReferenceException) { }
 
             if (csvStream != null)
-                try
-                {
+                try {
                     csvStream.Dispose();
                 }
-                catch
-                {
+                catch {
                     ModalMessageBox("Dispose csvStream Exception");
                 }
 
             if (File.Exists(csvFileName))
-                try
-                {
+                try {
                     File.Delete(csvFileName);
                 }
-                catch
-                {
+                catch {
                     ModalMessageBox("Temp file delete Exception");
                 }
 

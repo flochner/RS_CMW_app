@@ -90,14 +90,12 @@ namespace CMWtests
 
             while (instr != null)
             {
-                try
-                {
+                try {
                     cmwTempC = ReadTemp(instr);
                     if (stopwatch.IsRunning && (OptionsForm.RecordTemp == true))
                         RecordTemp();
                 }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     mainForm.ModalMessageBox(
                         "Broken at TempGauge read" +
                          Environment.NewLine + e.Source + ":" +
@@ -195,14 +193,12 @@ namespace CMWtests
         {
             stopRecording = true;
 
-            try
-            {
+            try {
                 csvStream.Close();
                 csvStream.Dispose();
             }
             catch (ObjectDisposedException) { }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 mainForm.ModalMessageBox(
                     "Close TempGauge csvStream Exception" +
                      Environment.NewLine + e.Source + ":" +
@@ -219,12 +215,10 @@ namespace CMWtests
             if (Directory.Exists(dataDir) == false)
                 Directory.CreateDirectory(dataDir);
 
-            try
-            {
+            try {
                 File.Move(csvFileName, newFullName);
             }
-            catch (Exception e)
-            {
+            catch (Exception e) {
                 mainForm.ModalMessageBox(
                     "File move Exception" +
                      Environment.NewLine + e.Source + ":" +
@@ -250,13 +244,11 @@ namespace CMWtests
             elapsedTime = string.Format("{0:00}:{1:00}:{2:00}.{3:000}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
 
             if (csvStream != null && stopRecording == false)
-                try
-                {
+                try {
                     csvStream.WriteLine(elapsedTime + "," + cmwTempC.ToString());
                 }
                 catch (ObjectDisposedException) { }
-                catch (Exception e)
-                {
+                catch (Exception e) {
                     mainForm.ModalMessageBox("RecordTemp():\n" + e.Message, e.GetType().ToString());
                 }
         }
