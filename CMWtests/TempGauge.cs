@@ -155,7 +155,7 @@ namespace CMWtests
             while (gaugeTask.Status == TaskStatus.Running)
             {
 #if DEBUG
-                Invoke(new MethodInvoker(() => { mainForm.SetDebugText("tempGauge.Stop()"); }));
+                mainForm.SetDebugText("tempGauge.Stop()");
 #endif
                 Thread.Sleep(10);
                 if (i++ > 1000)
