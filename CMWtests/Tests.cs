@@ -351,7 +351,6 @@ namespace CMWtests
             string visaResponse = "";
             string[] pmResponse = { };
 
-            //SetDebugText("Waiting at Measure Start");
             mreMeasure.WaitOne();
             if (CancelTesting == true)
                 return TestStatus.Abort;
@@ -373,7 +372,7 @@ namespace CMWtests
 
             /// setup sensor to read
             Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
-                      "RESolution PD0; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
+                      "RESolution PD1; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
@@ -412,7 +411,6 @@ namespace CMWtests
 
             do  ///// Main Loop
             {
-                //SetDebugText("Waiting at Measure main loop start");
                 mreMeasure.WaitOne();
                 Status = TestStatus.InProgress;
                 if (CancelTesting == true)
@@ -443,7 +441,6 @@ namespace CMWtests
                 #region  Take sensor reading
                 do  //while (retry)
                 {
-                    //SetDebugText("Waiting at Take sensor reading");
                     mreMeasure.WaitOne();
                     if (CancelTesting == true)
                         return TestStatus.Abort;

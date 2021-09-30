@@ -303,7 +303,6 @@ namespace CMWtests
             OptionsForm.TempOverride = false;
             SetBtnBeginEnabled(true);
             Status = TestStatus.Complete;
-            CancelTesting = false;
             areExit.Set();
             return Status;
         }
