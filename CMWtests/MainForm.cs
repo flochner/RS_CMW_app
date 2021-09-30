@@ -133,22 +133,13 @@ namespace CMWtests
         private bool CancelTests()
         {
             mreMeasure.Reset();
-            while (Status != TestStatus.Complete && mreMeasure.WaitOne(0) == true)
+            while ((Status != TestStatus.Complete) && (mreMeasure.WaitOne(0) == true))
                 Thread.Sleep(100);
 
-            if (CancelTesting == true)
-            {
-                MessageBox.Show("Unexpected exit");
-                GracefulExit(TestStatus.Abort);
-            }
-
-            if (Status == TestStatus.Complete ||
-                MessageBox.Show("Really abort testing?",
-                                "Warning",
-                                MessageBoxButtons.YesNo,
-                                MessageBoxIcon.Warning,
-                                MessageBoxDefaultButton.Button2)
-                == DialogResult.Yes)
+            if (Status == TestStatus.Complete || MessageBox.Show("Really abort testing?", "Warning",
+                                                                  MessageBoxButtons.YesNo,
+                                                                  MessageBoxIcon.Warning,
+                                                                  MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 CancelTesting = true;
                 mreMeasure.Set();
@@ -236,9 +227,9 @@ namespace CMWtests
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mreMeasure.Reset();
+            mreMeasure.Reset();  // sends blocking signal for WaitOne() to catch
             while (Status != TestStatus.Complete &&
-                   mreMeasure.WaitOne(0) == true)
+                   mreMeasure.WaitOne(0) == true)  // WaitOne(0) :: true = thread is not blocking :: WaitOne() has not received Reset() signal
                 Thread.Sleep(100);
 
             using (var options = new OptionsForm())
@@ -247,7 +238,7 @@ namespace CMWtests
             if (cmw != null)
                 Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:SCOunt " + OptionsForm.StatsCount);
 
-            mreMeasure.Set();
+            mreMeasure.Set();  // sends unblocking signal for WaitOne() to catch
         }
 
         private void communicateWithInstrumentToolStripMenuItem_Click(object sender, EventArgs e)
