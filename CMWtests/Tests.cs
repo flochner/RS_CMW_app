@@ -371,8 +371,8 @@ namespace CMWtests
             #region Config RX / TX
 
             /// setup sensor to read
-            Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:REPetition SINGleshot; TOUT 15; " +
-                      "RESolution PD1; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
+            Write(cmw, "CONFigure:GPRF:MEAS:EPSensor:REPetition CONTinuous; TOUT 0; " +
+                       "RESolution PD0; SCOunt " + OptionsForm.StatsCount + "; ATTenuation:STATe OFF");
 
             ///// setup measurement tests
             if (testName.Contains("RX"))
