@@ -5,7 +5,7 @@ namespace CMWtests
 {
     public partial class OptionsForm : Form
     {
-        public static int StatsCount = 3;
+        public static int StatsCount = 5;
         public static bool TempOverride = false;
         public static bool TempOverrideEnabled = true;
         public static bool RecordTemp = false;
